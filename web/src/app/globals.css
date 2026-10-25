@@ -1,15 +1,54 @@
 @import "tailwindcss";
 
 /*
- * إستراتيجية الوضع الداكن: **بالكلاس لا بتفضيل النظام**.
+ * الوضع الداكن: **بالكلاس لا بتفضيل النظام**.
  *
  * Tailwind v4 يجعل `dark:` تتبع `@media (prefers-color-scheme: dark)` افتراضيًا.
  * ولأن هذا التطبيق يملك مفتاح تبديل صريحًا (كلاس `.dark` على <html>)، كان
- * الوضع الفاتح لا يعمل عند من نظامه داكن: 162 أداة `dark:*` تبقى مفعّلة
+ * الوضع الفاتح لا يعمل عند من نظامه داكن: كل أدوات `dark:*` تبقى مفعّلة
  * وتتجاهل المفتاح، بينما خلفية الصفحة (متغيّرات CSS) تصبح فاتحة ⇒ خليط.
  * السطر التالي يربط كل `dark:*` بالكلاس وحده.
  */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * ============================================================
+ *  مقياس الطباعة — مصدر واحد لكل الأحجام
+ * ============================================================
+ *
+ * المشكلة قبل ذلك: 294 صنف حجم نص موزّعة على 8 مقاسات متقاربة
+ * (10px · 11px · xs 12 · 13px · sm 14 · base 16 …)، فكان النص العربي
+ * يتفاوت بين بطاقة وأخرى بلا سبب، وكثير منه يصغر عن حدّ القراءة.
+ *
+ * القاعدة الآن:
+ *   - المتن 17px (نص عربي طويل يحتاج أكبر من 16px لاتيني).
+ *   - أصغر نص في التطبيق 13px، ولا يوجد 10px أو 11px إطلاقًا.
+ *   - ستة مقاسات فقط: meta · label · body-sm · body · title · display.
+ *
+ * المتغيّرات معرّفة هنا، والأصناف (utilities) في نهاية الملف.
+ */
+@theme {
+  --text-meta: 0.8125rem; /* 13px — شارات وتواريخ فقط */
+  --text-meta--line-height: 1.5;
+
+  --text-label: 0.875rem; /* 14px — تسميات الحقول والأزرار الصغيرة */
+  --text-label--line-height: 1.6;
+
+  --text-body-sm: 0.9375rem; /* 15px — نص ثانوي كثيف */
+  --text-body-sm--line-height: 1.8;
+
+  --text-body: 1.0625rem; /* 17px — المتن (الافتراضي) */
+  --text-body--line-height: 1.85;
+
+  --text-title: 1.25rem; /* 20px — عناوين الأقسام */
+  --text-title--line-height: 1.5;
+
+  --text-heading: 1.5rem; /* 24px — عناوين على الشاشات الكبيرة */
+  --text-heading--line-height: 1.45;
+
+  --text-display: 1.625rem; /* 26px — عنوان الصفحة */
+  --text-display--line-height: 1.35;
+}
 
 @layer base {
   :root {
@@ -64,19 +103,50 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* منع أي عنصر عريض من دفع الصفحة أفقيًا على الهاتف */
+  overflow-x: hidden;
 }
 
 body {
-  font-family: var(--font-cairo), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body), var(--font-latin), "Noto Naskh Arabic", "Segoe UI", Arial, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
-  font-size: 1rem;
-  line-height: 1.7;
+  /* المتن الموحّد: كل نص بلا صنف حجم يأخذ هذا */
+  font-size: var(--text-body);
+  line-height: 1.85;
+  /* يمنع «الفقاعة» عند الضغط المطوّل على iOS */
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/*
+ * نص عربي: لا نستخدم letter-spacing سلبيًا ولا font-weight أخف من 400،
+ * فالناسخ يفقد وضوحه. وكل العناوين تقف عند 700 لأن العائلة لا تحمل 800/900
+ * (كان `font-black` يُصنَّع صناعيًا فيبدو سميكًا ومشوّهًا).
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+b,
+strong {
+  font-weight: 700;
 }
 
 .font-quran {
   font-family: var(--font-amiri), "Traditional Arabic", serif;
-  line-height: 2.4;
+  line-height: 2.6;
 }
 
 /* بطاقة ثلاثية الأبعاد */
@@ -97,7 +167,7 @@ body {
   transform: rotateY(180deg);
 }
 
-/* إخفاء شريط التمرير في صفوف التبويبات */
+/* إخفاء شريط التمرير لصفوف التبويبات الأفقية */
 .scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -106,10 +176,41 @@ body {
   display: none;
 }
 
+/*
+ * انزلاق أفقي مع إشارة بصرية: تلاشٍ على الحافة التي يوجد خلفها محتوى.
+ * كان الشريط يُقطع بلا أي دليل على وجود بقية، فيظنّ المستخدم أنها النهاية.
+ */
+.scroll-hint {
+  position: relative;
+  scroll-snap-type: x proximity;
+}
+.scroll-hint > * {
+  scroll-snap-align: start;
+}
+
 /* مؤشر تركيز واضح لمستخدمي لوحة المفاتيح */
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+/* مناطق الضغط: لا زر أصغر من 44×44 على شاشات اللمس */
+@media (pointer: coarse) {
+  button,
+  a[role="button"],
+  [role="tab"] {
+    min-height: 44px;
+  }
+}
+
+/*
+ * مساحة للشريط السفلي على الهاتف: بدونه يغطّي آخرَ عنصر في الصفحة
+ * (زر «الوحدة التالية» أو الفوتر) فلا يمكن الوصول إليه.
+ */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* شريط تمرير مخصّص */
