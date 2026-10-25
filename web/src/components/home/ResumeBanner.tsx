@@ -8,7 +8,7 @@ import { UNITS_META } from "@/lib/units-meta";
 
 const TAB_LABELS: Record<string, string> = {
   mindmap: "الخريطة الذهنية",
-  lesson: "الدرس المنهجي",
+  lesson: "نص الدرس",
   flashcards: "الحفظ والاسترجاع",
   mcq: "اختبار QCM",
   quiz: "بنك الأسئلة",

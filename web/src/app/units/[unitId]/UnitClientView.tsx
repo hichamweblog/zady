@@ -34,15 +34,16 @@ interface UnitClientViewProps {
 }
 
 export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitClientViewProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("mindmap");
+  const [activeTab, setActiveTab] = useState<TabId>("lesson");
   /**
    * التبويبات تُركَّب عند أول زيارة ثم تبقى مركّبة (keep-alive):
    * - تبديل التبويب لم يعد يمحو تقدّم الجلسة (إجابات QCM، موضع البطاقة…)
    * - التبويبات الثقيلة لا تُصيَّر في HTML الأولي فيبقى حجم الصفحة معقولًا
-   * - «الخريطة» و«الدرس» مصيَّران خادميًا لأنهما محتوى المادة القابل للفهرسة
+   * - «نص الدرس» و«الخريطة» مصيَّران خادميًا لأنهما محتوى المادة القابل للفهرسة
+   * - الترتيب: نص الدرس أولًا (المادة الأصلية) ثم الخريطة (ملخّصها البصري)
    */
   const [mountedTabs, setMountedTabs] = useState<Set<TabId>>(
-    () => new Set<TabId>(["mindmap", "lesson"])
+    () => new Set<TabId>(["lesson", "mindmap"])
   );
   const tabListRef = useRef<HTMLDivElement>(null);
   const {
@@ -115,8 +116,8 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
 
   const tabs = useMemo<{ id: TabId; label: string; icon: typeof Layers; count: number | null }[]>(
     () => [
+      { id: "lesson", label: "نص الدرس", icon: BookOpen, count: null },
       { id: "mindmap", label: "الخريطة الذهنية", icon: Layers, count: null },
-      { id: "lesson", label: "الدرس المنهجي", icon: BookOpen, count: null },
       {
         id: "flashcards",
         label: "الحفظ والاسترجاع",
@@ -324,20 +325,6 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
       <div ref={contentRef} className="min-h-[500px] scroll-mt-36">
         <div
           role="tabpanel"
-          id="panel-mindmap"
-          aria-labelledby="tab-mindmap"
-          hidden={activeTab !== "mindmap"}
-          className={activeTab === "mindmap" ? "" : "hidden"}
-        >
-          <MindmapViewer
-            rootNode={unit.mindmapRoot}
-            imageSrc={unit.mindmapImage}
-            unitTitle={unit.shortTitle}
-          />
-        </div>
-
-        <div
-          role="tabpanel"
           id="panel-lesson"
           aria-labelledby="tab-lesson"
           hidden={activeTab !== "lesson"}
@@ -347,6 +334,20 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
             unitId={unit.id}
             learningObjective={unit.learningObjective}
             sections={unit.sections}
+          />
+        </div>
+
+        <div
+          role="tabpanel"
+          id="panel-mindmap"
+          aria-labelledby="tab-mindmap"
+          hidden={activeTab !== "mindmap"}
+          className={activeTab === "mindmap" ? "" : "hidden"}
+        >
+          <MindmapViewer
+            rootNode={unit.mindmapRoot}
+            imageSrc={unit.mindmapImage}
+            unitTitle={unit.shortTitle}
           />
         </div>
 

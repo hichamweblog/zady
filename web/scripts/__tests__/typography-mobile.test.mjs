@@ -313,3 +313,20 @@ test("لا ملاحظة متكرّرة عن الإغلاق، وفي كل وضع 
   const viewer = readSrc("components", "mindmap", "MindmapImageView.tsx");
   assert.match(viewer, /<span>رجوع<\/span>/, "المصورة: زر رجوع من العارض");
 });
+
+test("ترتيب خطوات الوحدة: «نص الدرس» أولًا ثم الخريطة", () => {
+  const view = readSrc("app", "units", "[unitId]", "UnitClientView.tsx");
+  const lessonIndex = view.indexOf('id: "lesson"');
+  const mindmapIndex = view.indexOf('id: "mindmap"');
+  assert.ok(lessonIndex > 0 && mindmapIndex > 0, "الخطوتان موجودتان");
+  assert.ok(lessonIndex < mindmapIndex, "الدرس قبل الخريطة في الترتيب");
+  assert.match(view, /id: "lesson", label: "نص الدرس"/, "اسم الخطوة «نص الدرس»");
+  assert.match(view, /useState<TabId>\("lesson"\)/, "الوحدة تفتح على نص الدرس");
+});
+
+test("الرجوع من عنصر فُتح من الفهرس يعيدك إلى القائمة لا إلى الخريطة", () => {
+  const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
+  assert.match(map, /fromIndex/, "تاريخ التنقّل يحفظ مصدر الانتقال");
+  assert.match(map, /if \(last\.fromIndex\) setIndexOpen\(true\)/, "الرجوع يفتح القائمة");
+  assert.match(map, /moveFocus\(id, true\)/, "الانتقال من الفهرس يسجَّل أنه من القائمة");
+});

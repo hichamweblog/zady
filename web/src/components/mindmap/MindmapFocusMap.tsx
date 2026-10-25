@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ChevronLeft, ChevronRight, CornerDownLeft, ListTree, Sparkles } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { buildFocusLayout, findMindmapNode, findNodePath } from "@/lib/mindmap-layout";
@@ -26,8 +26,15 @@ interface MindmapFocusMapProps {
 export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
   const [focusId, setFocusId] = useState(root.id);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [returnFocus, setReturnFocus] = useState<string | null>(null);
   const [indexOpen, setIndexOpen] = useState(false);
+  /**
+   * تاريخ التنقّل: كل انتقال يحفظ ما قبله مع *مصدره*.
+   * الفرق مهم: انتقال من «الفهرس» يجب أن يعيدك إلى **القائمة** عند الرجوع،
+   * لا إلى مستوى أعلى في الخريطة — لأن القائمة هي مكانك الأصلي.
+   */
+  const [history, setHistory] = useState<{ focusId: string; fromIndex: boolean }[]>([]);
+  /** هل فتحُ البطاقة الحالية نقل التركيز؟ (حتى لا يُرجِع الإغلاق خطوة لم تحدث) */
+  const cardMovedFocus = useRef(false);
 
   const focused = useMemo(() => findMindmapNode(root, focusId) ?? root, [root, focusId]);
   const trail = useMemo(() => findNodePath(root, focused.id), [root, focused.id]);
@@ -35,57 +42,77 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
   const ring = useMemo(() => buildFocusLayout(children), [children]);
   const activeNode = activeId ? findMindmapNode(root, activeId) : null;
 
+  /** ينقل التركيز ويسجّل الخطوة السابقة ومصدرها */
+  const moveFocus = useCallback(
+    (id: string, fromIndex: boolean) => {
+      if (id === focusId) return;
+      setHistory((prev) => [...prev, { focusId, fromIndex }]);
+      setFocusId(id);
+    },
+    [focusId]
+  );
+
+  /**
+   * الرجوع خطوة واحدة. يعيد `true` إن كان قد رجع فعلًا.
+   * إن كانت الخطوة السابقة قادمة من الفهرس ⇒ تُفتح القائمة مرة أخرى،
+   * لأن الأصل هو القائمة لا الخريطة.
+   */
+  const stepBack = useCallback(() => {
+    const last = history[history.length - 1];
+    if (!last) return false;
+    setHistory((prev) => prev.slice(0, -1));
+    setFocusId(last.focusId);
+    if (last.fromIndex) setIndexOpen(true);
+    return true;
+  }, [history]);
+
   /**
    * فتح عنصر: يصبح هو مركز الخريطة ويظهر شرحه في البطاقة.
-   * أي عنصر — حتى الورقة الأخيرة — ينتقل إليه التركيز، ويبقى معرّف ما قبله
-   * محفوظًا ليعود إليه الطالب عند إغلاق البطاقة.
+   * أي عنصر — حتى الورقة الأخيرة — ينتقل إليه التركيز.
    */
   const activate = useCallback(
     (node: MindmapNode) => {
       setActiveId(node.id);
-      if (node.id !== focusId) {
-        setReturnFocus(focusId);
-        setFocusId(node.id);
-      }
+      cardMovedFocus.current = node.id !== focusId;
+      moveFocus(node.id, false);
     },
-    [focusId]
+    [focusId, moveFocus]
   );
 
-  /** إغلاق البطاقة: يعود التركيز إلى ما كان عليه */
+  /** إغلاق البطاقة: يعود التركيز إلى ما كان عليه قبل فتحها */
   const closeSheet = useCallback(() => {
     setActiveId(null);
-    if (returnFocus) setFocusId(returnFocus);
-    setReturnFocus(null);
-  }, [returnFocus]);
+    if (!cardMovedFocus.current) return;
+    cardMovedFocus.current = false;
+    stepBack();
+  }, [stepBack]);
 
   /** التنقّل من داخل البطاقة إلى عنصر فرعي */
   const navigateTo = useCallback(
     (id: string) => {
-      const node = findMindmapNode(root, id);
-      if (!node) return;
+      if (!findMindmapNode(root, id)) return;
       setActiveId(id);
-      setFocusId(id);
+      cardMovedFocus.current = true;
+      moveFocus(id, false);
     },
-    [root]
+    [root, moveFocus]
   );
 
   const parentNode = trail.length > 1 ? trail[trail.length - 2] : null;
 
-  /** الرجوع خطوة واحدة إلى المحور الأعلى */
+  /** زر «رجوع»: الخطوة السابقة، وإلا المحور الأعلى */
   const goUp = useCallback(() => {
+    if (stepBack()) return;
     if (parentNode) setFocusId(parentNode.id);
-  }, [parentNode]);
+  }, [stepBack, parentNode]);
 
-  /** الانتقال من الفهرس: يغلق الفهرس ويضع التركيز على العنصر المختار */
+  /** الانتقال من الفهرس: يغلق القائمة وينقل التركيز (ويحفظ أنه جاء منها) */
   const focusFromIndex = useCallback(
     (id: string) => {
       setIndexOpen(false);
-      if (id !== focusId) {
-        setReturnFocus(focusId);
-        setFocusId(id);
-      }
+      moveFocus(id, true);
     },
-    [focusId]
+    [moveFocus]
   );
 
   const connector = (x: number, y: number) => {
@@ -108,7 +135,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
                 {index > 0 && <ChevronLeft className="h-4 w-4 text-slate-400" aria-hidden="true" />}
                 <button
                   type="button"
-                  onClick={() => setFocusId(node.id)}
+                  onClick={() => moveFocus(node.id, false)}
                   aria-current={isCurrent ? "true" : undefined}
                   className={`max-w-40 truncate rounded-lg px-1.5 py-1 transition-colors ${
                     isCurrent
@@ -124,7 +151,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          {parentNode && (
+          {(parentNode || history.length > 0) && (
             <button
               type="button"
               onClick={goUp}
