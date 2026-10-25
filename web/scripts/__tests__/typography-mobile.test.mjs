@@ -239,11 +239,28 @@ test("بنك الأسئلة: لا تصنيفات ولا عدّاد لكل نوع
   assert.ok(!mcq.includes('"list"'), "لا حالة عرض قائمة متبقية");
 });
 
-test("الخريطة البصرية معطَّلة مؤقتًا", () => {
+test("«المصورة» معطَّلة مؤقتًا كما طلب المستخدم", () => {
   const text = readSrc("components", "mindmap", "MindmapViewer.tsx");
   assert.match(text, /VISUAL_MAP_ENABLED = false/, "التبويب معطَّل حتى تُعاد الصور");
-  assert.ok(
-    !/onClick=\{\(\) => setViewMode\("image"\)\}/.test(text),
-    "لا طريق للوصول إلى صور غير جاهزة"
-  );
+  assert.match(text, /label: "المصورة"/, "اسم التبويب صار «المصورة»");
+  assert.match(text, /disabled=\{isDisabled\}/, "الزر معطَّل فعليًا لا مخفيًا");
+});
+
+test("الخريطة صارت بلا React Flow ولا لوحة تفاصيل جانبية", () => {
+  const dir = path.join(SRC, "components", "mindmap");
+  const files = fs.readdirSync(dir);
+  assert.ok(!files.includes("MindmapGraph.tsx"), "حُذف رسم React Flow القديم");
+  assert.ok(!files.includes("MindmapDetailsPanel.tsx"), "حُذفت اللوحة الجانبية");
+  for (const name of ["MindmapOutline.tsx", "MindmapFocusMap.tsx", "MindmapInfoSheet.tsx"]) {
+    assert.ok(files.includes(name), `${name} موجود`);
+  }
+  const pkg = fs.readFileSync(path.join(ROOT, "package.json"), "utf8");
+  assert.ok(!pkg.includes("@xyflow/react"), "حزمة الرسم الثقيلة أُزيلت من التبعيات");
+});
+
+test("بطاقة الشرح تُغلق بالضغط خارجها وبمفتاح Esc", () => {
+  const sheet = readSrc("components", "mindmap", "MindmapInfoSheet.tsx");
+  assert.match(sheet, /onClick=\{onClose\}/, "الضغط خارج البطاقة يغلقها");
+  assert.match(sheet, /Escape/, "مفتاح Esc يغلقها");
+  assert.match(sheet, /aria-modal="true"/, "معرَّفة كحوار للقارئات");
 });

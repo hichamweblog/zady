@@ -1,16 +1,21 @@
 /**
- * اختبارات هندسة الخريطة الذهنية التفاعلية.
+ * اختبارات هندسة «خريطة التركيز».
  *
- * الخريطة تُرسم على قماش React Flow بمواضع محسوبة يدويًا، وأي خطأ في الحساب
- * يظهر كعقد متراكبة أو وصلات معلّقة. هذه الاختبارات تتحقق من الهندسة بلا
- * متصفح: لا تراكب، اتجاه RTL صحيح، وصلات سليمة، وتخطيط حتمي.
+ * الخريطة ترسم العقدة المركّزة في المركز وأبناءها على مدار حولها، وأي خطأ
+ * في الحساب يعني عنصرًا خارج الحاوية أو متراكبًا مع عنصر آخر. هذه الاختبارات
+ * تتحقق من الهندسة بلا متصفح.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 
-import { buildMindmapLayout } from "../../src/lib/mindmap-layout.ts";
+import {
+  buildFocusLayout,
+  countMindmapNodes,
+  findMindmapNode,
+  findNodePath,
+} from "../../src/lib/mindmap-layout.ts";
 
 const DIR = path.join(import.meta.dirname, "..", "..", "src", "data", "lessons");
 const MINDMAP_FILES = fs
@@ -18,110 +23,147 @@ const MINDMAP_FILES = fs
   .filter((f) => f.endsWith("_mindmap.json"))
   .sort();
 
-const flatten = (node, depth = 0, out = []) => {
-  out.push({ node, depth });
-  (node.children ?? []).forEach((c) => flatten(c, depth + 1, out));
+const roots = MINDMAP_FILES.map((file) => ({
+  file,
+  root: JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8")).root,
+}));
+
+const walk = (node, out = []) => {
+  out.push(node);
+  (node.children ?? []).forEach((child) => walk(child, out));
   return out;
 };
 
-const layouts = MINDMAP_FILES.map((file) => {
-  const raw = JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8"));
-  return { file, root: raw.root, layout: buildMindmapLayout(raw.root) };
-});
-
-test("كل عقدة في الشجرة صار لها موضع واحد فريد", () => {
-  for (const { file, root, layout } of layouts) {
-    const expected = flatten(root).length;
-    assert.equal(layout.nodes.length, expected, `${file}: عدد العقد`);
-    const ids = new Set(layout.nodes.map((n) => n.id));
-    assert.equal(ids.size, layout.nodes.length, `${file}: معرّفات فريدة`);
+test("عنصر واحد لكل ابن، ولا عناصر زائدة", () => {
+  for (const { file, root } of roots) {
+    const branches = root.children ?? [];
+    const ring = buildFocusLayout(branches);
+    assert.equal(ring.length, branches.length, `${file}: عدد عناصر المدار`);
+    assert.deepEqual(
+      ring.map((item) => item.id),
+      branches.map((child) => child.id),
+      `${file}: الترتيب يطابق ترتيب البيانات`
+    );
   }
 });
 
-test("الوصلات: عددها = العقد − 1 وكل طرف موجود", () => {
-  for (const { file, layout } of layouts) {
-    assert.equal(layout.edges.length, layout.nodes.length - 1, `${file}: عدد الوصلات`);
-    const ids = new Set(layout.nodes.map((n) => n.id));
-    for (const edge of layout.edges) {
-      assert.ok(ids.has(edge.source), `${file}: مصدر ${edge.source} موجود`);
-      assert.ok(ids.has(edge.target), `${file}: هدف ${edge.target} موجود`);
-      assert.notEqual(edge.source, edge.target, `${file}: لا وصلة ذاتية`);
-    }
-  }
-});
-
-test("الاتجاه RTL: الجذر أقصى اليمين والأبناء يسارًا", () => {
-  for (const { file, layout } of layouts) {
-    const root = layout.nodes.find((n) => n.depth === 0);
-    assert.ok(root, `${file}: الجذر موجود`);
-    for (const node of layout.nodes) {
-      if (node.id === root.id) continue;
-      assert.ok(node.x < root.x, `${file}: العقدة «${node.label}» يجب أن تكون يسار الجذر`);
-    }
-    // كل ابن يسار أبيه
-    const byId = new Map(layout.nodes.map((n) => [n.id, n]));
-    for (const edge of layout.edges) {
-      const parent = byId.get(edge.source);
-      const child = byId.get(edge.target);
-      assert.ok(
-        child.x + child.width <= parent.x + 1,
-        `${file}: الابن «${child.label}» يجب أن ينتهي قبل بداية أبيه`
-      );
-    }
-  }
-});
-
-test("لا تراكب بين عقد العمود نفسه", () => {
-  for (const { file, layout } of layouts) {
-    const byDepth = new Map();
-    for (const node of layout.nodes) {
-      if (!byDepth.has(node.depth)) byDepth.set(node.depth, []);
-      byDepth.get(node.depth).push(node);
-    }
-    for (const [depth, column] of byDepth) {
-      const sorted = [...column].sort((a, b) => a.y - b.y);
-      for (let i = 1; i < sorted.length; i += 1) {
-        const prev = sorted[i - 1];
-        const cur = sorted[i];
-        assert.ok(
-          cur.y - cur.height / 2 >= prev.y + prev.height / 2 - 0.5,
-          `${file}: تراكب في العمق ${depth} بين «${prev.label}» و«${cur.label}»`
-        );
+test("كل العناصر داخل الحاوية (لا خروج أفقي أو رأسي)", () => {
+  for (const { file, root } of roots) {
+    for (const node of walk(root)) {
+      for (const item of buildFocusLayout(node.children ?? [])) {
+        assert.ok(item.x > 0.03 && item.x < 0.97, `${file}: x=${item.x} خارج الحاوية`);
+        assert.ok(item.y > 0.04 && item.y < 0.96, `${file}: y=${item.y} خارج الحاوية`);
       }
     }
   }
 });
 
-test("الأب في منتصف أبنائه رأسيًا", () => {
-  for (const { file, layout } of layouts) {
-    const byId = new Map(layout.nodes.map((n) => [n.id, n]));
-    const childrenOf = new Map();
-    for (const edge of layout.edges) {
-      if (!childrenOf.has(edge.source)) childrenOf.set(edge.source, []);
-      childrenOf.get(edge.source).push(byId.get(edge.target));
-    }
-    for (const [parentId, kids] of childrenOf) {
-      const parent = byId.get(parentId);
-      const expected = (kids[0].y + kids[kids.length - 1].y) / 2;
-      assert.ok(
-        Math.abs(parent.y - expected) < 0.001,
-        `${file}: مركز «${parent.label}» غير مطابق لمنتصف أبنائه`
-      );
+test("لا تراكب بين عنصري مدار متجاورين (مسافة كافية)", () => {
+  for (const { file, root } of roots) {
+    for (const node of walk(root)) {
+      const ring = buildFocusLayout(node.children ?? []);
+      for (let i = 0; i < ring.length; i += 1) {
+        for (let j = i + 1; j < ring.length; j += 1) {
+          const dx = ring[i].x - ring[j].x;
+          const dy = ring[i].y - ring[j].y;
+          assert.ok(
+            Math.hypot(dx, dy) > 0.12,
+            `${file}: «${ring[i].id}» و«${ring[j].id}» متقاربان جدًا`
+          );
+        }
+      }
     }
   }
+});
+
+test("الاتجاه RTL: العنصر الوحيد يسار المركز، والمدار متوزّع بانتظام", () => {
+  const single = buildFocusLayout([{ id: "a", label: "عنصر" }]);
+  assert.equal(single.length, 1);
+  assert.ok(single[0].x < 0.5, "العنصر الوحيد يتفرّع إلى اليسار");
+
+  const five = buildFocusLayout(
+    Array.from({ length: 5 }, (_, i) => ({ id: `n${i}`, label: `عنصر ${i}` }))
+  );
+  const angles = five.map((item) => item.angle);
+  assert.equal(new Set(angles).size, 5, "لا تكرار في الزوايا");
+  const gaps = angles.slice(1).map((angle, i) => ((angles[i] - angle + 360) % 360).toFixed(2));
+  assert.equal(new Set(gaps).size, 1, "التوزيع متساوٍ حول المركز");
 });
 
 test("التخطيط حتمي (نفس المُدخل ⇒ نفس المُخرج)", () => {
-  for (const { root } of layouts) {
-    const a = JSON.stringify(buildMindmapLayout(root));
-    const b = JSON.stringify(buildMindmapLayout(root));
-    assert.equal(a, b);
+  for (const { root } of roots) {
+    const branches = root.children ?? [];
+    assert.equal(
+      JSON.stringify(buildFocusLayout(branches)),
+      JSON.stringify(buildFocusLayout(branches))
+    );
   }
 });
 
-test("شجرة بعقدة واحدة لا تُنتج وصلات وأبعادًا موجبة", () => {
-  const layout = buildMindmapLayout({ id: "root", label: "محور وحيد" });
-  assert.equal(layout.nodes.length, 1);
-  assert.equal(layout.edges.length, 0);
-  assert.ok(layout.width > 0 && layout.height > 0);
+test("شجرة بلا أبناء تُنتج مدارًا فارغًا", () => {
+  assert.deepEqual(buildFocusLayout([]), []);
+});
+
+test("مسار التتبّع يصل من الجذر إلى أي عقدة، والبحث يجدها", () => {
+  for (const { file, root } of roots) {
+    const all = walk(root);
+    for (const target of all) {
+      const trail = findNodePath(root, target.id);
+      assert.ok(trail.length > 0, `${file}: مسار «${target.id}» مفقود`);
+      assert.equal(trail[0].id, root.id, `${file}: المسار يبدأ من الجذر`);
+      assert.equal(trail[trail.length - 1].id, target.id, `${file}: المسار ينتهي بالهدف`);
+      assert.equal(findMindmapNode(root, target.id)?.label, target.label, `${file}: البحث`);
+    }
+    assert.deepEqual(findNodePath(root, "غير-موجود"), [], `${file}: معرّف مجهول`);
+    assert.equal(countMindmapNodes(root), all.length, `${file}: عدد العقد`);
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/* هندسة الشاشة الكبيرة: البطاقات لا تتراكب ولا تخرج من الحاوية        */
+/* ------------------------------------------------------------------ */
+
+const overlaps = (a, b) =>
+  Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs(a.y - b.y) < (a.h + b.h) / 2;
+
+test("على الشاشات الكبيرة: لا تراكب بين بطاقات المدار ولا مع البطاقة المركزية", () => {
+  const PILL = { w: 176, h: 76 }; // lg:w-44
+  const CENTER = { w: 240, h: 132 }; // lg:w-60
+  const CANVAS = { w: 1024, h: 600 };
+
+  for (const { file, root } of roots) {
+    for (const node of walk(root)) {
+      const ring = buildFocusLayout(node.children ?? []);
+      const boxes = ring.map((item) => ({
+        id: item.id,
+        x: item.x * CANVAS.w,
+        y: item.y * CANVAS.h,
+        ...PILL,
+      }));
+
+      for (const box of boxes) {
+        assert.ok(
+          box.x - PILL.w / 2 >= 0 && box.x + PILL.w / 2 <= CANVAS.w,
+          `${file}: «${box.id}» يخرج أفقيًا من الحاوية`
+        );
+        assert.ok(
+          box.y - PILL.h / 2 >= 0 && box.y + PILL.h / 2 <= CANVAS.h,
+          `${file}: «${box.id}» يخرج رأسيًا من الحاوية`
+        );
+        assert.ok(
+          !overlaps(box, { x: CANVAS.w / 2, y: CANVAS.h / 2, ...CENTER }),
+          `${file}: «${box.id}» يتراكب مع البطاقة المركزية`
+        );
+      }
+
+      for (let i = 0; i < boxes.length; i += 1) {
+        for (let j = i + 1; j < boxes.length; j += 1) {
+          assert.ok(
+            !overlaps(boxes[i], boxes[j]),
+            `${file}: «${boxes[i].id}» يتراكب مع «${boxes[j].id}»`
+          );
+        }
+      }
+    }
+  }
 });

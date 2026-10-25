@@ -1,138 +1,89 @@
 import type { MindmapNode } from "./types";
 
 /**
- * تخطيط شجرة الخريطة الذهنية — دالة خالصة بلا React ولا DOM.
+ * هندسة «خريطة التركيز» — دوال خالصة بلا React ولا DOM.
  *
- * لماذا تخطيط يدوي بدل مكتبة (dagre/elk)؟
- * الشجرة هنا صغيرة (≤ 40 عقدة) وهرمية بحتة، فلا حاجة إلى محرك تخطيط عام
- * يضيف ~40KB. الخوارزمية هنا هي «tidy tree» المبسّطة: كل ورقة تأخذ صفًّا
- * بارتفاعها، والأب يجلس في منتصف أبنائه.
+ * لماذا لا مكتبة تخطيط (dagre/elk) ولا React Flow؟
+ *   الشجرة صغيرة (13–22 عقدة)، فمحرّك رسم عام يضيف ~55KB ولا يضيف فهمًا.
+ *   والأهم: الطالب لا يحتاج رؤية العشرين عقدة معًا في وقت واحد — يحتاج أن
+ *   يفهم عقدة واحدة في سياق أبنائها. لذلك نرسم «مدار» حول العقدة المركّزة،
+ *   كل مستوى في شاشة واحدة، بلا خطوط كثيرة ولا أزرار تحكّم.
  *
- * الاتجاه: RTL — الجذر في أقصى اليمين والأوراق تتفرّع يسارًا، وهو ما يوافق
- * اتجاه القراءة العربي بدل أن يبدأ الطالب من اليسار.
+ * الاتجاه: عربي (RTL) — يبدأ المدار من أعلى اليمين ويتقدّم عكس عقارب الساعة،
+ * فتقرأ العين العناصر بالترتيب الطبيعي بدل أن تقفز من اليسار.
  */
 
-export const WIDTH_BY_DEPTH = [250, 232, 214, 200];
-const H_GAP = 76;
-const V_GAP = 12;
-const PADDING_X = 16;
-const PADDING_Y = 12;
-export const LINE_HEIGHT = 21;
-const CHAR_WIDTH = 7.1;
-
-export const widthForDepth = (depth: number): number =>
-  WIDTH_BY_DEPTH[Math.min(depth, Math.max(WIDTH_BY_DEPTH.length - 1, 0))];
-
-/** تقدير ارتفاع البطاقة من طول النص — للتباعد فقط، والارتفاع النهائي من المتصفح */
-export function estimateHeight(label: string, depth: number, hasExtra: boolean): number {
-  const usable = widthForDepth(depth) - PADDING_X * 2;
-  const perLine = Math.max(6, Math.floor(usable / CHAR_WIDTH));
-  const lines = Math.max(1, Math.ceil(label.length / perLine));
-  return PADDING_Y + lines * LINE_HEIGHT + (hasExtra ? 20 : 0);
-}
-
-export interface LayoutNode {
+export interface FocusRingItem {
   id: string;
-  label: string;
-  depth: number;
-  /** الحد الأيسر للبطاقة بوحدات قماش React Flow */
+  /** موضع أفقي نسبي داخل الحاوية (0 = أقصى اليمين بالنسبة للاتجاه، 1 = أقصى اليسار) */
   x: number;
-  /** مركز البطاقة رأسيًا */
+  /** موضع رأسي نسبي (0 أعلى · 1 أسفل) */
   y: number;
-  width: number;
-  height: number;
+  /** زاوية بالدرجات (للدعم في الاختبار والترتيب) */
+  angle: number;
+  childCount: number;
   hasDetails: boolean;
   hasProof: boolean;
-  childCount: number;
 }
 
-export interface LayoutEdge {
-  id: string;
-  source: string;
-  target: string;
+export const RING_RADIUS_X = 0.34;
+export const RING_RADIUS_Y = 0.3;
+/** أول عنصر في أعلى اليمين، ثم ندور عكس عقارب الساعة */
+const START_ANGLE = -45;
+
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+/**
+ * توزيع أبناء العقدة المركّزة على مدار بيضاوي حول المركز.
+ * عنصر واحد يُوضع يسار المركز (اتجاه التفرّع الطبيعي في القراءة العربية).
+ */
+export function buildFocusLayout(
+  children: MindmapNode[],
+  radius: { x?: number; y?: number } = {}
+): FocusRingItem[] {
+  const rx = radius.x ?? RING_RADIUS_X;
+  const ry = radius.y ?? RING_RADIUS_Y;
+  const count = children.length;
+  if (count === 0) return [];
+
+  const step = 360 / count;
+
+  return children.map((child, index) => {
+    const angle = count === 1 ? 180 : START_ANGLE - index * step;
+    return {
+      id: child.id,
+      x: clamp(0.5 + Math.cos(toRad(angle)) * rx, 0.04, 0.96),
+      y: clamp(0.5 + Math.sin(toRad(angle)) * ry, 0.06, 0.94),
+      angle: ((angle % 360) + 360) % 360,
+      childCount: child.children?.length ?? 0,
+      hasDetails: Boolean(child.details),
+      hasProof: Boolean(child.proof),
+    };
+  });
 }
 
-export interface MindmapLayout {
-  nodes: LayoutNode[];
-  edges: LayoutEdge[];
-  /** أبعاد المحتوى الكاملة (تُستخدم للاختبارات وللعرض الاحتياطي) */
-  width: number;
-  height: number;
-}
-
-export function buildMindmapLayout(root: MindmapNode): MindmapLayout {
-  const nodes: LayoutNode[] = [];
-  const edges: LayoutEdge[] = [];
-
-  let maxDepth = 0;
-  const measureDepth = (node: MindmapNode, depth: number) => {
-    maxDepth = Math.max(maxDepth, depth);
-    node.children?.forEach((child) => measureDepth(child, depth + 1));
-  };
-  measureDepth(root, 0);
-
-  // الأصل يمينًا ⇒ x ينقص كلما زاد العمق
-  const xByDepth: number[] = new Array(maxDepth + 1).fill(0);
-  for (let d = maxDepth - 1; d >= 0; d -= 1) {
-    xByDepth[d] = xByDepth[d + 1] + widthForDepth(d + 1) + H_GAP;
-  }
-
-  let cursor = 0;
-  let minX = 0;
-  let maxX = 0;
-  let minY = 0;
-  let maxY = 0;
-
-  const place = (node: MindmapNode, depth: number): number => {
-    const kids = node.children ?? [];
-    const hasDetails = Boolean(node.details);
-    const hasProof = Boolean(node.proof);
-    const width = widthForDepth(depth);
-
-    let centerY: number;
-    if (kids.length === 0) {
-      const height = estimateHeight(node.label, depth, hasDetails || hasProof);
-      centerY = cursor + height / 2;
-      cursor += height + V_GAP;
-    } else {
-      const childCenters = kids.map((child) => place(child, depth + 1));
-      centerY = (childCenters[0] + childCenters[childCenters.length - 1]) / 2;
+/** مسار الأجداد من الجذر إلى العقدة المطلوبة (لبطاقة التتبّع) */
+export function findNodePath(root: MindmapNode, id: string): MindmapNode[] {
+  const walk = (node: MindmapNode, trail: MindmapNode[]): MindmapNode[] | null => {
+    const next = [...trail, node];
+    if (node.id === id) return next;
+    for (const child of node.children ?? []) {
+      const found = walk(child, next);
+      if (found) return found;
     }
-
-    const height = estimateHeight(node.label, depth, hasDetails || hasProof);
-    const x = xByDepth[depth];
-
-    nodes.push({
-      id: node.id,
-      label: node.label,
-      depth,
-      x,
-      y: centerY,
-      width,
-      height,
-      hasDetails,
-      hasProof,
-      childCount: kids.length,
-    });
-
-    minX = Math.min(minX, x);
-    maxX = Math.max(maxX, x + width);
-    minY = Math.min(minY, centerY - height / 2);
-    maxY = Math.max(maxY, centerY + height / 2);
-
-    kids.forEach((child) => {
-      edges.push({ id: `${node.id}->${child.id}`, source: node.id, target: child.id });
-    });
-
-    return centerY;
+    return null;
   };
+  return walk(root, []) ?? [];
+}
 
-  place(root, 0);
+/** بحث بالمعرّف داخل الشجرة */
+export function findMindmapNode(root: MindmapNode, id: string): MindmapNode | null {
+  const path = findNodePath(root, id);
+  return path.length > 0 ? path[path.length - 1] : null;
+}
 
-  return {
-    nodes,
-    edges,
-    width: maxX - minX,
-    height: maxY - minY,
-  };
+/** عدد العقد الكلي — يُعرض في ترويسة القسم للطالب */
+export function countMindmapNodes(root: MindmapNode): number {
+  return 1 + (root.children ?? []).reduce((total, child) => total + countMindmapNodes(child), 0);
 }
