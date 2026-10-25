@@ -24,6 +24,9 @@ interface MindmapViewerProps {
  * أُزيل التبويب الثالث («المحاور») لأنه كان يعرض الشجرة نفسها بقائمة، فيبدو
  * تكرارًا بلا فائدة؛ بدلًا منه صار في الخريطة زر «الفهرس» يفتح الشجرة كأداة
  * تنقّل صغيرة ثم يعود بك إلى الخريطة.
+ *
+ * الشجرة المفهومية فقط: لا شواهد ولا كلمات مفتاحية ولا ملاحظات في بيانات
+ * الخريطة؛ ما ليس مفهومًا يُعرض في «نص الدرس» ببطاقة مصباح (إضاءة/فائدة).
  */
 export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: MindmapViewerProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("map");
@@ -34,7 +37,7 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
       id: "map",
       label: "الخريطة",
       icon: Network,
-      hint: "اضغط عنصرًا ليصبح مركز الخريطة ويظهر شرحه. «الفهرس» يوصلك إلى أي محور، و«رجوع» يعيدك خطوة.",
+      hint: "خريطة المفاهيم: اضغط عنصرًا ليصبح مركز الخريطة ويظهر شرحه. «الفهرس» يوصلك إلى أي محور، و«رجوع» يعيدك خطوة.",
     },
     {
       id: "image",
@@ -52,7 +55,7 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
         <div className="flex flex-wrap items-end justify-between gap-2">
           <h2 className="text-title font-bold text-slate-900 dark:text-white">الخريطة الذهنية</h2>
           <span className="text-meta font-bold text-slate-500 dark:text-slate-400">
-            {nodeCount} عنصرًا
+            {nodeCount} مفهومًا
           </span>
         </div>
 

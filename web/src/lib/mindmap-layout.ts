@@ -23,7 +23,6 @@ export interface FocusRingItem {
   angle: number;
   childCount: number;
   hasDetails: boolean;
-  hasProof: boolean;
 }
 
 export const RING_RADIUS_X = 0.34;
@@ -58,7 +57,6 @@ export function buildFocusLayout(
       angle: ((angle % 360) + 360) % 360,
       childCount: child.children?.length ?? 0,
       hasDetails: Boolean(child.details),
-      hasProof: Boolean(child.proof),
     };
   });
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   BookOpen,
+  Lightbulb,
   ChevronDown,
   ChevronUp,
   Sparkles,
@@ -13,6 +14,8 @@ import {
 } from "lucide-react";
 import { useProgress } from "@/lib/useProgressStore";
 import { resolveSectionTitle, SECTION_TITLES } from "@/lib/section-titles";
+import { insightFor, isInsightField } from "@/lib/content-kinds";
+import InsightCard from "./InsightCard";
 import type { LessonSection } from "@/lib/types";
 
 type Content = Record<string, unknown>;
@@ -91,6 +94,16 @@ export default function StandardLessonViewer({
           </div>
         </div>
       )}
+
+      {/* مفتاح العلامات: يُذكر مرة واحدة فقط أعلى الدرس */}
+      <div className="flex items-start gap-2.5 px-1 text-meta font-medium text-slate-600 dark:text-slate-400">
+        <Lightbulb className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />
+        <p>
+          بطاقة المصباح = <span className="font-bold">إضاءة</span> للفهم أو{" "}
+          <span className="font-bold">فائدة</span> مساعدة، ليست عنصرًا مفهوميًا يُحفظ؛ والخريطة
+          الذهنية للتعريفات والأقسام وحدها.
+        </p>
+      </div>
 
       <div className="space-y-4">
         {sections.map((section, idx) => {
@@ -207,10 +220,44 @@ const HANDLED_KEYS = new Set([
   "quranic_proof_warsh",
   "quranic_proof",
   "prophetic_proof",
+  "proof_warsh",
   "proof_anchor_phrase",
   "tawheed_categories",
   "effects",
 ]);
+
+/**
+ * محتوى بطاقة المصباح: نص، أو قائمة وسوم، أو بنية تُعرض بالشرح العادي.
+ * لا نعرض هنا أي تنسيق مفهومي (تعريف/شاهد) حتى تبقى البطاقة خفيفة ودالّة.
+ */
+function InsightValue({
+  value,
+  onCopyAyah,
+  copiedAyah,
+}: {
+  value: unknown;
+  onCopyAyah: (text: string, id: string) => void;
+  copiedAyah: string | null;
+}) {
+  if (typeof value === "string") return <p>{value}</p>;
+
+  if (Array.isArray(value) && value.every((item) => typeof item === "string")) {
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        {value.map((item, idx) => (
+          <span
+            key={idx}
+            className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100"
+          >
+            {String(item)}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  return <RenderContent data={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />;
+}
 
 function RenderContent({
   data,
@@ -270,6 +317,7 @@ function RenderContent({
 
   const proofText =
     asString(data.quranic_proof_warsh) ||
+    asString(data.proof_warsh) ||
     asString(data.quranic_proof) ||
     asString(data.prophetic_proof);
   const proofLabel = asString(data.prophetic_proof)
@@ -330,13 +378,8 @@ function RenderContent({
       )}
 
       {proofText && (
-        <div className="p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border-r-4 border-amber-500 space-y-2.5 shadow-sm">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-body-sm font-bold text-amber-900 dark:text-amber-300">
-              <BookOpen className="w-4 h-4 text-amber-600" aria-hidden="true" />
-              <span>{proofLabel}:</span>
-            </div>
-
+        <InsightCard tone="benefit" title={proofLabel}>
+          <div className="flex items-center justify-end gap-3 flex-wrap">
             <button
               type="button"
               onClick={() => onCopyAyah(proofText, ayahId)}
@@ -356,19 +399,19 @@ function RenderContent({
             </button>
           </div>
 
-          <div className="font-quran text-title sm:text-heading text-amber-950 dark:text-amber-100 leading-loose py-2">
+          <div className="font-quran text-title sm:text-heading text-slate-900 dark:text-slate-50 leading-loose py-1">
             {proofText}
           </div>
 
           {asString(data.proof_anchor_phrase) && (
-            <div className="pt-2.5 border-t border-amber-200/80 dark:border-amber-900/60 flex items-center gap-2 text-body-sm text-amber-900 dark:text-amber-300 flex-wrap">
-              <span className="font-bold px-2.5 py-1 rounded-lg bg-amber-200/80 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200">
+            <div className="flex items-center gap-2 text-body-sm text-slate-700 dark:text-slate-200 flex-wrap">
+              <span className="font-bold px-2.5 py-1 rounded-lg bg-white/70 dark:bg-slate-900/60">
                 محل الشاهد:
               </span>
               <span className="font-bold">«{asString(data.proof_anchor_phrase)}»</span>
             </div>
           )}
-        </div>
+        </InsightCard>
       )}
 
       {Array.isArray(data.tawheed_categories) && (
@@ -414,33 +457,45 @@ function RenderContent({
                 {asString(eff.explanation)}
               </p>
               {asString(eff.quranic_proof_warsh) && (
-                <div className="font-quran text-body text-amber-950 dark:text-amber-100 bg-amber-50/80 dark:bg-amber-950/40 p-3.5 rounded-xl border-r-4 border-amber-500 leading-loose">
-                  {asString(eff.quranic_proof_warsh)}
-                </div>
+                <InsightCard tone="benefit" title="الشاهد الشرعي">
+                  <p className="font-quran text-body leading-loose text-slate-900 dark:text-slate-50">
+                    {asString(eff.quranic_proof_warsh)}
+                  </p>
+                </InsightCard>
               )}
               {Array.isArray(eff.key_extraction_indicators) && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="text-label font-bold text-slate-600 dark:text-slate-300 py-1">
-                    مؤشرات الاستخراج:
-                  </span>
-                  {eff.key_extraction_indicators.map((ind, idx) => (
-                    <span
-                      key={idx}
-                      className="text-label font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
-                    >
-                      {String(ind)}
-                    </span>
-                  ))}
-                </div>
+                <InsightCard tone="illumination" title="مؤشرات الاستخراج">
+                  <div className="flex flex-wrap gap-1.5">
+                    {eff.key_extraction_indicators.map((ind, idx) => (
+                      <span
+                        key={idx}
+                        className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100"
+                      >
+                        {String(ind)}
+                      </span>
+                    ))}
+                  </div>
+                </InsightCard>
               )}
             </div>
           ))}
         </div>
       )}
 
+      {/* ما ليس عنصرًا مفهوميًا (كلمات مفتاحية، ملاحظات، تحذيرات…): بطاقة مصباح */}
+      {Object.entries(data).map(([key, value]) => {
+        const meta = insightFor(key);
+        if (!meta || HANDLED_KEYS.has(key) || value === null || value === undefined) return null;
+        return (
+          <InsightCard key={key} field={key}>
+            <InsightValue value={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />
+          </InsightCard>
+        );
+      })}
+
       {/* بقية الحقول: تُعرض بعناوين عربية من القاموس */}
       {Object.entries(data).map(([key, value], index) => {
-        if (HANDLED_KEYS.has(key)) return null;
+        if (HANDLED_KEYS.has(key) || isInsightField(key)) return null;
         if (value === null || value === undefined) return null;
         const isComplex = typeof value === "object";
         if (!isComplex) return null;

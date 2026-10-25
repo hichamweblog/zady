@@ -1,11 +1,15 @@
 /** أنواع البيانات المشتركة بين الخادم والعميل */
 
+/**
+ * عقدة في الخريطة الذهنية — **عنصر مفهومي فقط**: تسمية المفهوم وشرحه.
+ * لا تحمل شواهد ولا كلمات مفتاحية ولا ملاحظات منهجية؛ فهذه مكانها نص الدرس
+ * مع علامة المصباح (إضاءة/فائدة).
+ */
 export interface MindmapNode {
   id: string;
   label: string;
   color?: string;
   details?: string;
-  proof?: string;
   node_type?: string;
   children?: MindmapNode[];
 }

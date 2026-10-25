@@ -330,3 +330,53 @@ test("الرجوع من عنصر فُتح من الفهرس يعيدك إلى ا
   assert.match(map, /if \(last\.fromIndex\) setIndexOpen\(true\)/, "الرجوع يفتح القائمة");
   assert.match(map, /moveFocus\(id, true\)/, "الانتقال من الفهرس يسجَّل أنه من القائمة");
 });
+
+test("المحتوى غير المفهومي في الدرس موسوم بمصباح «إضاءة/فائدة»", () => {
+  const card = readSrc("components", "lesson", "InsightCard.tsx");
+  assert.match(card, /Lightbulb/, "البطاقة تحمل أيقونة مصباح");
+  assert.match(card, /label: "إضاءة"/, "نوع «إضاءة» موسوم بلفظه");
+  assert.match(card, /label: "فائدة"/, "نوع «فائدة» موسوم بلفظه");
+
+  const kinds = readSrc("lib", "content-kinds.ts");
+  for (const key of [
+    "keywords",
+    "key_extraction_indicators",
+    "pedagogical_note",
+    "pedagogical_guidance",
+    "common_pitfall",
+    "examiner_warning",
+  ]) {
+    assert.ok(kinds.includes(`${key}:`) || kinds.includes(`${key}`), `الحقل ${key} مصنّف`);
+  }
+  assert.match(kinds, /_note.*_tip.*_guidance/s, "أي حقل جديد ينتهي بـ_note/_tip/_guidance يُعدّ إضاءة");
+});
+
+test("الدرس يمرّر كل حقل غير مفهومي إلى بطاقة المصباح", () => {
+  const viewer = readSrc("components", "lesson", "StandardLessonViewer.tsx");
+  assert.match(viewer, /import InsightCard from "\.\/InsightCard"/, "يستعمل بطاقة المصباح");
+  assert.match(viewer, /insightFor\(key\)/, "يكتشف الحقول غير المفهومية");
+  assert.match(viewer, /isInsightField\(key\)/, "لا يعرضها بالعنوان العام مرة ثانية");
+  assert.match(
+    viewer,
+    /<InsightCard tone="illumination" title="مؤشرات الاستخراج">/,
+    "مؤشرات الاستخراج إضاءة لا مفهوم"
+  );
+  assert.match(viewer, /<InsightCard tone="benefit" title=\{proofLabel\}>/, "الشاهد فائدة");
+});
+
+test("الخريطة الذهنية لا تعرض الشواهد ولا الكلمات المفتاحية", () => {
+  const sheet = readSrc("components", "mindmap", "MindmapInfoSheet.tsx");
+  assert.ok(!sheet.includes("node.proof"), "بطاقة العنصر لا تعرض شاهدًا");
+  assert.ok(!sheet.includes("الشاهد"), "لا عنوان «الشاهد» داخل الخريطة");
+  assert.match(sheet, /node.details/, "تعرض شرح المفهوم وحده");
+
+  const types = readSrc("lib", "types.ts");
+  const nodeType = types.slice(types.indexOf("interface MindmapNode"), types.indexOf("interface MindmapNode") + 400);
+  assert.ok(!nodeType.includes("proof"), "نوع عقدة الخريطة لا يحمل حقل شاهد");
+});
+
+test("الخريطة تُعلن أنها خريطة مفاهيم، ولا تُسمّى عناصرها «عناصر»", () => {
+  const viewer = readSrc("components", "mindmap", "MindmapViewer.tsx");
+  assert.match(viewer, /خريطة المفاهيم/, "التنبيه يوضّح أن الخريطة للمفاهيم");
+  assert.match(viewer, /\{nodeCount\} مفهومًا/, "العدّاد يقول «مفهومًا» لا «عنصرًا»");
+});

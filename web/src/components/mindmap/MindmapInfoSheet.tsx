@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
+import { ArrowRight, ChevronRight, X } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { useSheetA11y } from "./useSheetA11y";
 
@@ -20,6 +20,10 @@ interface MindmapInfoSheetProps {
  *   - تركيز واحد: لا تظهر إلا تفاصيل العنصر الذي ضغطه، ويُغلق بالضغط خارجه
  *     أو بمفتاح Esc — أو بزر «رجوع» — فيعود كل شيء إلى أصله.
  * التصميم بلا حدود: كتل ملوّنة خفيفة وظلال ناعمة فقط.
+ *
+ * البطاقة تعرض **العنصر المفهومي وحده**: التسمية وشرحها. أمّا الشواهد
+ * والكلمات المفتاحية والملاحظات فليست عناصر مفهومية، ولذلك لا تدخل الخريطة،
+ * وإنما تظهر في «نص الدرس» بعلامة المصباح (إضاءة/فائدة).
  */
 export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapInfoSheetProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -78,18 +82,6 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
               ? "هذا محور رئيسي: اختر أحد عناصره الفرعية لقراءة الشرح."
               : "لا يوجد شرح إضافي لهذا العنصر في هذه الوحدة."}
           </p>
-        )}
-
-        {node.proof && (
-          <div className="mt-4 rounded-2xl bg-amber-50 p-4 dark:bg-amber-950/30">
-            <p className="flex items-center gap-2 text-label font-bold text-amber-900 dark:text-amber-300">
-              <BookOpen className="h-4 w-4" aria-hidden="true" />
-              <span>الشاهد</span>
-            </p>
-            <p className="font-quran mt-2 text-title leading-loose text-amber-950 dark:text-amber-100">
-              {node.proof}
-            </p>
-          </div>
         )}
 
         {node.children && node.children.length > 0 && (

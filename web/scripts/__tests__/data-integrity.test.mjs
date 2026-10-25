@@ -159,6 +159,43 @@ test("كل عقدة طرفية في الخرائط الذهنية لها شرح"
   }
 });
 
+test("الخريطة الذهنية عناصر مفهومية فقط: لا شواهد ولا كلمات مفتاحية", () => {
+  const NON_CONCEPT_KEYS = ["proof", "keywords", "note", "tip", "pedagogical_note"];
+  const NOT_CONCEPT_LABEL = [/﴿/, /\[/, /\d+\s*[.)]\s/, /^أول(?:اً|ا)\s*:/, /^القسم\s*\d/];
+
+  for (const file of MINDMAP_FILES) {
+    const walk = (node, depth = 0) => {
+      for (const key of NON_CONCEPT_KEYS) {
+        assert.equal(
+          node[key],
+          undefined,
+          `${file} :: ${node.id}: «${key}» ليس عنصرًا مفهوميًا ومكانه نص الدرس`
+        );
+      }
+      for (const rx of NOT_CONCEPT_LABEL) {
+        assert.ok(
+          !rx.test(node.label),
+          `${file} :: ${node.id}: التسمية «${node.label}» تحمل زخرفة غير مفهومية`
+        );
+      }
+      (node.children || []).forEach((child) => walk(child, depth + 1));
+    };
+    walk(read(file).root);
+  }
+});
+
+test("كل عنصر مفهومي في الخريطة له شرح، والشرح نصّ لا قائمة", () => {
+  for (const file of MINDMAP_FILES) {
+    const walk = (node) => {
+      if (node.details !== undefined) {
+        assert.equal(typeof node.details, "string", `${file} :: ${node.id}: الشرح ليس نصًّا`);
+      }
+      (node.children || []).forEach(walk);
+    };
+    walk(read(file).root);
+  }
+});
+
 test("معرّفات عقد الخرائط فريدة", () => {
   for (const file of MINDMAP_FILES) {
     const ids = [];
