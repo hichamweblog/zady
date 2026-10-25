@@ -65,7 +65,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
 
   if (questions.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
         <p className="font-bold text-slate-700 dark:text-slate-200">
           لا توجد أسئلة لهذه الوحدة حاليًا.
@@ -77,7 +77,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
   return (
     <div className="space-y-6">
       {/* رأس بنك الأسئلة: عدد + تقدّم + بحث. لا تصنيفات ولا أزرار كشف جماعي. */}
-      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:rounded-3xl sm:p-5">
+      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-600 dark:bg-slate-800 sm:rounded-3xl sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-title font-bold text-slate-900 dark:text-white">بنك الأسئلة</h2>
           <div className="flex flex-wrap items-center gap-1.5 text-label font-bold">
@@ -101,14 +101,14 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="البحث في نصوص الأسئلة والإجابات"
             placeholder="ابحث في الأسئلة والإجابات…"
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pe-10 ps-4 text-body-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pe-10 ps-4 text-body-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           />
         </div>
       </div>
 
       <div className="space-y-4">
         {filteredQuestions.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+          <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
             <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
             <h3 className="font-bold text-slate-700 dark:text-slate-200 text-body">
               لا توجد أسئلة تطابق بحثك
@@ -126,10 +126,10 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
             return (
               <article
                 key={question.id}
-                className={`bg-white dark:bg-slate-900 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
+                className={`bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
                   isMastered
                     ? "border-emerald-300 dark:border-emerald-900/60"
-                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
+                    : "border-slate-200 dark:border-slate-600 hover:border-slate-300"
                 }`}
               >
                 <div className="p-5 sm:p-6 flex items-start justify-between gap-4">
@@ -211,10 +211,10 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                 {isExpanded && (
                   <div
                     id={bodyId}
-                    className="border-t border-slate-100 dark:border-slate-800/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
+                    className="border-t border-slate-100 dark:border-slate-600/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
                   >
                     {question.anchor && (
-                      <div className="flex items-start gap-2 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                      <div className="flex items-start gap-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
                         <Target
                           className="w-4 h-4 text-teal-700 dark:text-teal-400 shrink-0 mt-0.5"
                           aria-hidden="true"
@@ -231,7 +231,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                         <FileCheck2 className="w-4 h-4" aria-hidden="true" />
                         <span>عناصر الإجابة النموذجية</span>
                       </div>
-                      <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-body leading-relaxed whitespace-pre-line font-medium shadow-sm">
+                      <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 text-body leading-relaxed whitespace-pre-line font-medium shadow-sm">
                         {question.modelAnswer}
                       </div>
                     </div>

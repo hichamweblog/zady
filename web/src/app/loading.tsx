@@ -9,7 +9,7 @@ export default function Loading() {
         <div className="w-6 h-6 rounded-lg bg-teal-700 animate-spin" aria-hidden="true" />
       </div>
       <div className="space-y-2 text-center">
-        <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto animate-pulse" />
+        <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto animate-pulse" />
         <p className="text-body-sm text-slate-600 dark:text-slate-300 font-semibold">
           جاري تحميل المحتوى التعليمي...
         </p>

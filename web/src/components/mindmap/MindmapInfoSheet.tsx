@@ -44,10 +44,10 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
         role="dialog"
         aria-modal="true"
         aria-labelledby="mindmap-sheet-title"
-        className="relative z-10 max-h-[86vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-5 shadow-2xl dark:bg-slate-900 sm:max-w-xl sm:rounded-[2rem] sm:p-7"
+        className="relative z-10 max-h-[86vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-5 shadow-2xl dark:bg-slate-800 sm:max-w-xl sm:rounded-[2rem] sm:p-7"
       >
         <div
-          className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200 dark:bg-slate-700 sm:hidden"
+          className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden"
           aria-hidden="true"
         />
 
@@ -73,7 +73,7 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
         </div>
 
         {node.details ? (
-          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-body leading-loose font-medium text-slate-800 dark:bg-slate-800/60 dark:text-slate-100">
+          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-body leading-loose font-medium text-slate-800 dark:bg-slate-700/60 dark:text-slate-100">
             {node.details}
           </p>
         ) : (
@@ -95,7 +95,7 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
                   key={child.id}
                   type="button"
                   onClick={() => onNavigate(child.id)}
-                  className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-right text-body-sm font-bold text-slate-800 transition-colors hover:bg-teal-50 dark:bg-slate-800/70 dark:text-slate-100 dark:hover:bg-teal-950/40"
+                  className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-right text-body-sm font-bold text-slate-800 transition-colors hover:bg-teal-50 dark:bg-slate-700/70 dark:text-slate-100 dark:hover:bg-teal-950/40"
                 >
                   <span className="min-w-0">{child.label}</span>
                   <ArrowRight
@@ -111,7 +111,7 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
         <button
           type="button"
           onClick={onClose}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-label font-bold text-slate-800 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-label font-bold text-slate-800 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-700"
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
           <span>رجوع</span>

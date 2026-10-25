@@ -137,7 +137,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
 
   if (prepared.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
         <p className="font-bold text-slate-700 dark:text-slate-200">
           لا توجد أسئلة QCM متوفرة لهذه الوحدة حاليًا.
@@ -149,18 +149,18 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
   return (
     <div className="space-y-6">
       {/* الشريط العلوي */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between flex-wrap gap-4">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200 dark:border-slate-600 shadow-sm flex items-center justify-between flex-wrap gap-4">
         <div />
 
         <div className="flex items-center gap-3 text-label font-bold text-slate-700 dark:text-slate-300 flex-wrap">
           {bestAttempt && (
-            <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-meta">
+            <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-meta">
               أفضل نتيجة: {bestAttempt.score}/{bestAttempt.total} ({bestAttempt.percentage}%)
               {attemptCount > 1 ? `· ${attemptCount} محاولات` : ""}
             </span>
           )}
           {lastAttempt && attemptCount > 1 && (
-            <span className="hidden md:inline-block px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-meta">
+            <span className="hidden md:inline-block px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-meta">
               آخر محاولة: {lastAttempt.percentage}%
             </span>
           )}
@@ -170,7 +170,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
           </span>
           <button
             onClick={restartQuiz}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
           >
             <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
             <span>إعادة البدء</span>
@@ -179,7 +179,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
       </div>
 
       {quizFinished ? (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm text-center max-w-xl mx-auto space-y-6">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8 sm:p-12 shadow-sm text-center max-w-xl mx-auto space-y-6">
           <div className="w-20 h-20 rounded-3xl bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto shadow-lg shadow-teal-500/20">
             <Award className="w-10 h-10" aria-hidden="true" />
           </div>
@@ -191,7 +191,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             <p className="text-body-sm text-slate-600 dark:text-slate-300">{unitTitle}</p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 space-y-3">
             <div className="text-display font-bold text-teal-700 dark:text-teal-300">
               {scorePercentage}%
             </div>
@@ -204,7 +204,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label="نتيجة الاختبار"
-              className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
+              className="w-full h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden"
             >
               <div
                 style={{ width: `${scorePercentage}%` }}
@@ -244,14 +244,14 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
       ) : (
         <div className="max-w-2xl mx-auto space-y-6">
           {/* شبكة الانتقال بين الأسئلة */}
-          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-600 dark:bg-slate-800">
             {prepared.map((q, idx) => {
               const answer = selectedAnswers[idx];
               const isAnswered = !!answer;
               const isCorrect = answer === q.correct_answer;
               const isCurrent = idx === realQuestionIndex;
 
-              let pillColor = "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
+              let pillColor = "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300";
               if (isAnswered) {
                 pillColor = isCorrect ? "bg-emerald-600 text-white" : "bg-rose-600 text-white";
               }
@@ -277,7 +277,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             })}
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-6 sm:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <span className="text-label font-bold px-3 py-1 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border border-teal-200/60 dark:border-teal-900">
                 سؤال {realQuestionIndex + 1} من {prepared.length}
@@ -318,7 +318,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
                 const isCorrect = option === currentQ.correct_answer;
 
                 let optionStyle =
-                  "border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:border-teal-500 hover:bg-teal-50/50 dark:hover:bg-slate-700";
+                  "border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 hover:border-teal-500 hover:bg-teal-50/50 dark:hover:bg-slate-700";
                 if (isAnswered) {
                   if (isCorrect) {
                     optionStyle =
@@ -328,7 +328,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
                       "border-2 border-rose-600 bg-rose-50 dark:bg-rose-950/70 text-rose-950 dark:text-rose-100 font-bold";
                   } else {
                     optionStyle =
-                      "border border-slate-200 dark:border-slate-800 opacity-50 bg-slate-100 dark:bg-slate-800/40 text-slate-700 dark:text-slate-400";
+                      "border border-slate-200 dark:border-slate-600 opacity-50 bg-slate-100 dark:bg-slate-700/40 text-slate-700 dark:text-slate-400";
                   }
                 }
 
@@ -385,7 +385,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             <button
               disabled={currentIndex === 0}
               onClick={handlePrev}
-              className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-body-sm transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-body-sm transition-all disabled:opacity-50"
             >
               <ChevronRight className="w-5 h-5" aria-hidden="true" />
               <span>السابق</span>

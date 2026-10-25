@@ -58,7 +58,7 @@ export default function UnitProgressBadge({ unitId, totals }: UnitProgressBadgeP
         <span className="text-slate-600 dark:text-slate-300">تقدّمك</span>
         <span className="text-teal-800 dark:text-teal-300">{percentage}%</span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-600">
         <div
           style={{ width: `${percentage}%` }}
           className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500"

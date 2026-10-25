@@ -74,7 +74,7 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
                 className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-label font-bold transition-all ${
                   isActive
                     ? "bg-teal-700 text-white shadow-sm shadow-teal-700/25"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />

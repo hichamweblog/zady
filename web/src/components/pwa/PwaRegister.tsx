@@ -69,7 +69,7 @@ export default function PwaRegister() {
       )}
 
       {installEvent && !installDismissed && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl max-w-[92vw]">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-xl max-w-[92vw]">
           <Download
             className="w-5 h-5 text-teal-700 dark:text-teal-400 shrink-0"
             aria-hidden="true"

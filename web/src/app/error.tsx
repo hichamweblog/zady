@@ -17,7 +17,7 @@ export default function Error({
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-xl space-y-6">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8 shadow-xl space-y-6">
         <div className="w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-900">
           <AlertCircle className="w-8 h-8" aria-hidden="true" />
         </div>
@@ -45,7 +45,7 @@ export default function Error({
 
           <Link
             href="/"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-label text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 font-bold text-label text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Home className="w-4 h-4" aria-hidden="true" />
             <span>الرئيسية</span>

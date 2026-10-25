@@ -68,7 +68,7 @@ export default function InsightCard({
         )}
       </div>
 
-      <div className="space-y-2 text-body-sm leading-relaxed font-medium text-slate-800 dark:text-slate-100">
+      <div className="space-y-2 text-body leading-relaxed font-medium text-slate-800 dark:text-slate-100">
         {children}
       </div>
     </div>

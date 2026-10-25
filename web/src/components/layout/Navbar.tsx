@@ -31,7 +31,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-600 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         <div className="flex items-center gap-6 min-w-0">
           <Link href="/" className="flex items-center gap-3 group shrink-0">
@@ -81,7 +81,7 @@ export default function Navbar() {
               </button>
 
               {isMenuOpen && (
-                <div className="absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800">
+                <div className="absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-600">
                   {UNITS_META.map((unit) => {
                     const isActive = pathname === `/units/${unit.id}`;
                     return (
@@ -97,7 +97,7 @@ export default function Navbar() {
                         }`}
                       >
                         <span className="truncate">{unit.shortTitle}</span>
-                        <span className="text-meta font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                        <span className="text-meta font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">
                           {unit.badge}
                         </span>
                       </Link>
@@ -119,7 +119,7 @@ export default function Navbar() {
             onClick={toggleTheme}
             aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
             aria-pressed={isDark}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-label font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-label font-bold border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             {isDark ? (
               <>

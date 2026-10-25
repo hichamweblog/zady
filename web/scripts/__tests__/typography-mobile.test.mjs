@@ -400,3 +400,40 @@ test("الخريطة تُعلن أنها خريطة مفاهيم، ولا تُس
   assert.match(viewer, /خريطة المفاهيم/, "التنبيه يوضّح أن الخريطة للمفاهيم");
   assert.match(viewer, /\{nodeCount\} مفهومًا/, "العدّاد يقول «مفهومًا» لا «عنصرًا»");
 });
+
+test("نصوص الدرس كلها بمقاس واحد، لا مقاس أصغر في درس دون آخر", () => {
+  const viewer = readSrc("components", "lesson", "StandardLessonViewer.tsx");
+  const card = readSrc("components", "lesson", "InsightCard.tsx");
+  assert.ok(
+    !viewer.includes("text-body-sm"),
+    "الدرس: لا نصّ بمقاس 16px بجانب نصوص 18px"
+  );
+  assert.ok(!card.includes("text-body-sm"), "بطاقة المصباح: النص بمقاس نص الدرس");
+  assert.match(viewer, /font-quran text-title/, "النص القرآني بمقاس واحد ثابت في كل الدروس");
+  assert.ok(!viewer.includes("sm:text-heading"), "لا يقفز مقاس الشاهد على الشاشات الكبيرة");
+});
+
+test("الوضع الليلي: أسطح متدرّجة بدل سطح واحد مسطّح", () => {
+  const surfaces = new Set();
+  for (const file of walk(SRC, ".tsx")) {
+    const text = fs.readFileSync(file, "utf8");
+    const name = path.basename(file);
+    assert.ok(!text.includes("dark:bg-slate-900"), `${name}: السطح الليلي صار slate-800`);
+    assert.ok(!text.includes("dark:border-slate-800"), `${name}: الحدّ الليلي صار slate-600`);
+    for (const m of text.matchAll(/dark:bg-slate-(\d+)/g)) surfaces.add(m[1]);
+  }
+  // ثلاث درجات على الأقل: صفحة ← بطاقة ← وسم
+  assert.ok(surfaces.has("800") && surfaces.has("700"), "بطاقة slate-800 ووسم slate-700");
+
+  const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
+  assert.match(css, /--background: #070b14/, "خلفية ليلية أعمق حتى تظهر البطاقات");
+});
+
+test("بطاقة الخريطة لها خلفية ليلية صريحة (لا نصّ فاتح على بطاقة بيضاء)", () => {
+  const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
+  const start = map.indexOf("group min-w-0 rounded-2xl");
+  assert.ok(start > 0, "بطاقة العنصر موجودة");
+  const node = map.slice(start, start + 700);
+  assert.match(node, /bg-white/, "خلفية نهارية");
+  assert.match(node, /dark:bg-slate-7/, "ولها نظير ليلي");
+});

@@ -67,7 +67,7 @@ export default function StandardLessonViewer({
 
   if (sections.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
         <p className="font-bold text-slate-700 dark:text-slate-200">
           لا يوجد شرح منهجي متاح لهذه الوحدة حاليًا.
@@ -88,7 +88,7 @@ export default function StandardLessonViewer({
             <h2 className="font-bold text-label uppercase tracking-wider text-teal-800 dark:text-teal-300">
               الكفاءة المستهدفة والمؤشر الختامي للوحدة
             </h2>
-            <p className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+            <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
               {learningObjective}
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function StandardLessonViewer({
       )}
 
       {/* مفتاح العلامات: يُذكر مرة واحدة فقط أعلى الدرس */}
-      <div className="flex items-start gap-2.5 px-1 text-meta font-medium text-slate-600 dark:text-slate-400">
+      <div className="flex items-start gap-2.5 px-1 text-label font-medium text-slate-600 dark:text-slate-400">
         <Lightbulb className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />
         <p>
           بطاقة المصباح = <span className="font-bold">إضاءة</span> للفهم أو{" "}
@@ -114,13 +114,13 @@ export default function StandardLessonViewer({
           return (
             <section
               key={section.key}
-              className={`bg-white dark:bg-slate-900 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
+              className={`bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
                 isRead
                   ? "border-emerald-300 dark:border-emerald-900/60"
-                  : "border-slate-200 dark:border-slate-800"
+                  : "border-slate-200 dark:border-slate-600"
               }`}
             >
-              <div className="p-5 sm:p-6 flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="p-5 sm:p-6 flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-600">
                 <button
                   type="button"
                   onClick={() => toggleSection(section.key)}
@@ -129,7 +129,7 @@ export default function StandardLessonViewer({
                   className="flex items-center gap-3 text-right flex-1 min-w-0"
                 >
                   <span
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-body-sm shrink-0 border transition-colors ${
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-label shrink-0 border transition-colors ${
                       isRead
                         ? "bg-emerald-600 text-white border-emerald-600"
                         : "bg-teal-50 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border-teal-200/60 dark:border-teal-900"
@@ -157,7 +157,7 @@ export default function StandardLessonViewer({
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-label font-bold transition-all ${
                       isRead
                         ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }`}
                     title={isRead ? "إلغاء وسم الإتمام" : "تحديد كمكتمل"}
                   >
@@ -247,7 +247,7 @@ function InsightValue({
         {value.map((item, idx) => (
           <span
             key={idx}
-            className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100"
+            className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-800/60 text-slate-800 dark:text-slate-100"
           >
             {String(item)}
           </span>
@@ -285,7 +285,7 @@ function RenderContent({
           isRecord(item) || Array.isArray(item) ? (
             <div
               key={i}
-              className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3"
+              className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 space-y-3"
             >
               {isRecord(item) && typeof item.title === "string" && (
                 <h4 className="font-bold text-body text-teal-800 dark:text-teal-300">
@@ -297,13 +297,13 @@ function RenderContent({
           ) : (
             <div
               key={i}
-              className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800"
+              className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600"
             >
               <span
                 className="mt-2 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"
                 aria-hidden="true"
               />
-              <p className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+              <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed">
                 {String(item)}
               </p>
             </div>
@@ -320,9 +320,7 @@ function RenderContent({
     asString(data.proof_warsh) ||
     asString(data.quranic_proof) ||
     asString(data.prophetic_proof);
-  const proofLabel = asString(data.prophetic_proof)
-    ? "الشاهد الحديثي"
-    : "الشاهد الشرعي";
+  const proofLabel = asString(data.prophetic_proof) ? "الشاهد الحديثي" : "الشاهد الشرعي";
   const ayahId = proofText ? `ayah_${hashText(proofText)}` : "";
 
   const definitionBlocks: { label: string; text: string }[] = [
@@ -344,7 +342,7 @@ function RenderContent({
           key={block.label}
           className="p-5 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 space-y-1.5 shadow-sm"
         >
-          <span className="text-body-sm font-bold text-teal-800 dark:text-teal-300">
+          <span className="text-label font-bold text-teal-800 dark:text-teal-300">
             {block.label}:
           </span>
           <p className="text-body text-slate-900 dark:text-slate-100 leading-relaxed font-semibold">
@@ -394,7 +392,7 @@ function RenderContent({
       {proofText && (
         <div className="p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border-r-4 border-amber-500 space-y-2.5 shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-body-sm font-bold text-amber-900 dark:text-amber-300">
+            <div className="flex items-center gap-2 text-label font-bold text-amber-900 dark:text-amber-300">
               <BookOpen className="w-4 h-4 text-amber-600" aria-hidden="true" />
               <span>{proofLabel}:</span>
             </div>
@@ -418,12 +416,12 @@ function RenderContent({
             </button>
           </div>
 
-          <div className="font-quran text-title sm:text-heading text-amber-950 dark:text-amber-100 leading-loose py-2">
+          <div className="font-quran text-title text-amber-950 dark:text-amber-100 leading-loose py-2">
             {proofText}
           </div>
 
           {asString(data.proof_anchor_phrase) && (
-            <div className="pt-2.5 border-t border-amber-200/80 dark:border-amber-900/60 flex items-center gap-2 text-body-sm text-amber-900 dark:text-amber-300 flex-wrap">
+            <div className="pt-2.5 border-t border-amber-200/80 dark:border-amber-900/60 flex items-center gap-2 text-body text-amber-900 dark:text-amber-300 flex-wrap">
               <span className="font-bold px-2.5 py-1 rounded-lg bg-amber-200/80 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200">
                 محل الشاهد:
               </span>
@@ -438,7 +436,7 @@ function RenderContent({
           {data.effects.filter(isRecord).map((eff, i) => (
             <div
               key={i}
-              className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-800/90 border-2 border-slate-200 dark:border-slate-700 shadow-sm space-y-3"
+              className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-700/90 border-2 border-slate-200 dark:border-slate-600 shadow-sm space-y-3"
             >
               <div className="flex items-center gap-2.5">
                 <span className="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-300 text-label font-bold flex items-center justify-center shrink-0">
@@ -448,11 +446,11 @@ function RenderContent({
                   {asString(eff.official_title) || asString(eff.title)}
                 </h5>
               </div>
-              <p className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+              <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
                 {asString(eff.explanation)}
               </p>
               {asString(eff.quranic_proof_warsh) && (
-                <div className="font-quran text-body text-amber-950 dark:text-amber-100 bg-amber-50/80 dark:bg-amber-950/40 p-3.5 rounded-xl border-r-4 border-amber-500 leading-loose">
+                <div className="font-quran text-title text-amber-950 dark:text-amber-100 bg-amber-50/80 dark:bg-amber-950/40 p-3.5 rounded-xl border-r-4 border-amber-500 leading-loose">
                   {asString(eff.quranic_proof_warsh)}
                 </div>
               )}
@@ -462,7 +460,7 @@ function RenderContent({
                     {eff.key_extraction_indicators.map((ind, idx) => (
                       <span
                         key={idx}
-                        className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100"
+                        className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-800/60 text-slate-800 dark:text-slate-100"
                       >
                         {String(ind)}
                       </span>
@@ -496,9 +494,9 @@ function RenderContent({
         return (
           <section
             key={key}
-            className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2"
+            className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-600 space-y-2"
           >
-            <h5 className="font-bold text-body-sm text-slate-900 dark:text-white">
+            <h5 className="font-bold text-body text-slate-900 dark:text-white">
               {SECTION_TITLES[key] ?? resolveSectionTitle(key, index + 1)}
             </h5>
             <RenderContent data={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />

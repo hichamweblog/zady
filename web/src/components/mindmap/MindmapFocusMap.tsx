@@ -155,7 +155,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             <button
               type="button"
               onClick={goUp}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
               <span>رجوع</span>
@@ -165,7 +165,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           <button
             type="button"
             onClick={() => setIndexOpen(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             <ListTree className="h-4 w-4" aria-hidden="true" />
             <span>الفهرس</span>
@@ -227,7 +227,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
                       "--y": position.y,
                     } as CSSProperties
                   }
-                  className={`group min-w-0 rounded-2xl bg-white/85 px-3 py-2.5 text-right shadow-sm shadow-slate-900/5 backdrop-blur transition-all hover:bg-teal-700 hover:text-white focus-visible:outline-2 focus-visible:outline-teal-600 lg:absolute lg:top-[calc(var(--y)*100%)] lg:left-[calc(var(--x)*100%)] lg:w-44 lg:-translate-x-1/2 lg:-translate-y-1/2 ${
+                  className={`group min-w-0 rounded-2xl bg-white/90 px-3 py-2.5 text-right text-slate-900 shadow-sm shadow-slate-900/10 backdrop-blur transition-all hover:bg-teal-700 hover:text-white focus-visible:outline-2 focus-visible:outline-teal-600 dark:bg-slate-700/95 dark:text-slate-50 dark:shadow-black/40 dark:hover:bg-teal-700 lg:absolute lg:top-[calc(var(--y)*100%)] lg:left-[calc(var(--x)*100%)] lg:w-44 lg:-translate-x-1/2 lg:-translate-y-1/2 ${
                     isActive ? "bg-teal-700 text-white" : "text-slate-800 dark:text-slate-100"
                   }`}
                 >
@@ -245,7 +245,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             })}
           </div>
         ) : (
-          <p className="relative z-10 mt-3 rounded-2xl bg-white/80 px-4 py-3 text-body-sm font-medium text-slate-600 dark:bg-slate-800/70 dark:text-slate-300 lg:absolute lg:bottom-8 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
+          <p className="relative z-10 mt-3 rounded-2xl bg-white/80 px-4 py-3 text-body-sm font-medium text-slate-600 dark:bg-slate-700/70 dark:text-slate-300 lg:absolute lg:bottom-8 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
             هذا العنصر ورقة أخيرة: لا فروع تحته. شرحه في البطاقة، وزر «رجوع» يعيدك خطوة.
           </p>
         )}

@@ -30,7 +30,7 @@ export default function MindmapImageView({ src, unitTitle }: MindmapImageViewPro
   useSheetA11y(open, close, closeRef);
 
   return (
-    <div className="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-sm dark:bg-slate-900 sm:p-3">
+    <div className="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-sm dark:bg-slate-800 sm:p-3">
       <button
         type="button"
         onClick={() => setOpen(true)}

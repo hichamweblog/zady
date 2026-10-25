@@ -50,7 +50,7 @@ export default function MindmapIndexSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="mindmap-index-title"
-        className="relative z-10 flex max-h-[86vh] w-full flex-col rounded-t-[2rem] bg-white shadow-2xl dark:bg-slate-900 sm:max-w-lg sm:rounded-[2rem]"
+        className="relative z-10 flex max-h-[86vh] w-full flex-col rounded-t-[2rem] bg-white shadow-2xl dark:bg-slate-800 sm:max-w-lg sm:rounded-[2rem]"
       >
         <div className="flex items-start justify-between gap-3 p-5 pb-3">
           <div className="min-w-0 space-y-1">

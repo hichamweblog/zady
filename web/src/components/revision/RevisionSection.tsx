@@ -33,7 +33,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
 
   if (isEmpty) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <Zap className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
         <h3 className="font-bold text-slate-700 dark:text-slate-200">
           لا يوجد محتوى مراجعة سريعة لهذه الوحدة بعد.
@@ -72,7 +72,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
             {lastMinute.map((group) => (
               <article
                 key={group.title}
-                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-3"
+                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-5 shadow-sm space-y-3"
               >
                 <h3 className="font-bold text-body-sm text-teal-800 dark:text-teal-300">
                   {group.title}
@@ -110,7 +110,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
             {rules.map((rule, i) => (
               <li
                 key={i}
-                className="flex items-start gap-3 p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
+                className="flex items-start gap-3 p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-sm"
               >
                 <span className="w-7 h-7 rounded-xl bg-teal-700 text-white text-label font-bold flex items-center justify-center shrink-0">
                   {i + 1}
@@ -137,7 +137,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
             {differentiation.map((row) => (
               <article
                 key={row.id}
-                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4"
+                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-5 shadow-sm space-y-4"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-3.5 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-900">
@@ -148,7 +148,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
                       {row.termA}
                     </p>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
                     <span className="text-meta font-bold text-slate-600 dark:text-slate-300 block mb-1">
                       المصطلح الثاني
                     </span>
@@ -200,7 +200,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
             {summary.map((group) => (
               <article
                 key={group.title}
-                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-3"
+                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-5 shadow-sm space-y-3"
               >
                 <h3 className="font-bold text-body-sm text-slate-900 dark:text-white">
                   {group.title}
@@ -209,7 +209,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
                   {group.items.map((item, i) => (
                     <li
                       key={i}
-                      className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800"
+                      className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/60 border border-slate-100 dark:border-slate-600"
                     >
                       {item}
                     </li>
@@ -286,7 +286,7 @@ function PreviousBacCard({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 shadow-sm overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -308,7 +308,7 @@ function PreviousBacCard({
       </button>
 
       {open && (
-        <div className="px-4 sm:p-5 sm:pt-0 border-t border-slate-100 dark:border-slate-800 pt-4">
+        <div className="px-4 sm:p-5 sm:pt-0 border-t border-slate-100 dark:border-slate-600 pt-4">
           <span className="text-meta font-bold text-teal-800 dark:text-teal-300 block mb-2">
             الإجابة النموذجية
           </span>

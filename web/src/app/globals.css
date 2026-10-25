@@ -78,11 +78,12 @@
 
   .dark {
     color-scheme: dark;
-    --background: #0b1120;
+    /* صفحة أعمق + أسطح أفتح: كان الفرق بين الصفحة والبطاقة 1.05 فلا يرى الطالب حدًّا */
+    --background: #070b14;
     --foreground: #f8fafc;
-    --card: #131c31;
+    --card: #1e293b;
     --card-foreground: #f8fafc;
-    --popover: #131c31;
+    --popover: #1e293b;
     --popover-foreground: #f8fafc;
     --primary: #14b8a6;
     --primary-foreground: #022c22;
@@ -94,8 +95,8 @@
     --accent-foreground: #f8fafc;
     --destructive: #f87171;
     --destructive-foreground: #0b1120;
-    --border: #1e293b;
-    --input: #1e293b;
+    --border: #475569;
+    --input: #334155;
     --ring: #14b8a6;
   }
 }

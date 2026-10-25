@@ -33,9 +33,9 @@ export default function FlashcardSection({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex items-center justify-between flex-wrap gap-4 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-600 shadow-sm">
         <div
-          className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl"
+          className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-700 rounded-xl"
           role="tablist"
         >
           <button
@@ -44,7 +44,7 @@ export default function FlashcardSection({
             onClick={() => setActiveTab("flashcards")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-label font-bold transition-all ${
               activeTab === "flashcards"
-                ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-sm"
+                ? "bg-white dark:bg-slate-800 text-teal-800 dark:text-teal-300 shadow-sm"
                 : "text-slate-700 dark:text-slate-300 hover:text-slate-900"
             }`}
           >
@@ -57,7 +57,7 @@ export default function FlashcardSection({
             onClick={() => setActiveTab("cloze")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-label font-bold transition-all ${
               activeTab === "cloze"
-                ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-sm"
+                ? "bg-white dark:bg-slate-800 text-teal-800 dark:text-teal-300 shadow-sm"
                 : "text-slate-700 dark:text-slate-300 hover:text-slate-900"
             }`}
           >
@@ -182,7 +182,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
   if (cards.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <p className="font-bold text-slate-700 dark:text-slate-200">
           لا توجد بطاقات حفظ لهذه الوحدة حاليًا.
         </p>
@@ -192,7 +192,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
   if (!currentCard) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 space-y-4">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8 space-y-4">
         <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" aria-hidden="true" />
         <h3 className="font-bold text-slate-900 dark:text-white text-title">
           رائع! لقد أتقنت جميع بطاقات هذه الوحدة!
@@ -234,7 +234,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
             className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border text-label transition-colors ${
               onlyUnmastered
                 ? "bg-teal-700 text-white border-teal-700"
-                : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                : "border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
             }`}
           >
             <Filter className="w-3.5 h-3.5" aria-hidden="true" />
@@ -243,7 +243,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
           <button
             onClick={handleShuffle}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
           >
             <Shuffle className="w-3.5 h-3.5" aria-hidden="true" />
             <span>خلط</span>
@@ -275,13 +275,13 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
           style={{ transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
         >
           {/* الوجه: السؤال */}
-          <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 rounded-3xl p-5 sm:p-10 border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-lg">
+          <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 rounded-3xl p-5 sm:p-10 border-2 border-slate-200 dark:border-slate-600 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between gap-2">
               <span className="text-label font-bold uppercase tracking-wider text-teal-800 dark:text-teal-400 flex items-center gap-1.5">
                 <Flame className="w-4 h-4 text-amber-600" aria-hidden="true" />
                 <span>السؤال / المفهوم</span>
               </span>
-              <span className="text-label text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full font-bold">
+              <span className="text-label text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-full font-bold">
                 انقر للقلب 🔄
               </span>
             </div>
@@ -340,7 +340,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
       </div>
 
       {/* تقييم ذاتي ثلاثي */}
-      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+      <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-sm space-y-3">
         <span className="text-label font-bold text-slate-600 dark:text-slate-300 block text-center">
           ما مدى تمكنك من الإجابة؟ (انقر أو اضغط 1، 2، 3)
         </span>
@@ -375,7 +375,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={handlePrev}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
         >
           <ChevronRight className="w-4 h-4" aria-hidden="true" />
           <span>السابق</span>
@@ -383,7 +383,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
         <button
           onClick={handleNext}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
         >
           <span>التالي</span>
           <ChevronLeft className="w-4 h-4" aria-hidden="true" />
@@ -396,7 +396,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 function ClozeRecallList({ items }: { items: NormalizedCloze[] }) {
   if (items.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
         <p className="font-bold text-slate-700 dark:text-slate-200">
           لا يوجد تحدي ملء فراغات لهذه الوحدة حاليًا.
         </p>
@@ -470,8 +470,8 @@ function ClozeCard({ item, index }: { item: NormalizedCloze; index: number }) {
   const allCorrect = maskKeys.length > 0 && correctCount === maskKeys.length;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2 flex-wrap">
+    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-5 sm:p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-600 gap-2 flex-wrap">
         <div className="flex items-center gap-2.5">
           <span className="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 text-label font-bold flex items-center justify-center">
             {index}
@@ -481,7 +481,7 @@ function ClozeCard({ item, index }: { item: NormalizedCloze; index: number }) {
           </h3>
         </div>
         {item.category && (
-          <span className="text-label px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+          <span className="text-label px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium">
             {item.category}
           </span>
         )}
@@ -525,7 +525,7 @@ function ClozeCard({ item, index }: { item: NormalizedCloze; index: number }) {
                   }}
                   aria-invalid={blank.checked && !blank.correct}
                   style={{ width: `${Math.max(5, answer.length + 1)}ch` }}
-                  className={`text-body font-bold text-center px-2 py-1 rounded-xl border-2 bg-white dark:bg-slate-800 outline-none transition-colors focus:ring-2 focus:ring-teal-500/40 ${
+                  className={`text-body font-bold text-center px-2 py-1 rounded-xl border-2 bg-white dark:bg-slate-700 outline-none transition-colors focus:ring-2 focus:ring-teal-500/40 ${
                     blank.correct
                       ? "border-emerald-600 text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40"
                       : blank.checked

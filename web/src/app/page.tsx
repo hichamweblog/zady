@@ -128,7 +128,7 @@ export default function HomePage() {
           {stats.map(({ label, hint, icon: Icon, tone }) => (
             <div
               key={label}
-              className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1 sm:p-6 sm:rounded-3xl"
+              className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-sm space-y-1 sm:p-6 sm:rounded-3xl"
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-2 ${
@@ -166,7 +166,7 @@ export default function HomePage() {
             {units.map((unit) => (
               <article
                 key={unit.id}
-                className="group flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-teal-500/70 dark:border-slate-800 dark:bg-slate-900 sm:gap-6 sm:rounded-3xl sm:p-7"
+                className="group flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-teal-500/70 dark:border-slate-600 dark:bg-slate-800 sm:gap-6 sm:rounded-3xl sm:p-7"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -200,7 +200,7 @@ export default function HomePage() {
                   }}
                 />
 
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap text-label font-bold text-slate-600 dark:text-slate-300">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-600 flex items-center justify-between gap-2 flex-wrap text-label font-bold text-slate-600 dark:text-slate-300">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="flex items-center gap-1 text-teal-700 dark:text-teal-300">
                       <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
@@ -258,7 +258,7 @@ export default function HomePage() {
             ].map(({ n, title, hint }) => (
               <li
                 key={n}
-                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-600 dark:bg-slate-800"
               >
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-label font-bold text-teal-800 dark:bg-teal-950 dark:text-teal-300">
                   {n}

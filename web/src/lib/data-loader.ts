@@ -426,14 +426,23 @@ function buildRevision(std: unknown, adv: unknown): RevisionContent {
   };
 }
 
+/**
+ * مفاتيح لا تصير محورًا دراسيًا حتى لو وردت داخل `detailed_explanation`:
+ * «القواعد والضوابط المنهجية» ضوابط إجابة، ومكانها «المراجعة السريعة».
+ * الحارس هنا لا في البيانات وحدها، فلا يعود الخطأ مع أي ملف جديد.
+ */
+const REVISION_ONLY_KEYS = new Set(["methodology_and_rules", "section_4_methodological_rules"]);
+
 function buildSections(std: unknown): LessonSection[] {
   const s = isRecord(std) ? std : {};
   const detailed = isRecord(s.detailed_explanation) ? s.detailed_explanation : {};
-  return Object.entries(detailed).map(([key, content], i) => ({
-    key,
-    title: resolveSectionTitle(key, i + 1, isRecord(content) ? content.title : undefined),
-    content,
-  }));
+  return Object.entries(detailed)
+    .filter(([key]) => !REVISION_ONLY_KEYS.has(key) && !key.includes("methodolog"))
+    .map(([key, content], i) => ({
+      key,
+      title: resolveSectionTitle(key, i + 1, isRecord(content) ? content.title : undefined),
+      content,
+    }));
 }
 
 /* ─────────────────────────── بناء الوحدات ─────────────────────────── */

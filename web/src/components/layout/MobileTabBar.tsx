@@ -34,7 +34,7 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label="التنقّل السريع"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-slate-600 dark:bg-slate-800/95 md:hidden"
     >
       <div className="mx-auto flex max-w-lg items-stretch gap-1 px-2 py-1">
         <Link href="/" aria-current={isHome ? "page" : undefined} className={itemClass(isHome)}>
