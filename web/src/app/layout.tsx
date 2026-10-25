@@ -24,6 +24,26 @@ import MobileTabBar from "@/components/layout/MobileTabBar";
  * ملاحظة عن الحجم: المتن 17px لا 16px، ولا شيء أصغر من 13px. النص العربي
  * يحتاج مقاسًا أكبر من نظيره اللاتيني ليُقرأ على الهاتف دون تكبير.
  */
+/**
+ * خطّ الواجهة: **IBM Plex Sans Arabic** (SIL OFL، مستضاف محليًا).
+ * اختير لأنه عربي مصمَّم أصلًا (لا لاتيني مُعرَّب): أرقامه وأوزانه متوازنة،
+ * وحروفه تُقرأ في المقاسات الصغيرة داخل الأزرار والرقائق، ويحمل 4 أوزان
+ * (400/500/600/700) فنستغني عن الأوزان الصناعية.
+ */
+const plex = localFont({
+  src: [
+    { path: "./fonts/plex-arabic-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/plex-arabic-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/plex-arabic-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/plex-arabic-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-ui",
+  display: "swap",
+  fallback: ["Segoe UI", "Arial", "sans-serif"],
+  preload: true,
+  adjustFontFallback: false,
+});
+
 const naskh = localFont({
   src: [
     { path: "./fonts/noto-naskh-400.woff2", weight: "400", style: "normal" },
@@ -32,7 +52,7 @@ const naskh = localFont({
   variable: "--font-body",
   display: "swap",
   fallback: ["Noto Naskh Arabic", "Traditional Arabic", "Segoe UI", "Arial", "sans-serif"],
-  preload: true,
+  preload: false,
   adjustFontFallback: false,
 });
 
@@ -41,15 +61,6 @@ const naskh = localFont({
  * عائلة مستقلة لتفادي تعارض `@font-face`، وتُستدعى بعد العربية في السلسلة
  * فتُستخدم لحروفها فقط (الاحتياط للحرف الواحد يعمل في CSS تلقائيًا).
  */
-const naskhLatin = localFont({
-  src: [{ path: "./fonts/noto-naskh-latin-400.woff2", weight: "400", style: "normal" }],
-  variable: "--font-latin",
-  display: "swap",
-  fallback: ["Segoe UI", "Arial", "sans-serif"],
-  preload: false,
-  adjustFontFallback: false,
-});
-
 const amiri = localFont({
   src: [
     { path: "./fonts/amiri-arabic-400-normal.woff2", weight: "400", style: "normal" },
@@ -109,7 +120,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f17" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -129,7 +140,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${naskh.variable} ${naskhLatin.variable} ${amiri.variable}`}
+      className={`${plex.variable} ${naskh.variable} ${amiri.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -138,7 +149,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col selection:bg-teal-600 selection:text-white">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-teal-700 focus:text-white focus:font-bold"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-teal-700 focus:text-white focus:font-semibold"
         >
           تخطَّ إلى المحتوى الرئيسي
         </a>

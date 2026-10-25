@@ -65,9 +65,9 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
 
   if (questions.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
-        <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
-        <p className="font-bold text-slate-700 dark:text-slate-200">
+      <div className="text-center py-12 u-card p-8">
+        <HelpCircle className="w-12 h-12 text-[var(--ink-faint)] mx-auto mb-3" aria-hidden="true" />
+        <p className="font-semibold text-slate-700 dark:text-slate-200">
           لا توجد أسئلة لهذه الوحدة حاليًا.
         </p>
       </div>
@@ -77,14 +77,14 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
   return (
     <div className="space-y-6">
       {/* رأس بنك الأسئلة: عدد + تقدّم + بحث. لا تصنيفات ولا أزرار كشف جماعي. */}
-      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-600 dark:bg-slate-800 sm:rounded-3xl sm:p-5">
+      <div className="space-y-3 u-card p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-title font-bold text-slate-900 dark:text-white">بنك الأسئلة</h2>
-          <div className="flex flex-wrap items-center gap-1.5 text-label font-bold">
-            <span className="rounded-full border border-teal-200/60 bg-teal-50 px-3 py-1 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-300">
+          <h2 className="text-title font-semibold text-[var(--ink)]">بنك الأسئلة</h2>
+          <div className="flex flex-wrap items-center gap-1.5 text-label font-semibold">
+            <span className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-[var(--brand-strong)]">
               {questions.length} سؤالًا
             </span>
-            <span className="rounded-full border border-emerald-200/60 bg-emerald-50 px-3 py-1 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
               متقن: {masteredCount}
             </span>
           </div>
@@ -101,21 +101,22 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="البحث في نصوص الأسئلة والإجابات"
             placeholder="ابحث في الأسئلة والإجابات…"
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pe-10 ps-4 text-body-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            className="w-full rounded-xl bg-[var(--surface-2)] py-3 pe-10 ps-4 text-body-sm text-[var(--ink)] outline-none focus:ring-2 focus:ring-[var(--ring)]"
           />
         </div>
       </div>
 
       <div className="space-y-4">
         {filteredQuestions.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
-            <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
-            <h3 className="font-bold text-slate-700 dark:text-slate-200 text-body">
+          <div className="text-center py-12 u-card p-8">
+            <HelpCircle
+              className="w-12 h-12 text-[var(--ink-faint)] mx-auto mb-3"
+              aria-hidden="true"
+            />
+            <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-body">
               لا توجد أسئلة تطابق بحثك
             </h3>
-            <p className="text-body-sm text-slate-600 dark:text-slate-300 mt-1">
-              جرّب كلمة بحث أخرى.
-            </p>
+            <p className="text-body-sm text-[var(--ink-soft)] mt-1">جرّب كلمة بحث أخرى.</p>
           </div>
         ) : (
           filteredQuestions.map((question, idx) => {
@@ -126,10 +127,10 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
             return (
               <article
                 key={question.id}
-                className={`bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
+                className={`u-card overflow-hidden transition-all duration-200 ${
                   isMastered
                     ? "border-emerald-300 dark:border-emerald-900/60"
-                    : "border-slate-200 dark:border-slate-600 hover:border-slate-300"
+                    : "hover:shadow-[var(--shadow-hover)]"
                 }`}
               >
                 <div className="p-5 sm:p-6 flex items-start justify-between gap-4">
@@ -141,28 +142,28 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                     className="space-y-2 flex-1 text-right"
                   >
                     <span className="flex items-center gap-2 flex-wrap">
-                      <span className="w-6 h-6 rounded-lg bg-teal-100 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 text-label font-bold flex items-center justify-center shrink-0">
+                      <span className="w-6 h-6 rounded-lg bg-teal-100 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 text-label font-semibold flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       {question.session && (
-                        <span className="text-meta font-bold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300">
+                        <span className="text-meta font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300">
                           {question.session}
                         </span>
                       )}
                       {typeof question.officialMarks === "number" && (
-                        <span className="text-meta font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                        <span className="text-meta font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
                           {question.officialMarks} ن
                         </span>
                       )}
                       {isMastered && (
-                        <span className="text-meta font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                        <span className="text-meta font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
                           <span>تم الإتقان</span>
                         </span>
                       )}
                     </span>
 
-                    <span className="block text-body font-bold text-slate-900 dark:text-white leading-relaxed">
+                    <span className="block text-body font-semibold text-[var(--ink)] leading-relaxed">
                       {question.question}
                     </span>
 
@@ -170,7 +171,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                       <span className="block mt-2 p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border-r-4 border-amber-500 font-quran text-body-sm text-amber-950 dark:text-amber-100 leading-loose">
                         {question.text}
                         {question.reference && (
-                          <span className="font-sans text-meta font-bold text-amber-800 dark:text-amber-300 ms-1">
+                          <span className="font-sans text-meta font-semibold text-amber-800 dark:text-amber-300 ms-1">
                             {question.reference}
                           </span>
                         )}
@@ -211,38 +212,38 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                 {isExpanded && (
                   <div
                     id={bodyId}
-                    className="border-t border-slate-100 dark:border-slate-700/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
+                    className="border-t border-[var(--hairline)] p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
                   >
                     {question.anchor && (
-                      <div className="flex items-start gap-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
+                      <div className="flex items-start gap-2 p-3.5 rounded-xl bg-[var(--surface)] ">
                         <Target
                           className="w-4 h-4 text-teal-700 dark:text-teal-400 shrink-0 mt-0.5"
                           aria-hidden="true"
                         />
-                        <p className="text-body-sm text-slate-800 dark:text-slate-200">
-                          <span className="font-bold">محل الشاهد: </span>
+                        <p className="text-body-sm text-[var(--ink)]">
+                          <span className="font-semibold">محل الشاهد: </span>
                           <span className="font-quran text-body">«{question.anchor}»</span>
                         </p>
                       </div>
                     )}
 
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-label font-bold text-teal-800 dark:text-teal-400">
+                      <div className="flex items-center gap-2 text-label font-semibold text-teal-800 dark:text-teal-400">
                         <FileCheck2 className="w-4 h-4" aria-hidden="true" />
                         <span>عناصر الإجابة النموذجية</span>
                       </div>
-                      <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 text-body leading-relaxed whitespace-pre-line font-medium shadow-sm">
+                      <div className="p-5 rounded-xl bg-[var(--surface)] text-slate-900 dark:text-slate-100 text-body leading-relaxed whitespace-pre-line font-medium shadow-[var(--shadow-card)]">
                         {question.modelAnswer}
                       </div>
                     </div>
 
                     {question.scoringRubric && question.scoringRubric.length > 0 && (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-label font-bold text-emerald-800 dark:text-emerald-400">
+                        <div className="flex items-center gap-2 text-label font-semibold text-emerald-800 dark:text-emerald-400">
                           <Award className="w-4 h-4" aria-hidden="true" />
                           <span>سلم التنقيط وتوزيع الدرجات</span>
                         </div>
-                        <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 divide-y divide-emerald-200/60 dark:divide-emerald-900/40">
+                        <div className="divide-y divide-emerald-200/60 rounded-xl bg-emerald-50/80 dark:divide-emerald-900/40 dark:bg-emerald-500/10">
                           {question.scoringRubric.map((item, i) => (
                             <div
                               key={i}
@@ -251,7 +252,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                               <span className="text-emerald-950 dark:text-emerald-100 font-semibold">
                                 {item.criterion}
                               </span>
-                              <span className="font-bold px-2.5 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900/70 text-emerald-900 dark:text-emerald-200 shrink-0">
+                              <span className="font-semibold px-2.5 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900/70 text-emerald-900 dark:text-emerald-200 shrink-0">
                                 +{item.points} ن
                               </span>
                             </div>
@@ -261,13 +262,13 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                     )}
 
                     {question.examinerNotes && (
-                      <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 text-amber-950 dark:text-amber-100 text-body-sm">
+                      <div className="flex items-start gap-3 rounded-xl bg-[var(--amber-soft)] p-4 text-body-sm text-[var(--ink)]">
                         <AlertTriangle
                           className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5"
                           aria-hidden="true"
                         />
                         <div className="space-y-1">
-                          <span className="font-bold block text-amber-900 dark:text-amber-300">
+                          <span className="font-semibold block text-amber-900 dark:text-amber-300">
                             تنبيه وملاحظة المصحح:
                           </span>
                           <span className="leading-relaxed block">{question.examinerNotes}</span>

@@ -41,21 +41,21 @@ export default function ResumeBanner() {
   const href = `/units/${unit.id}`;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--pine-soft)] px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--brand-soft)] px-4 py-3">
       <div className="flex min-w-0 items-baseline gap-3">
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/70 px-2.5 py-1 text-meta font-bold text-[var(--pine-deep)] dark:bg-black/20">
+        <span className="inline-flex shrink-0 items-center gap-1.5 text-meta font-semibold text-[var(--brand-strong)]">
           <History className="h-3.5 w-3.5" aria-hidden="true" />
           تابع من حيث توقفت
         </span>
-        <p className="min-w-0 truncate text-body font-bold text-[var(--ink)]">
+        <p className="min-w-0 truncate text-body font-semibold text-[var(--ink)]">
           {unit.shortTitle}
-          <span className="mx-2 font-normal text-[var(--rule-strong)]">/</span>
+          <span className="mx-2 text-[var(--hairline-strong)]">/</span>
           <span className="font-medium text-[var(--ink-soft)]">{tabLabel}</span>
         </p>
       </div>
 
       <div className="flex items-center gap-3">
-        <Link href={href} className="u-cta min-h-9 px-4 py-1.5">
+        <Link href={href} className="u-cta min-h-9 px-3.5 py-1.5">
           <span>تابع</span>
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>

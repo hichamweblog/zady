@@ -39,19 +39,21 @@ export default function InsightCard({
 
   return (
     <aside
-      className={`rounded-2xl border border-[var(--ochre-soft)] bg-[var(--band-warm)] px-3.5 py-3 ${className}`}
+      className={`rounded-xl bg-[var(--amber-soft)] px-3.5 py-3 ${className}`}
       title={meta?.hint}
       data-insight={resolvedTone}
     >
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2 py-0.5 text-meta font-bold text-[var(--ochre)] dark:bg-black/25">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2 py-0.5 text-meta font-semibold text-[var(--amber-ink)] dark:bg-white/10">
           <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{LABEL[resolvedTone]}</span>
         </span>
-        {heading && <span className="text-meta font-bold text-[var(--ink-soft)]">{heading}</span>}
+        {heading && (
+          <span className="text-meta font-semibold text-[var(--amber-ink)]">{heading}</span>
+        )}
       </p>
 
-      <div className="mt-2 space-y-2 text-body leading-loose font-medium text-[var(--ink-soft)]">
+      <div className="mt-2 space-y-2 text-body leading-relaxed font-medium text-[var(--ink)]">
         {children}
       </div>
     </aside>

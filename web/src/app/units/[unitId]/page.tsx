@@ -81,13 +81,13 @@ export default async function UnitPage({ params }: { params: Promise<{ unitId: s
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+    <div className="flex min-h-screen flex-col bg-[var(--canvas)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Navbar />
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="u-wrap flex-1 py-6 sm:py-8">
         <UnitClientView unit={unit} previousUnit={prev} nextUnit={next} />
 
         {/* محتوى خادمي للزحف والقراءة السريعة دون JavaScript */}

@@ -28,238 +28,273 @@
  * المتغيّرات معرّفة هنا، والأصناف (utilities) في نهاية الملف.
  */
 @theme {
-  --text-meta: 0.875rem; /* 14px — شارات وتواريخ فقط */
+  --text-meta: 0.8125rem; /* 13px — بيانات وصفية فقط */
   --text-meta--line-height: 1.55;
 
-  --text-label: 0.9375rem; /* 15px — تسميات الحقول والأزرار الصغيرة */
-  --text-label--line-height: 1.65;
+  --text-label: 0.875rem; /* 14px — أزرار وتسميات */
+  --text-label--line-height: 1.6;
 
   --text-body-sm: 1rem; /* 16px — نص ثانوي كثيف */
-  --text-body-sm--line-height: 1.8;
+  --text-body-sm--line-height: 1.75;
 
-  --text-body: 1.125rem; /* 18px — المتن (الافتراضي) */
-  --text-body--line-height: 1.85;
+  --text-body: 1.125rem; /* 18px — متن القراءة (قرار الجولة 16: العربية تحتاج أكبر) */
+  --text-body--line-height: 1.8;
 
-  --text-title: 1.3125rem; /* 21px — عناوين الأقسام */
-  --text-title--line-height: 1.5;
+  --text-title: 1.25rem; /* 20px — عنوان قسم/بطاقة */
+  --text-title--line-height: 1.45;
 
-  --text-heading: 1.625rem; /* 26px — عناوين على الشاشات الكبيرة */
-  --text-heading--line-height: 1.45;
+  --text-heading: 1.375rem; /* 22px — عنوان فرعي */
+  --text-heading--line-height: 1.35;
 
-  --text-display: 1.875rem; /* 30px — عنوان الصفحة */
-  --text-display--line-height: 1.35;
+  --text-display: 1.75rem; /* 28px — عنوان صفحة/وحدة */
+  --text-display--line-height: 1.3;
 }
 
 
 /*
  * ============================================================
- *  نظام «حبر ونعنع» — لوحة عربية دافئة، سطوح ناعمة، ولون واحد
+ *  نظام «سليت وتيل» — Slate & Deep Teal
  * ============================================================
  *
- * بعد مراجعة لوحة الإلهام (مواقع عربية تعليمية ومتاجر حديثة): السطح الدافئ
- * الكريمي، أشرطة نعنعية فاتحة، بطاقات بيضاء مستديرة بظلّ خفيف، وأزرار حبّوبية.
- * اللون الأساسي واحد (صنوبري عميق) والثانوي واحد (ذهبي للحظة الانتباه)،
- * والباقي أسطح. هذا ما يفصل «منتجًا مصمَّمًا» عن قالب بدرجات بنفسجية.
+ * التشخيص الذي دفع إلى هذا النظام:
+ *   - الخلفية الزيتية الدافئة كانت تُتعب العين وتُصفرّ الشاشة.
+ *   - حدود 1px حول كل بطاقة جعلت الواجهة شبكة مربّعات متشابكة.
+ *   - شريط بـ6 تبويبات متجاورة بلا مسار تعليمي.
  *
- * نعيد كتابة درجات Tailwind نفسها حتى تتلوّن كل المكوّنات بلا تعارض.
+ * العلاج: كانفس سليت بارد #F8FAFC، سطح أبيض، لون علامة واحد (تيل عميق)،
+ * وذهب واحد للتنبيه المنهجي. الفصل بين الأسطح يحدث بالتباين والظلّ الناعم
+ * لا بالحدود. ونعيد كتابة درجات Tailwind نفسها حتى تتلوّن كل المكوّنات
+ * القديمة تلقائيًا بلا تعارض.
  */
 @theme {
-  /* أسطح وحبر — تحلّ محل slate */
-  --color-slate-50: #f7faf8;
-  --color-slate-100: #eef5f1;
-  --color-slate-200: #dde9e3;
-  --color-slate-300: #c2d5cc;
-  --color-slate-400: #8fa79c;
-  --color-slate-500: #6f857b;
-  --color-slate-600: #556a61;
-  --color-slate-700: #3c4f47;
-  --color-slate-800: #22332c;
-  --color-slate-900: #14231d;
-  --color-slate-950: #0b1512;
+  /* الأسطح والحبر — تحلّ محل slate */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #0b0f17;
 
-  /* الصنوبري — العلامة والتفاعل (يحلّ محل teal) */
-  --color-teal-50: #e9f4ef;
-  --color-teal-100: #d3e9e0;
-  --color-teal-200: #a9d3c4;
-  --color-teal-300: #77b8a3;
-  --color-teal-400: #479a82;
-  --color-teal-500: #237e67;
-  --color-teal-600: #146a56;
-  --color-teal-700: #0e5a49;
-  --color-teal-800: #0b4638;
-  --color-teal-900: #09372c;
-  --color-teal-950: #05241d;
+  /* التيل — العلامة والتفاعل (يحلّ محل teal) */
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+  --color-teal-800: #115e59;
+  --color-teal-900: #134e4a;
+  --color-teal-950: #042f2e;
 
-  /* الذهبي — للمصباح واللحظة الواحدة (يحلّ محل amber) */
-  --color-amber-50: #fdf5e4;
-  --color-amber-100: #f9e9c8;
-  --color-amber-200: #f0d69b;
-  --color-amber-300: #e3bd6c;
-  --color-amber-400: #d3a341;
-  --color-amber-500: #b98624;
-  --color-amber-600: #8f6215;
-  --color-amber-700: #714d12;
-  --color-amber-800: #5c4013;
-  --color-amber-900: #3c2a0e;
-  --color-amber-950: #241909;
+  /* الذهبي — للتنبيه المنهجي والشرح، لا للزينة (يحلّ محل amber) */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
 
-  /* الزيتوني — «تمّ» */
-  --color-emerald-50: #eef6e6;
-  --color-emerald-100: #dcecd0;
-  --color-emerald-200: #bfdaa9;
-  --color-emerald-300: #9cc27d;
-  --color-emerald-400: #78a556;
-  --color-emerald-500: #5b883c;
-  --color-emerald-600: #47712e;
-  --color-emerald-700: #375a24;
-  --color-emerald-800: #27401a;
-  --color-emerald-900: #1a2b12;
-  --color-emerald-950: #0f1a0a;
+  /* الزمردي — «متقن/تمّ» فقط */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-emerald-950: #022c22;
 
   /* الأزرق النيلي — أرقام الاختبار */
-  --color-blue-50: #edf2f8;
-  --color-blue-100: #dbe6f1;
-  --color-blue-200: #b9cde2;
-  --color-blue-300: #8dabc8;
-  --color-blue-400: #6386a8;
-  --color-blue-500: #46698b;
-  --color-blue-600: #375671;
-  --color-blue-700: #2c4459;
-  --color-blue-800: #1f3140;
-  --color-blue-900: #15222c;
-  --color-blue-950: #0b141a;
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
 
-  /* الطوبي — الخطأ فقط */
-  --color-rose-50: #fdefec;
-  --color-rose-100: #fadcd6;
-  --color-rose-200: #f3b9ae;
-  --color-rose-300: #e79183;
-  --color-rose-400: #d76c5b;
-  --color-rose-500: #bf5142;
-  --color-rose-600: #a64134;
-  --color-rose-700: #853329;
-  --color-rose-800: #5f251e;
-  --color-rose-900: #401914;
-  --color-rose-950: #250f0b;
+  /* الوردي — الخطأ فقط */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+  --color-rose-800: #9f1239;
+  --color-rose-900: #881337;
+  --color-rose-950: #4c0519;
 
-  /* استدارة: البطاقات مستديرة بلطف، والأزرار حبّوبية */
+  /* استدارة: حاويات 16px، أزرار وحقول 12px، رقائق حبّوبية */
   --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 1.875rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.25rem;
 
-  /* ظلّ واحد ناعم مشتقّ من لون الحبر لا من الأسود */
-  --shadow-xs: 0 1px 2px rgb(12 35 27 / 0.06);
-  --shadow-sm: 0 2px 10px -4px rgb(12 35 27 / 0.12);
-  --shadow-md: 0 14px 30px -18px rgb(12 35 27 / 0.28);
-  --shadow-lg: 0 28px 60px -32px rgb(12 35 27 / 0.35);
-  --shadow-xl: 0 40px 80px -40px rgb(12 35 27 / 0.4);
+  /* ظلّ محيطي ناعم متعدّد الطبقات — لا أسود صريح */
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 2px 6px -1px rgb(15 23 42 / 0.03);
+  --shadow-lg: 0 12px 32px -8px rgb(15 23 42 / 0.12), 0 4px 12px -4px rgb(15 23 42 / 0.05);
+  --shadow-xl: 0 24px 48px -12px rgb(15 23 42 / 0.16);
 }
 
 /* أسماء دلالية تُستعمل في المكوّنات */
 @theme {
-  --color-paper: #faf7f1;
-  --color-sheet: #ffffff;
-  --color-sunken: #eff6f2;
-  --color-rule: #e4ebe6;
-  --color-rule-strong: #cbd9d2;
-  --color-ink: #16211c;
-  --color-ink-soft: #4c5c54;
-  --color-ink-faint: #62736a;
-  --color-pine: #0e5a49;
-  --color-ochre: #8f6215;
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f5f9;
+  --color-hairline: #e2e8f0;
+  --color-ink: #0f172a;
+  --color-ink-2: #475569;
+  --color-brand: #0d9488;
+  --color-accent: #d97706;
 }
 
 @layer base {
+  /*
+   * الرموز الدلالية — الأسماء الجديدة هي المصدر، والأسماء القديمة (paper/sheet/
+   * pine/ochre/ink) تبقى كأسماء مستعارة حتى لا ينكسر أي مكوّن لم يُهاجَر بعد.
+   */
   :root {
     color-scheme: light;
-    /* ورق دافئ لا أبيض نقي: القراءة الطويلة على #fff تُتعب العين */
-    --background: #faf7f1;
-    --foreground: #16211c;
+    /* الكانفس والسطح */
+    --background: #f8fafc;
+    --foreground: #0f172a;
     --card: #ffffff;
-    --card-foreground: #16211c;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #16211c;
-    --primary: #0e5a49;
+    --popover-foreground: #0f172a;
+    --primary: #0f766e;
     --primary-foreground: #ffffff;
-    --secondary: #eff6f2;
-    --secondary-foreground: #16211c;
-    --muted: #eff6f2;
-    --muted-foreground: #4c5c54;
-    --accent: #fdf5e4;
-    --accent-foreground: #16211c;
-    --destructive: #a64134;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #475569;
+    --accent: #d97706;
+    --accent-foreground: #ffffff;
+    --destructive: #be123c;
     --destructive-foreground: #ffffff;
-    --border: #e4ebe6;
-    --input: #dde9e3;
-    --ring: #0e5a49;
-    --radius: 1rem;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #0d9488;
 
-    /* رموز النظام: سطحان + شريط + حبر + لون واحد */
-    --paper: #faf7f1;
-    --sheet: #ffffff;
-    --sunken: #eff6f2;
-    --band: #edf5f0;
-    --band-warm: #fdf5e4;
-    --rule: #e4ebe6;
-    --rule-strong: #cbd9d2;
-    --ink: #16211c;
-    --ink-soft: #4c5c54;
-    --ink-faint: #62736a;
-    --pine: #0e5a49;
-    --pine-deep: #0b4638;
-    --pine-soft: #e2f0ea;
-    --ochre: #8f6215;
-    --ochre-soft: #fdf5e4;
-    --shadow-card: 0 2px 10px -4px rgb(12 35 27 / 0.12);
-    --shadow-lift: 0 18px 34px -22px rgb(12 35 27 / 0.3);
+    /* السطح والعمق */
+    --canvas: #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --hairline: #e2e8f0;
+    --hairline-strong: #cbd5e1;
+
+    /* الحبر */
+    --ink: #0f172a;
+    --ink-soft: #475569;
+    --ink-faint: #64748b;
+
+    /* العلامة: تيل عميق + ذهب واحد */
+    --brand: #0d9488;
+    --brand-strong: #0f766e;
+    --brand-soft: #f0fdfa;
+    --brand-ring: rgb(13 148 136 / 0.28);
+    --brand-ink: #ffffff;
+    --amber: #d97706;
+    --amber-soft: #fffbeb;
+    --amber-chip: #fef3c7;
+    --amber-ink: #b45309;
+
+    --shadow-card: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 2px 6px -1px rgb(15 23 42 / 0.03);
+    --shadow-hover: 0 12px 32px -8px rgb(15 23 42 / 0.12), 0 4px 12px -4px rgb(15 23 42 / 0.05);
+    --shadow-float: 0 24px 48px -12px rgb(15 23 42 / 0.16);
+
+    /* أسماء مستعارة من النظام السابق */
+    --paper: var(--canvas);
+    --sheet: var(--surface);
+    --sunken: var(--surface-2);
+    --band: var(--brand-soft);
+    --band-warm: var(--amber-soft);
+    --rule: var(--hairline);
+    --rule-strong: var(--hairline-strong);
+    --pine: var(--brand-strong);
+    --pine-deep: var(--brand-strong);
+    --pine-soft: var(--brand-soft);
+    --ochre: var(--amber-ink);
+    --ochre-soft: var(--amber-soft);
+    --shadow-lift: var(--shadow-hover);
   }
 
   /*
-   * الوضع الليلي: أخضر عميق لا أزرق ليلي، والأسطح أفتح من الصفحة بدرجة
-   * واحدة، والحدود واضحة (1.7:1) حتى تُقرأ البنية بلا ظلال ثقيلة.
+   * الوضع الليلي: أزرق-فحمي عميق (Obsidian) وسطح كحلي مرتفع، وتيل فاتح
+   * للتفاعل. الحدود شبه شفافة (7%) لأن الفصل هنا يقوم بالسطوع لا بالخطّ.
    */
   .dark {
     color-scheme: dark;
-    --background: #0b1310;
-    --foreground: #ecf3ef;
-    --card: #14211c;
-    --card-foreground: #ecf3ef;
-    --popover: #16241f;
-    --popover-foreground: #ecf3ef;
-    --primary: #6ed0b4;
-    --primary-foreground: #06201a;
-    --secondary: #16241f;
-    --secondary-foreground: #ecf3ef;
-    --muted: #16241f;
-    --muted-foreground: #b9c9c1;
-    --accent: #2a2416;
-    --accent-foreground: #f6e7c8;
-    --destructive: #e79183;
-    --destructive-foreground: #0b1310;
-    --border: #22362e;
-    --input: #1b2c26;
-    --ring: #6ed0b4;
+    --background: #0b0f17;
+    --foreground: #f8fafc;
+    --card: #131b2e;
+    --card-foreground: #f8fafc;
+    --popover: #16203a;
+    --popover-foreground: #f8fafc;
+    --primary: #2dd4bf;
+    --primary-foreground: #04211d;
+    --secondary: #1a2438;
+    --secondary-foreground: #f8fafc;
+    --muted: #1a2438;
+    --muted-foreground: #94a3b8;
+    --accent: #fbbf24;
+    --accent-foreground: #1c1508;
+    --destructive: #fb7185;
+    --destructive-foreground: #150608;
+    --border: rgb(255 255 255 / 0.08);
+    --input: rgb(255 255 255 / 0.12);
+    --ring: #2dd4bf;
 
-    --paper: #0b1310;
-    --sheet: #14211c;
-    --sunken: #101b17;
-    --band: #101d18;
-    --band-warm: #1d1a10;
-    --rule: #22362e;
-    --rule-strong: #335046;
-    --ink: #ecf3ef;
-    --ink-soft: #b9c9c1;
-    --ink-faint: #93a99e;
-    --pine: #6ed0b4;
-    --pine-deep: #8ee0c7;
-    --pine-soft: #12302a;
-    --ochre: #f0c878;
-    --ochre-soft: #241d10;
-    --shadow-card: 0 2px 12px -6px rgb(0 0 0 / 0.55);
-    --shadow-lift: 0 24px 44px -28px rgb(0 0 0 / 0.7);
+    --canvas: #0b0f17;
+    --surface: #131b2e;
+    --surface-2: #1a2438;
+    --surface-3: #223049;
+    --hairline: rgb(255 255 255 / 0.07);
+    --hairline-strong: rgb(255 255 255 / 0.14);
+
+    --ink: #f8fafc;
+    --ink-soft: #94a3b8;
+    --ink-faint: #8494ad;
+
+    --brand: #2dd4bf;
+    --brand-strong: #5eead4;
+    --brand-soft: rgb(45 212 191 / 0.1);
+    --brand-ring: rgb(45 212 191 / 0.35);
+    --brand-ink: #04211d;
+    --amber: #fbbf24;
+    --amber-soft: rgb(251 191 36 / 0.1);
+    --amber-chip: rgb(251 191 36 / 0.14);
+    --amber-ink: #fbbf24;
+
+    --shadow-card: 0 4px 24px -6px rgb(0 0 0 / 0.55);
+    --shadow-hover: 0 16px 40px -12px rgb(0 0 0 / 0.7);
+    --shadow-float: 0 28px 64px -16px rgb(0 0 0 / 0.8);
   }
 }
 
@@ -271,13 +306,17 @@ html {
 }
 
 body {
-  font-family:
-    var(--font-body), var(--font-latin), "Noto Naskh Arabic", "Segoe UI", Arial, sans-serif;
+  /*
+   * واجهة الاستخدام بخطّ هندسي عربي حديث (IBM Plex Sans Arabic)، والنصوص
+   * الشرعية تبقى في خطّ النَّسخ (`.font-quran`). الفصل صار وظيفيًا: السانس
+   * للبنية والأزرار والأرقام، والنَّسخ للشاهد القرآني/الحديثي.
+   */
+  font-family: var(--font-ui), var(--font-body), "Segoe UI", Arial, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
   /* المتن الموحّد: كل نص بلا صنف حجم يأخذ هذا */
   font-size: var(--text-body);
-  line-height: 1.85;
+  line-height: 1.8;
   /* يمنع «الفقاعة» عند الضغط المطوّل على iOS */
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
@@ -424,138 +463,160 @@ strong {
  * الطويلة في كل مكوّن ويمنع أن يبدو كل قسم مصمَّمًا على حِدة.
  */
 
-/* سطح: بطاقة بيضاء مستديرة بظلّ ناعم مشتقّ من لون الحبر */
+/* ============================================================
+ *  طبقة المكوّنات (u-*) — مصدر واحد للشكل
+ * ============================================================
+ * 1. لا حدّ 1px حول البطاقات: الفصل بالسطوع + ظلّ محيطي ناعم.
+ * 2. حاويات 16px، أزرار وحقول 12px، رقائق حبّوبية.
+ * 3. لون علامة واحد (تيل) ولون تنبيه واحد (ذهب).
+ */
+
+/* سطح: بطاقة بيضاء بظلّ محيطي — بلا إطار */
 .u-card {
-  background-color: var(--sheet);
-  border: 1px solid var(--rule);
-  border-radius: 1.25rem;
+  background-color: var(--surface);
+  border: 1px solid transparent;
+  border-radius: 1rem;
   box-shadow: var(--shadow-card);
+}
+
+.dark .u-card {
+  border-color: rgb(255 255 255 / 0.06);
 }
 
 .u-card-hover {
   transition:
     box-shadow 0.2s ease,
     transform 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.2s ease;
 }
 
 .u-card-hover:hover {
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
-  border-color: var(--rule-strong);
 }
 
-/* شريط قسم: نعنعي فاتح أو ذهبي، بحواف مستديرة كبيرة */
+/* سطح ثانٍ: حاوية داخلية بلون خفيف بدل صندوق بإطار */
+.u-soft {
+  background-color: var(--surface-2);
+  border-radius: 1rem;
+}
+
+/* شريط قسم: تيل فاتح، بلا إطار */
 .u-band {
-  background-color: var(--band);
-  border-radius: 1.875rem;
+  background-color: var(--brand-soft);
+  border-radius: 1.25rem;
 }
 
 .u-band-warm {
-  background-color: var(--band-warm);
-  border-radius: 1.875rem;
+  background-color: var(--amber-soft);
+  border-radius: 1.25rem;
 }
 
-/* شريحة صغيرة: حالة أو تصنيف */
+/* رقاقة صغيرة: حالة أو تصنيف */
 .u-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   border-radius: 999px;
-  background-color: var(--pine-soft);
-  color: var(--pine-deep);
-  padding: 0.3rem 0.7rem;
+  background-color: var(--brand-soft);
+  color: var(--brand-strong);
+  padding: 0.2rem 0.6rem;
   font-size: var(--text-meta);
-  font-weight: 700;
-  line-height: 1.5;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 .u-chip-warm {
-  background-color: var(--ochre-soft);
-  color: var(--ochre);
+  background-color: var(--amber-chip);
+  color: var(--amber-ink);
 }
 
-/* عنوان كبير: النسخي بوزن 700 — الهيبة من الحجم والوزن معًا */
+.dark .u-chip-warm {
+  background-color: var(--amber-chip);
+  color: var(--amber);
+}
+
+/* عنوان كبير */
 .u-display {
   font-weight: 700;
-  line-height: 1.28;
+  line-height: 1.3;
   color: var(--ink);
   text-wrap: balance;
 }
 
 .u-kicker {
   font-size: var(--text-meta);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
   color: var(--ink-faint);
 }
 
-/* تمييز كلمة داخل العنوان: خطّ ماركر ذهبي لا لون صارخ */
+/* تمييز كلمة داخل العنوان: ماركر ذهبي شفاف لا لون صارخ */
 .u-mark {
-  background-image: linear-gradient(transparent 58%, var(--ochre-soft) 58%);
+  background-image: linear-gradient(transparent 62%, rgb(217 119 6 / 0.22) 62%);
   background-repeat: no-repeat;
-  padding-inline: 0.15rem;
+  padding-inline: 0.1rem;
 }
 
-/* زرّ أساسي: حبّوبي ممتلئ، ظلّ خفيف، وحركة دفع صغيرة */
+/* زرّ أساسي: ممتلئ، 12px، ظلّ ناعم */
 .u-cta {
   display: inline-flex;
-  min-height: 46px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  background-color: var(--pine);
-  color: #fff;
-  padding: 0.7rem 1.35rem;
+  border-radius: 0.75rem;
+  background-color: var(--brand-strong);
+  color: var(--brand-ink);
+  padding: 0.65rem 1.15rem;
   font-size: var(--text-label);
-  font-weight: 700;
-  box-shadow: var(--shadow-card);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
   transition:
     background-color 0.18s ease,
+    box-shadow 0.18s ease,
     transform 0.18s ease;
 }
 
 .u-cta:hover {
-  background-color: var(--pine-deep);
+  background-color: var(--primary);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
 .dark .u-cta {
-  color: #06201a;
+  color: var(--brand-ink);
 }
 
-/* زرّ ثانوي: حدّ فقط */
+/* زرّ ثانوي: سطح خفيف بلا حدّ */
 .u-ghost {
   display: inline-flex;
-  min-height: 46px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--rule-strong);
-  background-color: var(--sheet);
-  padding: 0.7rem 1.2rem;
+  border-radius: 0.75rem;
+  background-color: var(--surface-2);
+  padding: 0.65rem 1rem;
   font-size: var(--text-label);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink);
   transition:
     background-color 0.18s ease,
-    border-color 0.18s ease;
+    color 0.18s ease;
 }
 
 .u-ghost:hover {
-  background-color: var(--sunken);
-  border-color: var(--pine);
+  background-color: var(--surface-3);
 }
 
-/* فهرس مقسّم: حاوية نعنعية والاختيار قرص أبيض — نمط لوحة الإلهام */
+/* فهرس مقسّم: حاوية غائرة وقرص أبيض للاختيار */
 .u-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  border-radius: 999px;
-  background-color: var(--sunken);
+  gap: 0.125rem;
+  border-radius: 0.875rem;
+  background-color: var(--surface-2);
   padding: 0.25rem;
 }
 
@@ -565,10 +626,10 @@ strong {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
+  border-radius: 0.625rem;
+  padding: 0.4rem 0.8rem;
   font-size: var(--text-label);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink-soft);
   transition:
     background-color 0.18s ease,
@@ -581,38 +642,45 @@ strong {
 }
 
 .u-tab[aria-selected="true"] {
-  background-color: var(--sheet);
-  color: var(--pine-deep);
-  box-shadow: var(--shadow-xs);
+  background-color: var(--surface);
+  color: var(--brand-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .dark .u-tab[aria-selected="true"] {
-  background-color: var(--pine-soft);
-  color: var(--pine);
+  background-color: var(--surface-3);
+  color: var(--brand);
 }
 
 /* عدد داخل تبويب */
 .u-tab-count {
   border-radius: 999px;
-  background-color: var(--rule);
+  background-color: var(--surface-3);
   padding: 0 0.4rem;
   font-size: var(--text-meta);
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
 }
 
-/* اقتباس شرعي: سطح نعنعي مع حدّ جانبي */
+.dark .u-tab-count {
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+/* اقتباس شرعي (شاهد): سطح خفيف بلا صندوق ثقيل */
 .u-quote {
   border-radius: 1rem;
-  border-inline-start: 3px solid var(--pine);
-  background-color: var(--pine-soft);
+  background-color: var(--surface-2);
   padding: 1rem 1.1rem;
+}
+
+.dark .u-quote {
+  background-color: rgb(255 255 255 / 0.04);
 }
 
 /* رقم/عدّاد */
 .u-num {
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* عرض القراءة */

@@ -35,7 +35,7 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6">
       <div
-        className="absolute inset-0 bg-[#07231c]/45 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -44,10 +44,10 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
         role="dialog"
         aria-modal="true"
         aria-labelledby="mindmap-sheet-title"
-        className="relative z-10 max-h-[86vh] w-full overflow-y-auto rounded-t-[1.75rem] border border-[var(--rule)] bg-[var(--sheet)] p-5 shadow-[var(--shadow-lg)] sm:max-w-xl sm:rounded-[1.75rem] sm:p-7"
+        className="relative z-10 max-h-[86vh] w-full overflow-y-auto rounded-t-3xl bg-[var(--surface)] p-5 shadow-[var(--shadow-float)] sm:max-w-xl sm:rounded-3xl sm:p-7"
       >
         <div
-          className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[var(--rule-strong)] sm:hidden"
+          className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[var(--surface-3)] sm:hidden"
           aria-hidden="true"
         />
 
@@ -70,11 +70,11 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
         </div>
 
         {node.details ? (
-          <p className="mt-4 rounded-2xl bg-[var(--sunken)] p-4 text-body leading-loose font-medium text-[var(--ink-soft)]">
+          <p className="mt-4 rounded-xl bg-[var(--surface-2)] p-4 text-body leading-relaxed text-[var(--ink-soft)]">
             {node.details}
           </p>
         ) : (
-          <p className="mt-4 border-s-2 border-[var(--rule-strong)] ps-3 text-body font-medium text-[var(--ink-faint)]">
+          <p className="mt-4 rounded-lg bg-[var(--surface-2)] px-3 py-2 text-body-sm font-medium text-[var(--ink-faint)]">
             {node.children?.length
               ? "هذا محور رئيسي: اختر أحد عناصره الفرعية لقراءة الشرح."
               : "لا يوجد شرح إضافي لهذا العنصر في هذه الوحدة."}
@@ -90,7 +90,7 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
                   key={child.id}
                   type="button"
                   onClick={() => onNavigate(child.id)}
-                  className="flex items-center justify-between gap-2 rounded-xl bg-[var(--sunken)] px-3 py-2.5 text-right text-label font-bold text-[var(--ink)] transition-colors hover:bg-[var(--pine-soft)]"
+                  className="flex items-center justify-between gap-2 rounded-xl bg-[var(--surface-2)] px-3 py-2.5 text-right text-label font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--brand-soft)]"
                 >
                   <span className="min-w-0">{child.label}</span>
                   <ArrowRight

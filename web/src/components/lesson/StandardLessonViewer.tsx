@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, ChevronDown, Copy, Check, CheckCircle2 } from "lucide-react";
+import { BookOpen, ChevronDown, Copy, Check, CheckCircle2, Lightbulb } from "lucide-react";
 import { useProgress } from "@/lib/useProgressStore";
 import { resolveSectionTitle, SECTION_TITLES } from "@/lib/section-titles";
 import { insightFor, isInsightField } from "@/lib/content-kinds";
@@ -96,11 +96,12 @@ export default function StandardLessonViewer({
       )}
 
       {/* مفتاح العلامات — يُذكر مرة واحدة */}
-      <p className="u-chip u-chip-warm w-full justify-start rounded-2xl px-3.5 py-2.5 text-start text-label font-medium leading-relaxed">
-        <span aria-hidden="true">💡</span>
+      <p className="flex items-start gap-2 rounded-xl bg-[var(--amber-soft)] px-4 py-3 text-start text-label leading-relaxed text-[var(--ink)]">
+        <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-[var(--amber)]" aria-hidden="true" />
         <span>
-          بطاقة <span className="font-bold">إضاءة</span> أو <span className="font-bold">فائدة</span>{" "}
-          ليست عنصرًا مفهوميًا يُحفظ؛ والخريطة الذهنية للتعريفات والأقسام وحدها.
+          بطاقة <span className="font-semibold text-[var(--amber-ink)]">إضاءة</span> أو{" "}
+          <span className="font-semibold text-[var(--amber-ink)]">فائدة</span> ليست عنصرًا مفهوميًا
+          يُحفظ؛ والخريطة الذهنية للتعريفات والأقسام وحدها.
         </span>
       </p>
 
@@ -119,11 +120,11 @@ export default function StandardLessonViewer({
                 aria-controls={bodyId}
                 className="flex min-w-0 flex-1 items-start gap-3 text-right"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--pine-soft)] text-label font-bold text-[var(--pine-deep)]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-label font-semibold text-[var(--brand-strong)]">
                   {arabicNumber(idx + 1)}
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-title font-bold leading-snug text-[var(--ink)]">
+                  <span className="block text-title font-semibold leading-snug text-[var(--ink)]">
                     {section.title}
                   </span>
                   {isRead && (
@@ -143,10 +144,10 @@ export default function StandardLessonViewer({
                 type="button"
                 onClick={() => toggleSectionRead(unitId, section.key)}
                 aria-pressed={isRead}
-                className={`mt-0.5 shrink-0 rounded-full border px-3 py-1.5 text-meta font-bold transition-colors ${
+                className={`mt-0.5 shrink-0 rounded-lg px-3 py-1.5 text-meta font-semibold transition-colors ${
                   isRead
-                    ? "border-transparent bg-[var(--pine)] text-white"
-                    : "border-[var(--rule-strong)] text-[var(--ink-soft)] hover:bg-[var(--sunken)]"
+                    ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                    : "bg-[var(--surface-2)] text-[var(--ink-soft)] hover:bg-[var(--surface-3)] hover:text-[var(--ink)]"
                 }`}
               >
                 {isRead ? "مقروء ✓" : "علّم كمقروء"}
@@ -154,10 +155,7 @@ export default function StandardLessonViewer({
             </div>
 
             {open && (
-              <div
-                id={bodyId}
-                className="u-measure border-t border-[var(--rule)] px-4 pt-4 pb-5 sm:px-5"
-              >
+              <div id={bodyId} className="u-measure px-4 pt-1 pb-5 sm:px-5">
                 <RenderContent
                   data={section.content}
                   onCopyAyah={copyText}
@@ -245,7 +243,7 @@ function RenderContent({
         {data.map((item, i) => (
           <li
             key={i}
-            className="rounded-xl bg-[var(--sunken)] px-3.5 py-2.5 text-body leading-loose text-[var(--ink-soft)]"
+            className="rounded-xl bg-[var(--surface-2)] px-3.5 py-2.5 text-body leading-loose text-[var(--ink-soft)]"
           >
             {isRecord(item) && typeof item.title === "string" && (
               <h4 className="text-body font-bold text-[var(--ink)]">{item.title}</h4>
@@ -284,7 +282,7 @@ function RenderContent({
       )}
 
       {definitionBlocks.map((block) => (
-        <div key={block.label} className="rounded-2xl bg-[var(--pine-soft)] px-4 py-3">
+        <div key={block.label} className="rounded-xl bg-[var(--brand-soft)] px-4 py-3">
           <p className="text-meta font-bold text-[var(--pine-deep)]">{block.label}</p>
           <p className="mt-1 text-body font-medium leading-loose text-[var(--ink)]">{block.text}</p>
         </div>
@@ -370,9 +368,9 @@ function RenderContent({
       {Array.isArray(data.effects) && (
         <ol className="space-y-3">
           {data.effects.filter(isRecord).map((eff, i) => (
-            <li key={i} className="rounded-2xl border border-[var(--rule)] p-3.5">
+            <li key={i} className="rounded-xl bg-[var(--surface-2)] p-3.5">
               <div className="flex items-baseline gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--pine-soft)] text-meta font-bold text-[var(--pine-deep)]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-meta font-semibold text-[var(--brand-strong)]">
                   {arabicNumber(i + 1)}
                 </span>
                 <h5 className="text-body font-bold text-[var(--ink)]">
@@ -383,7 +381,7 @@ function RenderContent({
                 {asString(eff.explanation)}
               </p>
               {asString(eff.quranic_proof_warsh) && (
-                <p className="font-quran mt-2 rounded-xl bg-[var(--pine-soft)] px-3 py-2 text-title leading-loose text-[var(--ink)]">
+                <p className="font-quran mt-2 rounded-xl bg-[var(--brand-soft)] px-3 py-2 text-title leading-loose text-[var(--ink)]">
                   {asString(eff.quranic_proof_warsh)}
                 </p>
               )}

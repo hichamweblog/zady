@@ -36,15 +36,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--rule)] bg-[var(--background)]/90 backdrop-blur-md">
-      <div className="u-wrap flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--hairline)] bg-[var(--canvas)]/80 backdrop-blur-xl">
+      <div className="u-wrap flex h-14 items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="زادِي">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--pine)] text-white shadow-[var(--shadow-card)]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand-strong)] text-white shadow-[var(--shadow-sm)] dark:text-[var(--brand-ink)]">
               <BookOpen className="h-4 w-4" aria-hidden="true" />
             </span>
             <span className="leading-tight">
-              <span className="block text-title font-bold text-[var(--ink)]">زادِي</span>
+              <span className="block text-label font-bold tracking-normal text-[var(--ink)]">
+                زادِي
+              </span>
               <span className="block text-meta font-bold text-[var(--ink-faint)]">
                 العلوم الإسلامية
               </span>
@@ -55,10 +57,10 @@ export default function Navbar() {
             <Link
               href="/"
               aria-current={pathname === "/" ? "page" : undefined}
-              className={`rounded-full px-3.5 py-2 text-label font-bold transition-colors ${
+              className={`rounded-lg px-3 py-2 text-label font-semibold transition-colors ${
                 pathname === "/"
-                  ? "bg-[var(--pine-soft)] text-[var(--pine-deep)]"
-                  : "text-[var(--ink-soft)] hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+                  ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                  : "text-[var(--ink-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
               }`}
             >
               الرئيسية
@@ -70,7 +72,7 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen((v) => !v)}
                 aria-expanded={isMenuOpen}
                 aria-haspopup="true"
-                className="flex items-center gap-1 rounded-full px-3.5 py-2 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+                className="flex items-center gap-1 rounded-lg px-3 py-2 text-label font-semibold text-[var(--ink-soft)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
               >
                 <span>الوحدات</span>
                 <ChevronDown
@@ -81,7 +83,7 @@ export default function Navbar() {
               </button>
 
               {isMenuOpen && (
-                <div className="absolute end-0 top-full mt-2 w-72 rounded-2xl border border-[var(--rule)] bg-[var(--sheet)] p-1.5 shadow-[var(--shadow-lift)]">
+                <div className="absolute end-0 top-full mt-2 w-72 rounded-2xl bg-[var(--surface)] p-1.5 shadow-[var(--shadow-float)] ring-1 ring-black/[0.04] dark:ring-white/10">
                   {UNITS_META.map((unit) => {
                     const isActive = pathname === `/units/${unit.id}`;
                     return (
@@ -92,8 +94,8 @@ export default function Navbar() {
                         aria-current={isActive ? "page" : undefined}
                         className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-label transition-colors ${
                           isActive
-                            ? "bg-[var(--pine-soft)] font-bold text-[var(--pine-deep)]"
-                            : "font-medium text-[var(--ink-soft)] hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+                            ? "bg-[var(--brand-soft)] font-semibold text-[var(--brand-strong)]"
+                            : "font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
                         }`}
                       >
                         <span className="min-w-0 truncate">{unit.shortTitle}</span>
@@ -114,11 +116,11 @@ export default function Navbar() {
           onClick={toggleTheme}
           aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
           aria-pressed={isDark}
-          className="flex min-h-11 items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--sheet)] px-3 text-label font-bold text-[var(--ink-soft)] shadow-[var(--shadow-xs)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+          className="flex min-h-10 items-center gap-2 rounded-lg bg-[var(--surface-2)] px-2.5 text-label font-semibold text-[var(--ink-soft)] transition-colors hover:bg-[var(--surface-3)] hover:text-[var(--ink)]"
         >
           {isDark ? (
             <>
-              <Sun className="h-4 w-4 text-[var(--ochre)]" aria-hidden="true" />
+              <Sun className="h-4 w-4 text-[var(--amber)]" aria-hidden="true" />
               <span className="hidden sm:inline">نهاري</span>
             </>
           ) : (

@@ -96,24 +96,27 @@ test("لا أوزان 800/900 مع عائلة لا تحملها", () => {
 /* 2) الخط                                                             */
 /* ------------------------------------------------------------------ */
 
-test("خط المتن نَسخي محلي (Noto Naskh Arabic) لا خط ويب خارجي", () => {
+test("الخطوط محليّة: IBM Plex Sans Arabic للواجهة وAmiri للشاهد — بلا خط ويب خارجي", () => {
   // نستثني التعليقات: ذكر `next/font/google` في شرح ليس استيرادًا
   const layout = fs
     .readFileSync(path.join(SRC, "app", "layout.tsx"), "utf8")
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/.*$/gm, "");
   assert.match(layout, /next\/font\/local/, "الخطوط محلية لتعمل دون إنترنت");
-  assert.doesNotMatch(layout, /next\/font\/google/, "لا اعتماد على Google Fonts وقت البناء");
-  assert.match(layout, /variable:\s*"--font-body"/, "متغيّر خط المتن");
+  assert.doesNotMatch(layout, /from\s+["']next\/font\/google["']/, "لا خطوط من شبكة Google");
 
-  for (const file of ["noto-naskh-400.woff2", "noto-naskh-700.woff2"]) {
+  // أربعة أوزان هندسية عربية، كلٌّ منها خفيف بما يكفي للجوال
+  for (const weight of ["Regular", "Medium", "SemiBold", "Bold"]) {
+    const file = `plex-arabic-${weight}.woff2`;
     const full = path.join(SRC, "app", "fonts", file);
     assert.ok(fs.existsSync(full), `${file} موجود`);
-    assert.ok(fs.statSync(full).size < 80_000, `${file} خفيف (< 80KB)`);
+    assert.ok(fs.statSync(full).size < 90_000, `${file} خفيف (< 90KB)`);
   }
 
+  // الواجهة تستعمل خطّ الواجهة، والآية تستعمل خطّ الشاهد
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  assert.match(css, /font-family:\s*var\(--font-body\)/, "المتن يستخدم --font-body");
+  assert.match(css, /font-family: var\(--font-ui\)/, "المتن يستخدم --font-ui");
+  assert.match(css, /--font-amiri/, "الشاهد له عائلته");
 });
 
 /* ------------------------------------------------------------------ */
@@ -425,96 +428,126 @@ test("نصوص الدرس كلها بمقاس واحد، لا مقاس أصغر 
   assert.ok(!viewer.includes("sm:text-heading"), "لا يقفز مقاس الشاهد على الشاشات الكبيرة");
 });
 
-test("الوضع الليلي: حبر دافئ لا أزرق ليلي، وسطوح متدرّجة تُرى بقوّة التباين", () => {
+test("الوضع الليلي: أزرق فحميّ عميق وسطح كحلي مرتفع، لا أسود مسطّح", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
 
-  // ورق كريمي في النهار، وأخضر فحميّ في الليل — لا أبيض نقي ولا أزرق نليلي
-  assert.match(css, /--paper: #faf7f1/, "ورق كريمي دافئ في النهار (لا أبيض نقي)");
-  assert.match(css, /--paper: #0b1310/, "فحميّ مائل للأخضر في الليل (لا أزرق)");
-  assert.match(css, /--sheet: #14211c/, "السطح الليلي أفتح من الصفحة بدرجة");
-  assert.match(css, /--ink: #ecf3ef/, "حبر الليل فاتح عالي التباين لا أبيض ساطع");
+  assert.match(css, /--background: #0b0f17/, "الكانفس الليلي Obsidian لا أسود");
+  assert.match(css, /--surface: #131b2e/, "السطح الليلي كحلي أفتح من الكانفس");
+  assert.match(css, /--ink: #f8fafc/, "حبر ليلي فاتح عالي التباين");
+  assert.match(css, /--brand: #2dd4bf/, "التيل الفاتح للتفاعل في الليل");
 
-  // العمق الآن ظلّ ناعم مشتقّ من حبر النظام — لا أسود صريح ولا ظلّ ضخم
-  assert.match(css, /--shadow-card:/, "ظلّ البطاقة معرَّف كمتغيّر واحد");
-  assert.match(css, /--shadow-lift:/, "وظلّ الارتفاع عند المرور");
-  assert.doesNotMatch(css, /--shadow-sm: none/, "لم يبقَ قرار «لا ظلّ» من الجولة السابقة");
+  // حدود الليل شبه شفافة (7%) لا خطوط صلبة
+  assert.match(css, /--hairline: rgb\(255 255 255 \/ 0\.07\)/, "حدّ ليلي شفاف 7%");
 
-  // الحدود ما زالت من النظام، فلا خطوط صلبة محليّة
-  assert.match(css, /--rule: #e4ebe6/, "حدّ نهاري من نفس العائلة اللونية");
-  assert.match(css, /--rule: #22362e/, "وحدّ ليلي");
+  // العمق بالظلّ المحيطي، ويعود لونًا مختلفًا في الليل
+  assert.match(css, /--shadow-card:/, "ظلّ البطاقة معرَّف");
+  assert.match(css, /--shadow-hover:/, "وظلّ الارتفاع عند المرور");
 });
 
-test("لا تدرّجات ولا زجاج: الاستدارة والظلّ من سلّم النظام لا من قيم عشوائية", () => {
+test("لا إطارات حول البطاقات ولا تدرّجات: الفصل بالسطوع والظلّ", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  assert.match(css, /--radius-3xl: 1\.875rem/, "سقف الاستدارة 30px — شريط قسم لا فقاعة");
-  assert.match(css, /--radius-sm: 0\.5rem/, "وأصغر استدارة 8px على الأقل");
-  assert.match(css, /--radius-xl: 1\.25rem/, "البطاقة الداخلية 20px");
+
+  // البطاقة: إطار شفاف في النهار وحدّ 6% في الليل فقط
+  const card = css.slice(css.indexOf(".u-card {"), css.indexOf(".u-card-hover"));
+  assert.match(card, /border: 1px solid transparent/, "البطاقة بلا إطار مرئي");
+  assert.match(card, /box-shadow: var\(--shadow-card\)/, "وتفصلها ظلّ ناعم");
+
+  // السلّم: 8→20px للحاويات، وأزرار 12px
+  assert.match(css, /--radius-xl: 1rem/, "الحاويات 16px");
+  assert.match(css, /\.u-cta \{[^}]*border-radius: 0\.75rem/, "الأزرار 12px");
+  assert.match(css, /\.u-chip \{[^}]*border-radius: 999px/, "الرقائق حبّوبية");
 
   const offenders = [];
   for (const file of walk(SRC, ".tsx")) {
     const text = fs.readFileSync(file, "utf8");
     if (/bg-gradient|linear-gradient/.test(text)) offenders.push(path.basename(file));
   }
-  assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن — الأسطح بلون واحد");
-
-  // الأزرار والعناصر الحبّوبية تُعرَّف مرة واحدة في الطبقة الموحّدة
-  assert.match(css, /\.u-cta\s*\{/, "زرّ رئيسي واحد معرَّف مركزيًا");
-  assert.match(css, /border-radius: 999px/, "الأزرار حبّوبية بالكامل");
+  assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن");
 });
 
-test("بطاقة الخريطة: سطح النظام بظلّ ناعم واستدارة، لا مستطيل عائم", () => {
-  const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
-  const start = map.indexOf("group min-w-0 rounded-2xl border");
-  assert.ok(start > 0, "بطاقة العنصر موجودة");
-  const node = map.slice(start, start + 720);
-  assert.match(node, /bg-\[var\(--sheet\)\]/, "خلفيتها من نظام الورق (تتلوّن تلقائيًا ليلًا)");
-  assert.match(node, /border-\[var\(--rule\)\]/, "وحدّها من نظام الحدود");
-  assert.match(
-    node,
-    /shadow-\[var\(--shadow-(?:xs|card|lift)\)\]/,
-    "وترتفع بظلّ النظام لا بظلّ أسود"
-  );
-  assert.ok(!node.includes("bg-white"), "لا خلفية بيضاء صريحة");
-  assert.ok(!/shadow-(?:sm|md|lg|xl)\b/.test(node), "ولا ظلال Tailwind الافتراضية");
-});
-
-test("هوية «حبر ونعنع»: طبقة u-* واحدة، ومسطرة قراءة في الدرس", () => {
+test("لوحة Slate & Teal: لون علامة واحد ولون تنبيه واحد في النهار", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  for (const token of ["--paper:", "--sheet:", "--rule:", "--ink:", "--pine:", "--ochre:"]) {
-    assert.ok(css.includes(token), `المتغيّر ${token} معرَّف مرة واحدة`);
-  }
-  for (const cls of [".u-card", ".u-band", ".u-chip"]) {
-    assert.match(css, new RegExp(`\\${cls}\\s*\\{`), `الفئة ${cls} معرَّفة`);
-  }
-  assert.match(css, /\.u-tab\[aria-selected="true"\]/, "الاختيار قرص أبيض داخل حاوية نعنعية");
-  assert.match(css, /\.u-quote\s*\{/, "النص الشرعي له سطحه الخاص (شاهد لا فائدة)");
+  assert.match(css, /--canvas: #f8fafc/, "كانفس Slate 50");
+  assert.match(css, /--surface: #ffffff/, "سطح أبيض");
+  assert.match(css, /--brand: #0d9488/, "تيل 600 هو العلامة");
+  assert.match(css, /--amber: #d97706/, "ذهب واحد للتنبيه");
+  assert.match(css, /--ink: #0f172a/, "حبر Slate 900");
+  assert.match(css, /--ink-soft: #475569/, "حبر ثانوي Slate 600");
 
-  // لم يبقَ من مفردات الجولة السابقة شيء
-  const legacy = [];
-  for (const file of walk(SRC, ".tsx")) {
-    const text = fs.readFileSync(file, "utf8");
-    if (/className="[^"]*\bz-(?:sheet|hair|btn|link|num|kicker|display|index-item)/.test(text)) {
-      legacy.push(path.basename(file));
-    }
-  }
-  assert.deepEqual(legacy, [], "لا مكوّنات على مفردات .z-* القديمة");
+  // لا لون زخرفي ثالث في طبقة المكوّنات
+  const layer = css.slice(css.indexOf(".u-card {"));
+  assert.doesNotMatch(layer, /purple|violet|indigo|fuchsia/, "لا ألوان قوس قزح");
+});
+
+test("مسار التعلّم: ثلاث مراحل لا ستة أزرار متساوية", () => {
+  const view = readSrc("app", "units", "[unitId]", "UnitClientView.tsx");
+  const stages = view.slice(
+    view.indexOf("const STAGES"),
+    view.indexOf("interface UnitClientViewProps")
+  );
+  assert.match(stages, /label: "استيعاب"/, "المرحلة 1: استيعاب");
+  assert.match(stages, /label: "تثبيت"/, "المرحلة 2: تثبيت");
+  assert.match(stages, /label: "اختبار"/, "المرحلة 3: اختبار");
+  assert.match(stages, /steps: \["lesson", "mindmap"\]/, "القراءة والخريطة في الاستيعاب");
+
+  // الخطوات المعروضة هي خطوات المرحلة الحالية فقط
+  assert.match(view, /const visibleTabs = useMemo/, "الخطوات تُفلتر بالمرحلة");
+  assert.match(view, /visibleTabs\.map/, "الشريط يعرض خطوات المرحلة");
+  assert.doesNotMatch(view, /tabs\.map\(\s*\(tab, index\)/, "لم يبقَ شريط بستة أزرار");
+
+  // والمسار يبقى ملتصقًا أعلى الصفحة
+  assert.match(view, /sticky top-14/, "شريط المراحل لاصق أثناء التمرير");
 
   const rule = readSrc("components", "lesson", "ReadingRule.tsx");
   assert.match(rule, /requestAnimationFrame/, "مسطرة القراءة تُحدَّث في إطار رسم واحد");
-  assert.match(rule, /bg-\[var\(--pine\)\]/, "تتقدّم بلون الحبر الصنوبري");
+});
 
-  const view = readSrc("app", "units", "[unitId]", "UnitClientView.tsx");
-  assert.match(view, /<ReadingRule \/>/, "مسطرة القراءة مركّبة في تبويب الدرس");
+test("البطاقات: 4:3 والتقييم لا يظهر إلا بعد القلب", () => {
+  const deck = readSrc("components", "flashcards", "FlashcardSection.tsx");
+  assert.match(deck, /aspect-\[4\/3\]/, "البطاقة بنسبة 4:3 كالبطاقة الورقية");
+  assert.match(deck, /max-w-xl/, "بعرض محدود ومتمركز");
+  assert.match(deck, /\{isFlipped \? \(/, "كتلة التقييم مشروطة بالقلب");
+  assert.match(deck, /handleRate\("hard"\)/, "تقييم: صعب");
+  assert.match(deck, /handleRate\("medium"\)/, "تقييم: متوسط");
+  assert.match(deck, /handleRate\("easy"\)/, "تقييم: متقن");
+  // لا تعليمات لوحة مفاتيح مزدحمة في الواجهة
+  assert.doesNotMatch(deck, /اضغط Space للقلب، والأرقام/, "حُذفت تعليمات الكيبورد الطويلة");
+});
+
+test("QCM: شريط تقدّم وخيارات Radio Cards وتفسير بعد الإجابة", () => {
+  const mcq = readSrc("components", "quiz", "McqQuizViewer.tsx");
+  assert.match(mcq, /role="progressbar"/, "شريط تقدّم للاختبار");
+  assert.match(mcq, /role="radiogroup"/, "الخيارات مجموعة اختيار واحد");
+  assert.match(mcq, /role="radio"/, "كل خيار بطاقة اختيار");
+  assert.match(
+    mcq,
+    /bg-\[var\(--surface-2\)\] text-\[var\(--ink\)\] hover:bg-\[var\(--surface-3\)\]/,
+    "الخيار سطح بلا إطار"
+  );
+  assert.doesNotMatch(mcq, /border-2 border-slate/, "لا إطارات سميكة على الخيارات");
 });
 
 test("طلب واحدة لكل شاشة: إجراء ممتلئ واحد والباقي هادئ", () => {
   const page = readSrc("app", "page.tsx");
   const primary = (page.match(/className="u-cta"/g) || []).length;
-  assert.equal(primary, 1, "إجراء واحد ممتلئ في الغلاف (البطل)، لا أكثر");
-  assert.match(page, /className="u-ghost"/, "والإجراء الثاني ثانوي بحدّ فقط");
+  assert.equal(primary, 1, "إجراء واحد ممتلئ في الغلاف، لا أكثر");
+  assert.match(page, /استعرض الوحدات/, "والإجراء الثاني رابط نصّي");
   assert.match(
     page,
-    /text-label font-bold text-\[var\(--pine\)\]/,
-    "وبطاقات الوحدات تفتح برابط، لا بأربعة أزرار ممتلئة"
+    /text-label font-semibold text-\[var\(--brand-strong\)\]/,
+    "وبطاقات الوحدات تُفتح برابط"
   );
+});
+
+test("لا مكوّنات على مفردات .z-* القديمة", () => {
+  const legacy = [];
+  for (const file of walk(SRC, ".tsx")) {
+    const text = fs.readFileSync(file, "utf8");
+    if (
+      /className="[^"]*\bz-(?:sheet|hair|btn|link|num|kicker|display|index-item|quote)/.test(text)
+    ) {
+      legacy.push(path.basename(file));
+    }
+  }
+  assert.deepEqual(legacy, [], "كل المكوّنات على طبقة u-* الجديدة");
 });

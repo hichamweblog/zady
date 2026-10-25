@@ -16,15 +16,15 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md w-full u-card p-8 shadow-xl space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-900">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--canvas)] p-6 text-center">
+      <div className="w-full max-w-md space-y-6 rounded-3xl bg-[var(--surface)] p-8 shadow-[var(--shadow-float)]">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
           <AlertCircle className="w-8 h-8" aria-hidden="true" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-title font-bold text-slate-900 dark:text-white">حدث خطأ غير متوقع</h1>
-          <p className="text-body text-[var(--ink-soft)] leading-relaxed">
+          <h1 className="text-heading font-semibold text-[var(--ink)]">حدث خطأ غير متوقع</h1>
+          <p className="text-body-sm leading-relaxed text-[var(--ink-soft)]">
             واجه التطبيق مشكلة أثناء تحميل الصفحة. تقدّمك المحفوظ على جهازك لم يتأثر.
           </p>
           {error.digest && (
@@ -35,18 +35,12 @@ export default function Error({
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={() => reset()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-700 text-white font-bold text-label hover:bg-teal-800 transition-colors"
-          >
+          <button onClick={() => reset()} className="u-cta">
             <RotateCcw className="w-4 h-4" aria-hidden="true" />
             <span>إعادة المحاولة</span>
           </button>
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 font-bold text-label text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          >
+          <Link href="/" className="u-ghost">
             <Home className="w-4 h-4" aria-hidden="true" />
             <span>الرئيسية</span>
           </Link>

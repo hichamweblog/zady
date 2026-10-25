@@ -25,6 +25,17 @@ import { useProgress } from "@/lib/useProgressStore";
 
 type TabId = "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz" | "revision";
 
+/**
+ * مسار التعلّم: ثلاث مراحل لا ستّة أزرار متساوية.
+ * «استيعاب» = اقرأ وشاهد، «تثبيت» = احفظ واسترجع، «اختبار» = قِس نفسك.
+ * إسناد كل خطوة إلى مرحلتها هو ما يجعل الشريط يقول للطالب أين هو.
+ */
+const STAGES: { id: string; label: string; steps: TabId[] }[] = [
+  { id: "absorb", label: "استيعاب", steps: ["lesson", "mindmap"] },
+  { id: "anchor", label: "تثبيت", steps: ["flashcards"] },
+  { id: "test", label: "اختبار", steps: ["mcq", "quiz", "revision"] },
+];
+
 interface UnitClientViewProps {
   unit: ClientUnit;
   previousUnit?: UnitMeta;
@@ -151,6 +162,15 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
     setLastActivity(unit.id, candidate);
   }, [activeTab, progressData.lastActivity, selectTab, setLastActivity, tabs, unit.id]);
 
+  const activeStage = useMemo(
+    () => STAGES.find((stage) => stage.steps.includes(activeTab)) ?? STAGES[0],
+    [activeTab]
+  );
+  const visibleTabs = useMemo(
+    () => tabs.filter((tab) => activeStage.steps.includes(tab.id)),
+    [activeStage, tabs]
+  );
+
   const activeIndex = tabs.findIndex((t) => t.id === activeTab);
   const nextTab = activeIndex >= 0 && activeIndex < tabs.length - 1 ? tabs[activeIndex + 1] : null;
   const doneCount = tabs.filter((tab) => stepDone[tab.id]).length;
@@ -161,108 +181,170 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
       const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
       if (!keys.includes(event.key)) return;
       event.preventDefault();
-      const currentIndex = tabs.findIndex((t) => t.id === activeTab);
-      let nextIndex = currentIndex;
-      if (event.key === "ArrowRight") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-      if (event.key === "ArrowLeft") nextIndex = (currentIndex + 1) % tabs.length;
+      const currentIndex = visibleTabs.findIndex((t) => t.id === activeTab);
+      let nextIndex = currentIndex < 0 ? 0 : currentIndex;
+      if (event.key === "ArrowRight") {
+        nextIndex = (currentIndex - 1 + visibleTabs.length) % visibleTabs.length;
+      }
+      if (event.key === "ArrowLeft") {
+        nextIndex = (currentIndex + 1) % visibleTabs.length;
+      }
       if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = tabs.length - 1;
-      const tab = tabs[nextIndex];
+      if (event.key === "End") nextIndex = visibleTabs.length - 1;
+      const tab = visibleTabs[nextIndex];
+      if (!tab) return;
       selectTab(tab.id);
       tabListRef.current?.querySelector<HTMLButtonElement>(`#tab-${tab.id}`)?.focus();
     },
-    [activeTab, tabs, selectTab]
+    [activeTab, visibleTabs, selectTab]
   );
 
   return (
     <div className="space-y-5">
       {/* مسار التتبّع — سطر صغير أعلى العنوان */}
-      <nav aria-label="مسار التصفح" className="flex items-baseline gap-2 text-label font-medium">
+      <nav aria-label="مسار التصفح" className="flex items-center gap-1">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-meta font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+          className="inline-flex items-center gap-1 rounded-lg px-1.5 py-1 text-meta font-semibold text-[var(--ink-soft)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
         >
-          الغلاف
+          <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>كل الوحدات</span>
         </Link>
-        <span aria-hidden="true" className="text-[var(--rule-strong)]">
+        <span aria-hidden="true" className="text-[var(--ink-faint)]">
           /
         </span>
-        <span className="u-num">{unit.badge.replace("وحدة ", "")}</span>
-        <span className="text-[var(--ink-soft)]">{unit.shortTitle}</span>
+        <span className="u-num text-meta text-[var(--ink-faint)]">{unit.badge}</span>
       </nav>
 
       {/*
- رأس الوحدة: قلّصنا ما يُعرض قبل المحتوى.
- كان: شارتا تصنيف + عنوان + معلومتان + لوحة تقدّم بأربعة أسطر + 6 تبويبات
- بأرقامها وعدّاداتها. صار: عنوان + سطر معلومة واحد + شريط تقدّم واحد.
- التفاصيل الكاملة (المستهدف، عدّادات كل خطوة) انتقلت إلى مكانها الطبيعي.
- */}
-      <header className="u-band px-5 py-6 sm:px-8 sm:py-7">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="u-chip bg-white/85 dark:bg-white/10">
-                الوحدة {String(unit.id).padStart(2, "0")}
-              </span>
-              <span className="u-chip bg-white/85 dark:bg-white/10">{unit.timeAllocation}</span>
-              <span className="hidden text-meta font-bold text-[var(--ink-faint)] sm:inline">
-                {unit.targetAudience}
-              </span>
-            </div>
-            <h1 className="u-display text-[clamp(1.5rem,3.6vw,2.15rem)]">{unit.title}</h1>
-          </div>
+        رأس الوحدة: عنوان + سطر معلومة + قرص تقدّم.
+        القرص يقول «كم بقي» في ثانية واحدة، ويحلّ محلّ شريط أفقي وعدّاد نصي.
+      */}
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="u-display text-display sm:text-[1.75rem]">{unit.title}</h1>
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-label font-medium text-[var(--ink-soft)]">
+            <span>{unit.targetAudience}</span>
+            <span aria-hidden="true" className="text-[var(--ink-faint)]">
+              ·
+            </span>
+            <span>{unit.timeAllocation}</span>
+          </p>
+        </div>
 
-          <div className="w-full shrink-0 space-y-2 sm:w-64">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-meta font-bold text-[var(--ink-soft)]">الإتقان</span>
-              <span className="u-num text-title text-[var(--pine-deep)]">
-                {stats.progressPercentage}%
-              </span>
-            </div>
-            <div
+        <div className="flex shrink-0 items-center gap-3 self-start rounded-2xl bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-card)] sm:self-auto">
+          <div className="relative h-11 w-11 shrink-0" aria-hidden="true">
+            <svg viewBox="0 0 40 40" className="h-11 w-11 -rotate-90">
+              <circle
+                cx="20"
+                cy="20"
+                r="16"
+                fill="none"
+                stroke="var(--surface-3)"
+                strokeWidth="4"
+              />
+              <circle
+                cx="20"
+                cy="20"
+                r="16"
+                fill="none"
+                stroke="var(--brand)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                pathLength={100}
+                strokeDasharray={`${stats.progressPercentage} 100`}
+              />
+            </svg>
+            <span className="u-num absolute inset-0 grid place-items-center text-meta text-[var(--ink)]">
+              {stats.progressPercentage}%
+            </span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-label font-semibold text-[var(--ink)]">تقدّمك في الوحدة</p>
+            <p
+              className="text-meta text-[var(--ink-faint)]"
               role="progressbar"
               aria-valuenow={stats.progressPercentage}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label={`نسبة إتقان ${unit.shortTitle}`}
-              className="h-2 w-full overflow-hidden rounded-full bg-white/80 dark:bg-black/25"
             >
-              <div
-                className="h-full rounded-full bg-[var(--pine)] transition-[width] duration-500"
-                style={{ width: `${stats.progressPercentage}%` }}
-              />
-            </div>
-            <p className="text-meta font-medium text-[var(--ink-faint)]">
-              {doneCount} من 6 خطوات مكتملة
+              {doneCount} من {tabs.length} خطوات مكتملة
             </p>
           </div>
         </div>
       </header>
 
       {/*
-        شريط الخطوات — مصمَّم للهاتف أولًا.
+        مسار الوحدة: ثلاث مراحل (استيعاب ← تثبيت ← اختبار) ثم خطوات المرحلة
+        الحالية فقط. السبب: ستة أهداف جنبًا إلى جنب لا تقول للطالب من أين
+        يبدأ؛ أما المرحلة فتقول «أين أنت» في كلمة واحدة، والخطوات تحتها
+        لا تتجاوز ثلاثًا. والشريط يلتصق أعلى الصفحة أثناء التمرير.
+      */}
+      <div className="sticky top-14 z-30 -mx-5 border-y border-[var(--hairline)] bg-[var(--canvas)]/92 px-5 py-2.5 backdrop-blur-md sm:mx-0 sm:rounded-2xl sm:border-0 sm:px-3 sm:shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-1" role="group" aria-label="مراحل الوحدة">
+          {STAGES.map((stage, stageIndex) => {
+            const stageTabs = tabs.filter((tab) => stage.steps.includes(tab.id));
+            const stageDone = stageTabs.filter((tab) => stepDone[tab.id]).length;
+            const isActiveStage = activeStage.id === stage.id;
+            return (
+              <div key={stage.id} className="flex min-w-0 flex-1 items-center gap-1">
+                {stageIndex > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className={`h-px w-2 shrink-0 sm:w-3 ${
+                      isActiveStage ? "bg-[var(--brand)]" : "bg-[var(--hairline-strong)]"
+                    }`}
+                  />
+                )}
+                <button
+                  type="button"
+                  aria-current={isActiveStage ? "step" : undefined}
+                  onClick={() => selectTabAndScroll(stage.steps[0])}
+                  className={`flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2 py-1.5 text-start transition-colors ${
+                    isActiveStage
+                      ? "bg-[var(--surface)] shadow-[var(--shadow-sm)]"
+                      : "hover:bg-[var(--surface-2)]"
+                  }`}
+                >
+                  <span
+                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-meta font-semibold ${
+                      isActiveStage
+                        ? "bg-[var(--brand-strong)] text-white dark:text-[var(--brand-ink)]"
+                        : stageDone === stageTabs.length
+                          ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                          : "bg-[var(--surface-3)] text-[var(--ink-soft)]"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {stageIndex + 1}
+                  </span>
+                  <span className="min-w-0">
+                    <span
+                      className={`block truncate text-label font-semibold ${
+                        isActiveStage ? "text-[var(--ink)]" : "text-[var(--ink-soft)]"
+                      }`}
+                    >
+                      {stage.label}
+                    </span>
+                    <span className="u-num block text-meta text-[var(--ink-faint)]">
+                      {stageDone}/{stageTabs.length}
+                    </span>
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
 
-        المشكلة قبله: كان صفًّا أفقيًا بـ`overflow-x-auto` بلا أي دليل على وجود
-        تمرير، فتُقطع التبويبات على الهاتف ولا يرى الطالب بقيتها.
-        الآن: صفّ يلتف (flex-wrap). على الهاتف ثلاث خطوات في السطر الأول
-        وثلاث في الثاني، بأسمائها كاملة بلا قطع ولا تمرير أفقي، ثم صفّ واحد
-        على الشاشات الأكبر.
-        ويبقى ملتصقًا أعلى الصفحة في متناول الإبهام أثناء التمرير.
-      */}
-      {/*
-        فهرس الخطوات: نصوص مرقّمة على خطّ واحد، والعلامة السفلية تُعلن الحالة.
-        لا أقراص ملوّنة ولا أيقونات: ستة أهداف في سطرين على الهاتف، وسطر واحد
-        على الحاسوب، والمكتمل يظهر بعلامة صغيرة لا بلون كامل.
-      */}
-      <div className="z-30 sticky top-16 -mx-5 bg-[var(--background)]/92 px-5 py-2 backdrop-blur-md sm:mx-0 sm:px-0 sm:py-0">
         <div
           ref={tabListRef}
           role="tablist"
-          aria-label="أنماط الدراسة في الوحدة"
+          aria-label={`خطوات مرحلة ${activeStage.label}`}
           onKeyDown={onTabsKeyDown}
-          className="u-tabs"
+          className="u-tabs mt-2"
         >
-          {tabs.map((tab, index) => {
+          {visibleTabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const isDone = stepDone[tab.id];
             const Icon = tab.icon;
@@ -277,16 +359,14 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => selectTabAndScroll(tab.id)}
                 title={tab.label}
-                className="u-tab relative grow basis-[calc(50%_-_0.75rem)] sm:grow-0 sm:basis-auto"
+                className="u-tab relative flex-1"
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="whitespace-nowrap">{tab.label}</span>
-                {tab.count !== null && (
-                  <span className="u-tab-count hidden sm:inline">{tab.count}</span>
-                )}
+                {tab.count !== null && <span className="u-tab-count">{tab.count}</span>}
                 {isDone && (
                   <span
-                    className="absolute -top-0.5 end-1 h-1.5 w-1.5 rounded-full bg-[var(--pine)]"
+                    className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--brand)]"
                     aria-hidden="true"
                   />
                 )}

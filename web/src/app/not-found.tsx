@@ -6,26 +6,24 @@ import { UNITS_META } from "@/lib/units-meta";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+    <div className="flex min-h-screen flex-col bg-[var(--canvas)]">
       <Navbar />
 
       <main
         id="main-content"
         className="flex-1 flex flex-col items-center justify-center p-6 text-center"
       >
-        <div className="max-w-lg w-full u-card p-8 shadow-xl space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto border border-teal-200 dark:border-teal-900">
+        <div className="w-full max-w-lg space-y-6 rounded-3xl bg-[var(--surface)] p-8 shadow-[var(--shadow-float)]">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[var(--brand-soft)] text-[var(--brand-strong)]">
             <BookOpen className="w-8 h-8" aria-hidden="true" />
           </div>
 
           <div className="space-y-2">
-            <p className="text-label font-bold px-2.5 py-0.5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 inline-block">
-              404 — الصفحة غير موجودة
-            </p>
-            <h1 className="text-title font-bold text-slate-900 dark:text-white">
+            <p className="u-chip">404 — الصفحة غير موجودة</p>
+            <h1 className="text-heading font-semibold text-[var(--ink)]">
               الوحدة أو الصفحة المطلوبة غير متوفرة
             </h1>
-            <p className="text-body text-[var(--ink-soft)] leading-relaxed">
+            <p className="text-body-sm leading-relaxed text-[var(--ink-soft)]">
               تأكد من رقم الوحدة (من 1 إلى {UNITS_META.length})، أو اختر إحدى الوحدات المتوفرة
               أدناه.
             </p>
@@ -36,7 +34,7 @@ export default function NotFound() {
               <Link
                 key={unit.id}
                 href={`/units/${unit.id}`}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-label font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex items-center gap-1.5 rounded-lg bg-[var(--surface-2)] px-3 py-2 text-label font-medium text-[var(--ink)] transition-colors hover:bg-[var(--surface-3)]"
               >
                 <Compass className="w-3.5 h-3.5" aria-hidden="true" />
                 {unit.badge}
@@ -44,10 +42,7 @@ export default function NotFound() {
             ))}
           </div>
 
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-teal-700 text-white font-bold text-body-sm hover:bg-teal-800 transition-colors shadow-md shadow-teal-700/20"
-          >
+          <Link href="/" className="u-cta">
             <Home className="w-4 h-4" aria-hidden="true" />
             <span>العودة إلى الصفحة الرئيسية</span>
           </Link>
