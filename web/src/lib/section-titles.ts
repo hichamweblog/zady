@@ -51,7 +51,7 @@ export const SECTION_TITLES: Record<string, string> = {
   from_preventive_aspect: "من جانب العدم (الوقاية والحماية)",
   effects: "الآثار",
   tawheed_categories: "أقسام التوحيد",
-  quranic_proof_warsh: "الشاهد القرآني (رواية ورش)",
+  quranic_proof_warsh: "الشاهد القرآني",
   quranic_proof: "الشاهد القرآني",
   prophetic_proof: "الشاهد الحديثي",
   proof_anchor_phrase: "محل الشاهد",

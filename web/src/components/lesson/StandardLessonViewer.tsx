@@ -322,7 +322,7 @@ function RenderContent({
     asString(data.prophetic_proof);
   const proofLabel = asString(data.prophetic_proof)
     ? "الشاهد الحديثي"
-    : "الشاهد الشرعي (رواية ورش)";
+    : "الشاهد الشرعي";
   const ayahId = proofText ? `ayah_${hashText(proofText)}` : "";
 
   const definitionBlocks: { label: string; text: string }[] = [
