@@ -361,7 +361,27 @@ test("الدرس يمرّر كل حقل غير مفهومي إلى بطاقة ا
     /<InsightCard tone="illumination" title="مؤشرات الاستخراج">/,
     "مؤشرات الاستخراج إضاءة لا مفهوم"
   );
-  assert.match(viewer, /<InsightCard tone="benefit" title=\{proofLabel\}>/, "الشاهد فائدة");
+  // العناصر الثلاثة التي تُذكر في الشرح ولا تُعدّ عناصر درس (توجيهات التدرّج الرسمي)
+  assert.match(
+    viewer,
+    /\["relationship_linguistic_idiomatic", "core_foundation", "tawheed_categories"\]/,
+    "العلاقة وأصل العقيدة وأقسام التوحيد بطاقات إضاءة"
+  );
+});
+
+test("النص الشرعي ليس «إضاءة» ولا «فائدة» بل شاهدًا قائمًا بذاته", () => {
+  const viewer = readSrc("components", "lesson", "StandardLessonViewer.tsx");
+  assert.ok(
+    !viewer.includes('tone="benefit" title={proofLabel}'),
+    "لا شارة «فائدة» على الشاهد الشرعي"
+  );
+  assert.match(
+    viewer,
+    /proofText && \(\s*<div className="p-5 rounded-2xl bg-amber-50\/90[\s\S]{0,500}BookOpen/,
+    "الشاهد في كتلة مستقلة بعلامة الكتاب"
+  );
+  assert.match(viewer, /الشاهد الحديثي/, "عنوان الشاهد الحديثي");
+  assert.match(viewer, /الشاهد الشرعي \(رواية ورش\)/, "عنوان الشاهد القرآني");
 });
 
 test("الخريطة الذهنية لا تعرض الشواهد ولا الكلمات المفتاحية", () => {

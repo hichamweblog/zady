@@ -353,23 +353,37 @@ function RenderContent({
         </div>
       ))}
 
-      {asString(data.relationship_linguistic_idiomatic) && (
-        <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-body-sm text-slate-800 dark:text-slate-200">
-          <span className="font-bold text-slate-900 dark:text-white">العلاقة بين المعنيين: </span>
-          <span>{asString(data.relationship_linguistic_idiomatic)}</span>
-        </div>
-      )}
+      {/* ما يُشار إليه خلال شرح التعريف، وليس عنصرًا مفهوميًا في الدرس */}
+      {["relationship_linguistic_idiomatic", "core_foundation", "tawheed_categories"].map((key) => {
+        const value = data[key];
+        if (value === null || value === undefined || value === "") return null;
 
-      {asString(data.core_foundation) && (
-        <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-body shadow-sm">
-          <span className="font-bold text-emerald-800 dark:text-emerald-300">
-            أصل العقيدة الإسلامية:{" "}
-          </span>
-          <span className="text-slate-900 dark:text-slate-100 font-semibold">
-            {asString(data.core_foundation)}
-          </span>
-        </div>
-      )}
+        if (key === "tawheed_categories" && Array.isArray(value)) {
+          return (
+            <InsightCard key={key} field={key}>
+              <ul className="space-y-2">
+                {value.filter(isRecord).map((tc, i) => (
+                  <li key={i}>
+                    <span className="font-bold">{asString(tc.category)}: </span>
+                    <span>{asString(tc.definition)}</span>
+                    {asString(tc.example) && (
+                      <span className="mt-0.5 block text-meta font-medium text-slate-600 dark:text-slate-300">
+                        مثال: {asString(tc.example)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </InsightCard>
+          );
+        }
+
+        return (
+          <InsightCard key={key} field={key}>
+            <InsightValue value={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />
+          </InsightCard>
+        );
+      })}
 
       {asString(data.explanation) && (
         <p className="text-body text-slate-900 dark:text-slate-100 leading-relaxed font-medium">
@@ -378,8 +392,13 @@ function RenderContent({
       )}
 
       {proofText && (
-        <InsightCard tone="benefit" title={proofLabel}>
-          <div className="flex items-center justify-end gap-3 flex-wrap">
+        <div className="p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border-r-4 border-amber-500 space-y-2.5 shadow-sm">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-body-sm font-bold text-amber-900 dark:text-amber-300">
+              <BookOpen className="w-4 h-4 text-amber-600" aria-hidden="true" />
+              <span>{proofLabel}:</span>
+            </div>
+
             <button
               type="button"
               onClick={() => onCopyAyah(proofText, ayahId)}
@@ -399,42 +418,18 @@ function RenderContent({
             </button>
           </div>
 
-          <div className="font-quran text-title sm:text-heading text-slate-900 dark:text-slate-50 leading-loose py-1">
+          <div className="font-quran text-title sm:text-heading text-amber-950 dark:text-amber-100 leading-loose py-2">
             {proofText}
           </div>
 
           {asString(data.proof_anchor_phrase) && (
-            <div className="flex items-center gap-2 text-body-sm text-slate-700 dark:text-slate-200 flex-wrap">
-              <span className="font-bold px-2.5 py-1 rounded-lg bg-white/70 dark:bg-slate-900/60">
+            <div className="pt-2.5 border-t border-amber-200/80 dark:border-amber-900/60 flex items-center gap-2 text-body-sm text-amber-900 dark:text-amber-300 flex-wrap">
+              <span className="font-bold px-2.5 py-1 rounded-lg bg-amber-200/80 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200">
                 محل الشاهد:
               </span>
               <span className="font-bold">«{asString(data.proof_anchor_phrase)}»</span>
             </div>
           )}
-        </InsightCard>
-      )}
-
-      {Array.isArray(data.tawheed_categories) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {data.tawheed_categories.filter(isRecord).map((tc, i) => (
-            <div
-              key={i}
-              className="p-5 rounded-2xl bg-white dark:bg-slate-800/90 border-2 border-slate-200 dark:border-slate-700 space-y-3 shadow-sm"
-            >
-              <h5 className="font-bold text-body text-teal-800 dark:text-teal-300">
-                {asString(tc.category)}
-              </h5>
-              <p className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
-                {asString(tc.definition)}
-              </p>
-              {asString(tc.example) && (
-                <div className="text-label text-slate-700 dark:text-slate-300 pt-2.5 border-t border-slate-100 dark:border-slate-700/80">
-                  <span className="font-bold">مثال: </span>
-                  <span>{asString(tc.example)}</span>
-                </div>
-              )}
-            </div>
-          ))}
         </div>
       )}
 
@@ -457,11 +452,9 @@ function RenderContent({
                 {asString(eff.explanation)}
               </p>
               {asString(eff.quranic_proof_warsh) && (
-                <InsightCard tone="benefit" title="الشاهد الشرعي">
-                  <p className="font-quran text-body leading-loose text-slate-900 dark:text-slate-50">
-                    {asString(eff.quranic_proof_warsh)}
-                  </p>
-                </InsightCard>
+                <div className="font-quran text-body text-amber-950 dark:text-amber-100 bg-amber-50/80 dark:bg-amber-950/40 p-3.5 rounded-xl border-r-4 border-amber-500 leading-loose">
+                  {asString(eff.quranic_proof_warsh)}
+                </div>
               )}
               {Array.isArray(eff.key_extraction_indicators) && (
                 <InsightCard tone="illumination" title="مؤشرات الاستخراج">

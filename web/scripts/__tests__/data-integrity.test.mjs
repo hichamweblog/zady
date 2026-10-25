@@ -184,6 +184,33 @@ test("الخريطة الذهنية عناصر مفهومية فقط: لا شو�
   }
 });
 
+test("خريطة الوحدة 01 = عناصر التدرّج الرسمي وحدها", () => {
+  const root = read("unit01_aqidah_mindmap.json").root;
+  const labels = [];
+  const walk = (node) => {
+    labels.push(node.label);
+    (node.children || []).forEach(walk);
+  };
+  walk(root);
+
+  // «توجيهات خاصة بالأستاذ (ليست عناصر مفاهيمية)» في التدرّج: العلاقة بين
+  // المعنيين، أصول العقيدة، أقسام التوحيد — تُذكر في الشرح ولا تكون عناصر درس.
+  for (const notAnElement of ["العلاقة بين", "أصول العقيدة", "أقسام التوحيد", "توحيد الربوبية"]) {
+    assert.ok(
+      !labels.some((label) => label.includes(notAnElement)),
+      `«${notAnElement}» ليس عنصرًا مفاهيميًا ولا يدخل الخريطة`
+    );
+  }
+
+  // البنية الرسمية: التعريف (لغوي + اصطلاحي) ثم آثار الفرد (3) ثم آثار المجتمع (3)
+  assert.equal(root.children.length, 3, "ثلاثة محاور فقط");
+  assert.deepEqual(
+    root.children.map((child) => (child.children || []).length),
+    [2, 3, 3],
+    "٨ عناصر مفهومية: تعريفان وستة آثار"
+  );
+});
+
 test("كل عنصر مفهومي في الخريطة له شرح، والشرح نصّ لا قائمة", () => {
   for (const file of MINDMAP_FILES) {
     const walk = (node) => {

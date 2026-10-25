@@ -37,6 +37,21 @@ export const INSIGHT_FIELDS: Record<string, InsightMeta> = {
     tone: "illumination",
     hint: "ما يتحقّق منه المصحّح في إجابتك — إضاءة على طريقة الإجابة لا على المفهوم.",
   },
+  relationship_linguistic_idiomatic: {
+    label: "العلاقة بين التعريفين",
+    tone: "illumination",
+    hint: "ربطٌ بين التعريفين يُشار إليه في الشرح، وليس عنصرًا مستقلًا في الدرس.",
+  },
+  core_foundation: {
+    label: "أصل العقيدة الإسلامية",
+    tone: "illumination",
+    hint: "يُشار إليه داخل شرح التعريف الاصطلاحي، لا كعنصر دراسي قائم بذاته.",
+  },
+  tawheed_categories: {
+    label: "أقسام التوحيد",
+    tone: "illumination",
+    hint: "تفصيلٌ لِمَا يقتضيه الإيمان، يُذكر في الشرح ولا يُعدّ عنصرًا مفاهيميًا.",
+  },
   pedagogical_note: {
     label: "إضاءة",
     tone: "illumination",
@@ -102,8 +117,6 @@ export const CONCEPT_FIELD_LABELS: Record<string, string> = {
   definition: "التعريف",
   breakdown: "تفكيك التعريف",
   relation_to_takleef: "علاقة العقل بالتكليف",
-  relationship_linguistic_idiomatic: "العلاقة بين التعريفين",
-  core_foundation: "أصل العقيدة",
   general_meaning: "المعنى العام",
   specific_meaning: "المعنى الخاص",
   unity_of_messages: "وحدة الرسالات",
