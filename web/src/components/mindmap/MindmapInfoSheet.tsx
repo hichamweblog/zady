@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ArrowRight, BookOpen, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { useSheetA11y } from "./useSheetA11y";
 
@@ -18,7 +18,7 @@ interface MindmapInfoSheetProps {
  * لماذا بطاقة فوق المحتوى (modal/sheet)؟
  *   - على الهاتف لا مساحة للوحة جانبية، فكان الطالب يصعد وينزل ليرى الشرح.
  *   - تركيز واحد: لا تظهر إلا تفاصيل العنصر الذي ضغطه، ويُغلق بالضغط خارجه
- *     أو بمفتاح Esc فيعود كل شيء إلى أصله.
+ *     أو بمفتاح Esc — أو بزر «رجوع» — فيعود كل شيء إلى أصله.
  * التصميم بلا حدود: كتل ملوّنة خفيفة وظلال ناعمة فقط.
  */
 export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapInfoSheetProps) {
@@ -116,9 +116,14 @@ export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapI
           </div>
         )}
 
-        <p className="mt-5 text-center text-meta font-medium text-slate-500 dark:text-slate-400">
-          اضغط خارج البطاقة — أو مفتاح Esc — للرجوع
-        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-label font-bold text-slate-800 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          <span>رجوع</span>
+        </button>
       </div>
     </div>
   );

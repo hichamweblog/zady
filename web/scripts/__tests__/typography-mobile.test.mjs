@@ -292,3 +292,24 @@ test("كل نوافذ الخريطة تُغلق بالضغط خارجها وبم
     assert.ok(text.includes(modal), `${file}: معرَّفة كحوار للقارئات`);
   }
 });
+
+test("لا ملاحظة متكرّرة عن الإغلاق، وفي كل وضع زر «رجوع» ظاهر", () => {
+  const dir = path.join(SRC, "components", "mindmap");
+  for (const name of fs.readdirSync(dir)) {
+    const text = fs.readFileSync(path.join(dir, name), "utf8");
+    assert.ok(
+      !text.includes("اضغط خارج البطاقة"),
+      `${name}: الملاحظة المتكرّرة يجب أن تبقى محذوفة`
+    );
+  }
+
+  const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
+  assert.match(map, /<span>رجوع<\/span>/, "الخريطة: زر رجوع خطوة واحدة");
+  assert.match(map, /goUp/, "الخريطة: يعود إلى المحور الأعلى");
+
+  const sheet = readSrc("components", "mindmap", "MindmapInfoSheet.tsx");
+  assert.match(sheet, /<span>رجوع<\/span>/, "بطاقة الشرح: زر رجوع");
+
+  const viewer = readSrc("components", "mindmap", "MindmapImageView.tsx");
+  assert.match(viewer, /<span>رجوع<\/span>/, "المصورة: زر رجوع من العارض");
+});

@@ -34,7 +34,7 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
       id: "map",
       label: "الخريطة",
       icon: Network,
-      hint: "اضغط عنصرًا ليصبح مركز الخريطة ويظهر شرحه — واضغط خارج البطاقة للرجوع. زر «الفهرس» يوصلك إلى أي محور.",
+      hint: "اضغط عنصرًا ليصبح مركز الخريطة ويظهر شرحه. «الفهرس» يوصلك إلى أي محور، و«رجوع» يعيدك خطوة.",
     },
     {
       id: "image",

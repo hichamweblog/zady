@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
-import { ExternalLink, Maximize2, Minus, Plus, X } from "lucide-react";
+import { ChevronRight, ExternalLink, Maximize2, Minus, Plus } from "lucide-react";
 import { useSheetA11y } from "./useSheetA11y";
 
 interface MindmapImageViewProps {
@@ -75,10 +75,10 @@ export default function MindmapImageView({ src, unitTitle }: MindmapImageViewPro
               ref={closeRef}
               type="button"
               onClick={close}
-              aria-label="إغلاق العارض"
-              className="shrink-0 rounded-full p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-label font-bold text-white transition-colors hover:bg-white/20"
             >
-              <X className="h-5 w-5" aria-hidden="true" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              <span>رجوع</span>
             </button>
           </div>
 

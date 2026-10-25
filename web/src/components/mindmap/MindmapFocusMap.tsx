@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState, type CSSProperties } from "react";
-import { ChevronLeft, CornerDownLeft, ListTree, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, CornerDownLeft, ListTree, Sparkles } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { buildFocusLayout, findMindmapNode, findNodePath } from "@/lib/mindmap-layout";
 import MindmapInfoSheet from "./MindmapInfoSheet";
@@ -69,6 +69,13 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
     [root]
   );
 
+  const parentNode = trail.length > 1 ? trail[trail.length - 2] : null;
+
+  /** الرجوع خطوة واحدة إلى المحور الأعلى */
+  const goUp = useCallback(() => {
+    if (parentNode) setFocusId(parentNode.id);
+  }, [parentNode]);
+
   /** الانتقال من الفهرس: يغلق الفهرس ويضع التركيز على العنصر المختار */
   const focusFromIndex = useCallback(
     (id: string) => {
@@ -116,14 +123,27 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           })}
         </nav>
 
-        <button
-          type="button"
-          onClick={() => setIndexOpen(true)}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-        >
-          <ListTree className="h-4 w-4" aria-hidden="true" />
-          <span>الفهرس</span>
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {parentNode && (
+            <button
+              type="button"
+              onClick={goUp}
+              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              <span>رجوع</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIndexOpen(true)}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <ListTree className="h-4 w-4" aria-hidden="true" />
+            <span>الفهرس</span>
+          </button>
+        </div>
       </div>
 
       <div className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_50%_42%,#ecfdf5,#ffffff_74%)] p-4 dark:bg-[radial-gradient(circle_at_50%_42%,#093330,#020617_74%)] sm:p-6 lg:h-[600px] lg:p-0">
@@ -199,12 +219,12 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           </div>
         ) : (
           <p className="relative z-10 mt-3 rounded-2xl bg-white/80 px-4 py-3 text-body-sm font-medium text-slate-600 dark:bg-slate-800/70 dark:text-slate-300 lg:absolute lg:bottom-8 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
-            هذا العنصر ورقة أخيرة: لا فروع تحته. شرحه في البطاقة أعلاه.
+            هذا العنصر ورقة أخيرة: لا فروع تحته. شرحه في البطاقة، وزر «رجوع» يعيدك خطوة.
           </p>
         )}
 
         <p className="mt-3 text-center text-meta font-medium text-slate-500 dark:text-slate-400 lg:absolute lg:bottom-4 lg:left-1/2 lg:mt-0 lg:w-full lg:-translate-x-1/2">
-          اضغط عنصرًا ليصبح هو المركز ويظهر شرحه · اضغط خارج البطاقة للرجوع
+          اضغط عنصرًا ليصبح هو المركز ويظهر شرحه
         </p>
       </div>
 
