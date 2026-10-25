@@ -275,7 +275,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
           style={{ transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
         >
           {/* الوجه: السؤال */}
-          <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 rounded-3xl p-5 sm:p-10 border-2 border-slate-200 dark:border-slate-600 flex flex-col justify-between shadow-lg">
+          <div className="absolute inset-0 backface-hidden bg-[var(--sheet)] p-5 sm:p-10 border-2 border-slate-200 dark:border-slate-600 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between gap-2">
               <span className="text-label font-bold uppercase tracking-wider text-teal-800 dark:text-teal-400 flex items-center gap-1.5">
                 <Flame className="w-4 h-4 text-amber-600" aria-hidden="true" />
@@ -315,7 +315,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
           </div>
 
           {/* الظهر: الإجابة */}
-          <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-teal-900 via-teal-950 to-slate-950 rounded-3xl p-5 sm:p-10 text-white border-2 border-teal-500/40 flex flex-col justify-between shadow-2xl">
+          <div className="absolute inset-0 backface-hidden rotate-y-180 bg-[var(--ink)] dark:bg-[var(--pine)] p-5 sm:p-10 text-white border-2 border-teal-500/40 flex flex-col justify-between shadow-2xl">
             <div className="flex items-center justify-between gap-2">
               <span className="text-label font-bold uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" aria-hidden="true" />

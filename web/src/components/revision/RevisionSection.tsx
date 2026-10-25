@@ -44,15 +44,15 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
 
   return (
     <div className="space-y-6">
-      <div className="p-5 rounded-3xl bg-gradient-to-l from-amber-500/10 via-teal-500/5 to-transparent border border-amber-300/60 dark:border-amber-900/50 flex items-start gap-3.5">
-        <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+      <div className="flex items-start gap-3 border-y border-[var(--rule)] py-4">
+        <div className="mt-0.5 shrink-0 text-[var(--ochre)]">
           <Zap className="w-5 h-5" aria-hidden="true" />
         </div>
         <div className="space-y-1">
-          <h2 className="font-bold text-body-sm text-amber-900 dark:text-amber-200">
+          <h2 className="text-title font-bold text-[var(--ink)]">
             المراجعة السريعة قبل الامتحان
           </h2>
-          <p className="text-body-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+          <p className="mt-1 text-body font-medium leading-relaxed text-[var(--ink-soft)]">
             خلاصة الوحدة في بطاقات مكثفة: ما يجب حفظه حرفيًا، الأخطاء الممنوعة، الفروق بين
             المصطلحات، وأسئلة بكالوريا سابقة مع إجاباتها.
           </p>

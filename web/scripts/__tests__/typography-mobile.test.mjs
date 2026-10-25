@@ -140,7 +140,11 @@ test("شريط خطوات الوحدة لا يعتمد على تمرير أفق�
     /whitespace-nowrap[^"]*hidden|hidden[^"]*whitespace-nowrap/,
     "أسماء الخطوات تظهر على الهاتف كاملة، لا أيقونات فقط"
   );
-  assert.match(tablist, /text-label/, "اسم الخطوة يظهر بنص مقروء على الهاتف");
+  assert.match(
+    tablist + view,
+    /text-label|z-index-item/,
+    "اسم الخطوة يظهر بنص مقروء على الهاتف"
+  );
 });
 
 test("يوجد شريط تنقّل سفلي للهاتف ومركّب في التخطيط", () => {
@@ -334,8 +338,8 @@ test("الرجوع من عنصر فُتح من الفهرس يعيدك إلى ا
 test("المحتوى غير المفهومي في الدرس موسوم بمصباح «إضاءة/فائدة»", () => {
   const card = readSrc("components", "lesson", "InsightCard.tsx");
   assert.match(card, /Lightbulb/, "البطاقة تحمل أيقونة مصباح");
-  assert.match(card, /label: "إضاءة"/, "نوع «إضاءة» موسوم بلفظه");
-  assert.match(card, /label: "فائدة"/, "نوع «فائدة» موسوم بلفظه");
+  assert.match(card, /illumination: "إضاءة"/, "نوع «إضاءة» موسوم بلفظه");
+  assert.match(card, /benefit: "فائدة"/, "نوع «فائدة» موسوم بلفظه");
 
   const kinds = readSrc("lib", "content-kinds.ts");
   for (const key of [
@@ -377,9 +381,10 @@ test("النص الشرعي ليس «إضاءة» ولا «فائدة» بل ش�
   );
   assert.match(
     viewer,
-    /proofText && \(\s*<div className="p-5 rounded-2xl bg-amber-50\/90[\s\S]{0,500}BookOpen/,
-    "الشاهد في كتلة مستقلة بعلامة الكتاب"
+    /proofText && \(\s*<figure[\s\S]{0,1400}blockquote/,
+    "الشاهد اقتباس مستقل بخطّ جانبي"
   );
+  assert.match(viewer, /figcaption/, "للشاهد تسمية ظاهرة");
   assert.match(viewer, /الشاهد الحديثي/, "عنوان الشاهد الحديثي");
   assert.match(viewer, /"الشاهد الشرعي"/, "عنوان الشاهد القرآني");
 });
@@ -409,31 +414,72 @@ test("نصوص الدرس كلها بمقاس واحد، لا مقاس أصغر 
     "الدرس: لا نصّ بمقاس 16px بجانب نصوص 18px"
   );
   assert.ok(!card.includes("text-body-sm"), "بطاقة المصباح: النص بمقاس نص الدرس");
-  assert.match(viewer, /font-quran text-title/, "النص القرآني بمقاس واحد ثابت في كل الدروس");
+  assert.match(viewer, /font-quran[^"]*text-title/, "النص القرآني بمقاس واحد ثابت في كل الدروس");
   assert.ok(!viewer.includes("sm:text-heading"), "لا يقفز مقاس الشاهد على الشاشات الكبيرة");
 });
 
-test("الوضع الليلي: أسطح متدرّجة بدل سطح واحد مسطّح", () => {
-  const surfaces = new Set();
-  for (const file of walk(SRC, ".tsx")) {
-    const text = fs.readFileSync(file, "utf8");
-    const name = path.basename(file);
-    assert.ok(!text.includes("dark:bg-slate-900"), `${name}: السطح الليلي صار slate-800`);
-    assert.ok(!text.includes("dark:border-slate-800"), `${name}: الحدّ الليلي صار slate-600`);
-    for (const m of text.matchAll(/dark:bg-slate-(\d+)/g)) surfaces.add(m[1]);
-  }
-  // ثلاث درجات على الأقل: صفحة ← بطاقة ← وسم
-  assert.ok(surfaces.has("800") && surfaces.has("700"), "بطاقة slate-800 ووسم slate-700");
-
+test("الوضع الليلي: حبر دافئ لا أزرق ليلي، وبنية تُرى بلا ظلال", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  assert.match(css, /--background: #070b14/, "خلفية ليلية أعمق حتى تظهر البطاقات");
+
+  // صفحة وورقة: درجتان متقاربتان لكنهما مفصولتان، ونصّ فاتح عالي التباين
+  assert.match(css, /--background: #f4efe3/, "ورق دافئ في النهار (لا أبيض نقي)");
+  assert.match(css, /--background: #0f1109/, "فحميّ مائل للأخضر في الليل (لا أزرق)");
+  assert.match(css, /--card: #1a1c13/, "الورقة الليلية أفتح من الصفحة بدرجة");
+  assert.match(css, /--foreground: #efeada/, "حبر الليل كريمي لا أبيض ساطع");
+
+  // لا ظلال: العمق من الخطوط الشعرية
+  assert.match(css, /--shadow-sm: none/, "لا ظلّ على الأسطح");
+  assert.match(css, /--shadow-lg: none/, "ولا ظلّ كبير");
+
+  // الخطوط الشعرية معرَّفة مرة واحدة وتُستعمل عبر متغيّر
+  assert.match(css, /--rule: #dad1bc/, "خطّ شعري نهاري");
+  assert.match(css, /--rule: #3f4335/, "خطّ شعري ليلي");
 });
 
-test("بطاقة الخريطة لها خلفية ليلية صريحة (لا نصّ فاتح على بطاقة بيضاء)", () => {
+test("لا تدرّجات ولا استدارات كبيرة ولا زجاج — هوية مطبوعة لا قالب", () => {
+  const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
+  assert.match(css, /--radius-3xl: 0\.125rem/, "أقصى استدارة 2px");
+  assert.match(css, /--radius-2xl: 0\.125rem/, "وبطاقات «2xl» مثلها");
+
+  const offenders = [];
+  for (const file of walk(SRC, ".tsx")) {
+    const text = fs.readFileSync(file, "utf8");
+    if (/bg-gradient-to-(?:r|l|br|tr)/.test(text)) offenders.push(path.basename(file));
+  }
+  assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن");
+});
+
+test("بطاقة الخريطة ورقةٌ بخطّ شعري، لا بطاقة بيضاء تبهت في الليل", () => {
   const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
-  const start = map.indexOf("group min-w-0 rounded-2xl");
+  const start = map.indexOf("group min-w-0 border");
   assert.ok(start > 0, "بطاقة العنصر موجودة");
-  const node = map.slice(start, start + 700);
-  assert.match(node, /bg-white/, "خلفية نهارية");
-  assert.match(node, /dark:bg-slate-7/, "ولها نظير ليلي");
+  const node = map.slice(start, start + 620);
+  assert.match(node, /bg-\[var\(--sheet\)\]/, "خلفيتها من نظام الورق (تتلوّن تلقائيًا ليلًا)");
+  assert.match(node, /border-\[var\(--rule\)\]/, "وحدّها خطّ شعري لا ظلّ");
+  assert.ok(!node.includes("bg-white"), "لا خلفية بيضاء صريحة");
+  assert.ok(!node.includes("shadow"), "ولا ظلّ");
+});
+
+test("هوية «الورق والحبر»: أربعة عناصر بنيوية فقط، ومسطرة قراءة في الدرس", () => {
+  const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
+  for (const token of ["--paper:", "--sheet:", "--rule:", "--ink:", "--pine:", "--ochre:"]) {
+    assert.ok(css.includes(token), `المتغيّر ${token} معرَّف مرة واحدة`);
+  }
+  assert.match(css, /\.z-sheet\s*\{/, "ورقة موحّدة");
+  assert.match(css, /\.z-hair\s*\{/, "خطّ شعري موحّد");
+  assert.match(css, /\.z-index-item\[aria-selected="true"\]::after/, "الفهرس بعلامة سفلية لا بقرص ملوّن");
+
+  const rule = readSrc("components", "lesson", "ReadingRule.tsx");
+  assert.match(rule, /requestAnimationFrame/, "مسطرة القراءة تُحدَّث في إطار رسم واحد");
+  assert.match(rule, /bg-\[var\(--pine\)\]/, "تتقدّم بلون الحبر الصنوبري");
+
+  const view = readSrc("app", "units", "[unitId]", "UnitClientView.tsx");
+  assert.match(view, /<ReadingRule \/>/, "مسطرة القراءة مركّبة في تبويب الدرس");
+});
+
+test("طلب واحدة لكل شاشة: لا زرّان متساويان في الأهمية", () => {
+  const page = readSrc("app", "page.tsx");
+  const primary = (page.match(/className="z-btn"/g) || []).length;
+  assert.equal(primary, 1, "إجراء واحد ممتلئ (حبر) في الغلاف، لا أكثر");
+  assert.match(page, /className="z-link text-label font-bold"/, "والإجراء الثاني رابط لا زرّ");
 });

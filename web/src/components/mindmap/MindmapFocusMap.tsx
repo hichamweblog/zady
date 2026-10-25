@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ChevronLeft, ChevronRight, CornerDownLeft, ListTree, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, CornerDownLeft, ListTree } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { buildFocusLayout, findMindmapNode, findNodePath } from "@/lib/mindmap-layout";
 import MindmapInfoSheet from "./MindmapInfoSheet";
@@ -132,15 +132,20 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             const isCurrent = index === trail.length - 1;
             return (
               <span key={node.id} className="flex items-center gap-1.5">
-                {index > 0 && <ChevronLeft className="h-4 w-4 text-slate-400" aria-hidden="true" />}
+                {index > 0 && (
+                  <ChevronLeft
+                    className="h-3.5 w-3.5 text-[var(--rule-strong)]"
+                    aria-hidden="true"
+                  />
+                )}
                 <button
                   type="button"
                   onClick={() => moveFocus(node.id, false)}
                   aria-current={isCurrent ? "true" : undefined}
-                  className={`max-w-40 truncate rounded-lg px-1.5 py-1 transition-colors ${
+                  className={`max-w-40 truncate px-1 py-1 transition-colors ${
                     isCurrent
-                      ? "bg-teal-700 text-white"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                      ? "font-bold text-[var(--ink)] underline decoration-[var(--pine)] decoration-2 underline-offset-4"
+                      : "text-[var(--ink-faint)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {node.label}
@@ -155,7 +160,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             <button
               type="button"
               onClick={goUp}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="inline-flex min-h-11 items-center gap-1 border border-[var(--rule)] px-3 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
               <span>رجوع</span>
@@ -165,7 +170,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           <button
             type="button"
             onClick={() => setIndexOpen(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 border border-[var(--rule)] px-3 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
           >
             <ListTree className="h-4 w-4" aria-hidden="true" />
             <span>الفهرس</span>
@@ -173,7 +178,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_50%_42%,#ecfdf5,#ffffff_74%)] p-4 dark:bg-[radial-gradient(circle_at_50%_42%,#093330,#020617_74%)] sm:p-6 lg:h-[600px] lg:p-0">
+      <div className="relative overflow-hidden border border-[var(--rule)] bg-[var(--sheet)] p-4 sm:p-6 lg:h-[560px] lg:p-0">
         {/* وصلات خفيفة: خط شعرة واحد لكل ابن، بلا إطارات حول العناصر */}
         <svg
           aria-hidden="true"
@@ -188,25 +193,22 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
               fill="none"
               strokeWidth={1.5}
               vectorEffect="non-scaling-stroke"
-              className="stroke-teal-700/25 dark:stroke-teal-300/25"
+              className="stroke-[var(--rule-strong)]"
             />
           ))}
         </svg>
 
-        {/* المركز */}
+        {/* المركز: كتلة حبر واحدة في الصفحة */}
         <button
           type="button"
           onClick={() => activate(focused)}
-          className="relative z-10 w-full rounded-[1.75rem] bg-teal-700 p-4 text-right text-white shadow-lg shadow-teal-900/20 transition-colors hover:bg-teal-800 sm:p-5 lg:absolute lg:top-1/2 lg:left-1/2 lg:w-60 lg:-translate-x-1/2 lg:-translate-y-1/2"
+          className="relative z-10 w-full bg-[var(--ink)] p-5 text-right text-[var(--paper)] transition-opacity hover:opacity-90 dark:bg-[var(--pine)] dark:text-[#0b0d07] sm:p-6 lg:absolute lg:top-1/2 lg:left-1/2 lg:w-64 lg:-translate-x-1/2 lg:-translate-y-1/2"
         >
-          <span className="text-meta font-bold text-teal-100">
+          <span className="block text-meta font-bold opacity-70">
             {trail.length > 1 ? "المحور الحالي" : "موضوع الوحدة"}
           </span>
-          <span className="mt-1 block text-title leading-snug font-bold">{focused.label}</span>
-          <span className="mt-2 inline-flex items-center gap-1.5 text-meta font-bold text-teal-100">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            اضغط لقراءة الشرح
-          </span>
+          <span className="mt-1.5 block text-title leading-snug font-bold">{focused.label}</span>
+          <span className="mt-2.5 block text-meta font-medium opacity-70">اقرأ الشرح</span>
         </button>
 
         {/* أبناء المحور الحالي */}
@@ -227,17 +229,19 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
                       "--y": position.y,
                     } as CSSProperties
                   }
-                  className={`group min-w-0 rounded-2xl bg-white/90 px-3 py-2.5 text-right text-slate-900 shadow-sm shadow-slate-900/10 backdrop-blur transition-all hover:bg-teal-700 hover:text-white focus-visible:outline-2 focus-visible:outline-teal-600 dark:bg-slate-700/95 dark:text-slate-50 dark:shadow-black/40 dark:hover:bg-teal-700 lg:absolute lg:top-[calc(var(--y)*100%)] lg:left-[calc(var(--x)*100%)] lg:w-44 lg:-translate-x-1/2 lg:-translate-y-1/2 ${
-                    isActive ? "bg-teal-700 text-white" : "text-slate-800 dark:text-slate-100"
-                  }`}
+                  className={`group min-w-0 border px-3 py-3 text-right transition-colors ${
+                    isActive
+                      ? "border-[var(--pine)] bg-[var(--pine)] text-[var(--paper)]"
+                      : "border-[var(--rule)] bg-[var(--sheet)] text-[var(--ink)] hover:border-[var(--rule-strong)] hover:bg-[var(--sunken)]"
+                  } lg:absolute lg:top-[calc(var(--y)*100%)] lg:left-[calc(var(--x)*100%)] lg:w-44 lg:-translate-x-1/2 lg:-translate-y-1/2`}
                 >
-                  <span className="line-clamp-3 block text-body-sm leading-snug font-bold">
+                  <span className="line-clamp-3 block text-label leading-snug font-bold">
                     {child.label}
                   </span>
                   {position.childCount > 0 && (
-                    <span className="mt-1 flex items-center gap-1 text-meta font-bold text-slate-500 group-hover:text-white">
+                    <span className="mt-1.5 flex items-center gap-1 text-meta font-medium text-[var(--ink-faint)] group-hover:text-inherit">
                       <CornerDownLeft className="h-3 w-3" aria-hidden="true" />
-                      {position.childCount} عناصر
+                      {position.childCount} فروع
                     </span>
                   )}
                 </button>
@@ -245,13 +249,13 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             })}
           </div>
         ) : (
-          <p className="relative z-10 mt-3 rounded-2xl bg-white/80 px-4 py-3 text-body-sm font-medium text-slate-600 dark:bg-slate-700/70 dark:text-slate-300 lg:absolute lg:bottom-8 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
-            هذا العنصر ورقة أخيرة: لا فروع تحته. شرحه في البطاقة، وزر «رجوع» يعيدك خطوة.
+          <p className="relative z-10 mt-3 border border-[var(--rule)] bg-[var(--sunken)] px-4 py-3 text-body font-medium text-[var(--ink-soft)] lg:absolute lg:bottom-10 lg:left-1/2 lg:mt-0 lg:max-w-md lg:-translate-x-1/2">
+            عنصر نهائي — لا فروع تحته.
           </p>
         )}
 
-        <p className="mt-3 text-center text-meta font-medium text-slate-500 dark:text-slate-400 lg:absolute lg:bottom-4 lg:left-1/2 lg:mt-0 lg:w-full lg:-translate-x-1/2">
-          اضغط عنصرًا ليصبح هو المركز ويظهر شرحه
+        <p className="mt-3 text-center text-meta font-medium text-[var(--ink-faint)] lg:absolute lg:bottom-4 lg:left-1/2 lg:mt-0 lg:w-full lg:-translate-x-1/2">
+          اضغط عنصرًا ليصبح المركز
         </p>
       </div>
 

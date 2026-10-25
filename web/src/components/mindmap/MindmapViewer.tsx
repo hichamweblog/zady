@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ImageIcon, Network } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { countMindmapNodes } from "@/lib/mindmap-layout";
 import MindmapFocusMap from "./MindmapFocusMap";
@@ -32,18 +31,16 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
   const [viewMode, setViewMode] = useState<ViewMode>("map");
   const nodeCount = useMemo(() => countMindmapNodes(rootNode), [rootNode]);
 
-  const modes: { id: ViewMode; label: string; icon: typeof Network; hint: string }[] = [
+  const modes: { id: ViewMode; label: string; hint: string }[] = [
     {
       id: "map",
       label: "الخريطة",
-      icon: Network,
-      hint: "خريطة المفاهيم: اضغط عنصرًا ليصبح مركز الخريطة ويظهر شرحه. «الفهرس» يوصلك إلى أي محور، و«رجوع» يعيدك خطوة.",
+      hint: "خريطة المفاهيم. اضغط عنصرًا ليصبح المركز ويُقرأ شرحه.",
     },
     {
       id: "image",
       label: "المصورة",
-      icon: ImageIcon,
-      hint: "خريطة الوحدة كصورة واحدة — اضغطها للتكبير والتحريك بلا حدود.",
+      hint: "الخريطة كما رُسمت: صورة واحدة تُكبَّر وتُسحب.",
     },
   ];
 
@@ -51,40 +48,30 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <h2 className="text-title font-bold text-slate-900 dark:text-white">الخريطة الذهنية</h2>
-          <span className="text-meta font-bold text-slate-500 dark:text-slate-400">
-            {nodeCount} مفهومًا
-          </span>
+      <div className="mx-auto w-full max-w-[980px] space-y-4">
+        <div className="flex items-baseline justify-between gap-3 border-b border-[var(--rule-strong)] pb-1">
+          <div className="flex items-baseline gap-4">
+            {modes.map((mode) => {
+              const isActive = viewMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`mindmap-panel-${mode.id}`}
+                  onClick={() => setViewMode(mode.id)}
+                  className="z-index-item"
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
+          <span className="z-num shrink-0">{nodeCount} مفهومًا</span>
         </div>
 
-        <div role="tablist" aria-label="طرق عرض الخريطة" className="grid grid-cols-2 gap-2">
-          {modes.map((mode) => {
-            const isActive = viewMode === mode.id;
-            const Icon = mode.icon;
-            return (
-              <button
-                key={mode.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`mindmap-panel-${mode.id}`}
-                onClick={() => setViewMode(mode.id)}
-                className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-label font-bold transition-all ${
-                  isActive
-                    ? "bg-teal-700 text-white shadow-sm shadow-teal-700/25"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
-                }`}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{mode.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="text-body-sm font-medium text-slate-600 dark:text-slate-300">{activeHint}</p>
+        <p className="text-meta font-medium text-[var(--ink-faint)]">{activeHint}</p>
       </div>
 
       {viewMode === "map" && (

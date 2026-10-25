@@ -27,14 +27,16 @@ export default function MobileTabBar() {
   const isUnitPage = pathname.startsWith("/units/");
 
   const itemClass = (active: boolean) =>
-    `flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-meta font-bold transition-colors ${
-      active ? "text-teal-800 dark:text-teal-300" : "text-slate-600 dark:text-slate-400"
+    `flex flex-1 flex-col items-center justify-center gap-1 py-2 text-meta font-bold transition-colors ${
+      active
+        ? "text-[var(--pine)] dark:text-[var(--pine)]"
+        : "text-[var(--ink-faint)] hover:text-[var(--ink)]"
     }`;
 
   return (
     <nav
       aria-label="التنقّل السريع"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-slate-600 dark:bg-slate-800/95 md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--rule-strong)] bg-[var(--background)]/97 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden"
     >
       <div className="mx-auto flex max-w-lg items-stretch gap-1 px-2 py-1">
         <Link href="/" aria-current={isHome ? "page" : undefined} className={itemClass(isHome)}>

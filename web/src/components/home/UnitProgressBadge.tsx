@@ -49,21 +49,18 @@ export default function UnitProgressBadge({ unitId, totals }: UnitProgressBadgeP
   }, [data, totals, unitId]);
 
   if (percentage === 0) {
-    return <p className="text-meta font-bold text-slate-500 dark:text-slate-400">لم تبدأ بعد</p>;
+    return <span className="z-kicker">لم تبدأ بعد</span>;
   }
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-meta font-bold">
-        <span className="text-slate-600 dark:text-slate-300">تقدّمك</span>
-        <span className="text-teal-800 dark:text-teal-300">{percentage}%</span>
-      </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-600">
-        <div
-          style={{ width: `${percentage}%` }}
-          className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500"
-        />
-      </div>
-    </div>
+    <span className="block">
+      <span className="flex items-baseline justify-between gap-2">
+        <span className="z-kicker">تقدّمك</span>
+        <span className="z-num text-[var(--pine)]">{percentage}%</span>
+      </span>
+      <span className="mt-1.5 block h-[2px] w-full bg-[var(--rule)]">
+        <span className="block h-full bg-[var(--pine)]" style={{ width: `${percentage}%` }} />
+      </span>
+    </span>
   );
 }

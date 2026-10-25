@@ -41,7 +41,7 @@ export default function MindmapIndexSheet({
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6">
       <div
-        className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-[#0b0d07]/50 backdrop-blur-[1px]"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -50,18 +50,15 @@ export default function MindmapIndexSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="mindmap-index-title"
-        className="relative z-10 flex max-h-[86vh] w-full flex-col rounded-t-[2rem] bg-white shadow-2xl dark:bg-slate-800 sm:max-w-lg sm:rounded-[2rem]"
+        className="relative z-10 flex max-h-[86vh] w-full flex-col border border-[var(--rule)] bg-[var(--sheet)] sm:max-w-lg sm:border-b-0"
       >
         <div className="flex items-start justify-between gap-3 p-5 pb-3">
           <div className="min-w-0 space-y-1">
-            <h2
-              id="mindmap-index-title"
-              className="flex items-center gap-2 text-title font-bold text-slate-900 dark:text-white"
-            >
-              <ListTree className="h-5 w-5 text-teal-700 dark:text-teal-400" aria-hidden="true" />
+            <h2 id="mindmap-index-title" className="z-display flex items-center gap-2 text-title">
+              <ListTree className="h-4 w-4 text-[var(--pine)]" aria-hidden="true" />
               <span>فهرس المحاور</span>
             </h2>
-            <p className="text-body-sm font-medium text-slate-600 dark:text-slate-300">
+            <p className="text-meta font-medium text-[var(--ink-faint)]">
               اختر أي عنوان لينتقل إليه التركيز في الخريطة.
             </p>
           </div>
@@ -70,7 +67,7 @@ export default function MindmapIndexSheet({
             type="button"
             onClick={onClose}
             aria-label="إغلاق الفهرس"
-            className="shrink-0 rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+            className="shrink-0 p-2 text-[var(--ink-faint)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -122,14 +119,18 @@ function IndexRow({
           type="button"
           onClick={() => onSelect(node.id)}
           aria-current={isCurrent ? "true" : undefined}
-          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-2 py-2 text-right text-body-sm font-bold text-slate-800 transition-colors hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+          className="flex min-w-0 flex-1 items-center gap-2.5 px-2 py-2 text-right text-label font-bold text-[var(--ink)] transition-colors hover:bg-[var(--sunken)]"
         >
           <span
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ backgroundColor: node.color || (depth === 0 ? "#0f766e" : "#14b8a6") }}
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{
+              backgroundColor: node.color || (depth === 0 ? "var(--pine)" : "var(--rule-strong)"),
+            }}
             aria-hidden="true"
           />
-          <span className={`min-w-0 ${isCurrent ? "text-teal-800 dark:text-teal-300" : ""}`}>
+          <span
+            className={`min-w-0 ${isCurrent ? "underline decoration-[var(--pine)] decoration-2 underline-offset-4" : ""}`}
+          >
             {node.label}
           </span>
         </button>
@@ -140,7 +141,7 @@ function IndexRow({
             onClick={() => onToggle(node.id)}
             aria-expanded={!isCollapsed}
             aria-label={`${isCollapsed ? "إظهار" : "إخفاء"} عناصر «${node.label}»`}
-            className="shrink-0 rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
+            className="shrink-0 p-1.5 text-[var(--ink-faint)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
           >
             <ChevronDown
               className={`h-4 w-4 transition-transform ${isCollapsed ? "-rotate-90" : ""}`}

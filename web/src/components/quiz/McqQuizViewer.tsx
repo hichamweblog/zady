@@ -208,7 +208,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             >
               <div
                 style={{ width: `${scorePercentage}%` }}
-                className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
+                className="h-full bg-[var(--pine)]"
               />
             </div>
           </div>

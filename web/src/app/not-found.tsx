@@ -13,7 +13,7 @@ export default function NotFound() {
         id="main-content"
         className="flex-1 flex flex-col items-center justify-center p-6 text-center"
       >
-        <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8 shadow-xl space-y-6">
+        <div className="max-w-lg w-full z-sheet p-8 shadow-xl space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto border border-teal-200 dark:border-teal-900">
             <BookOpen className="w-8 h-8" aria-hidden="true" />
           </div>
@@ -25,7 +25,7 @@ export default function NotFound() {
             <h1 className="text-title font-bold text-slate-900 dark:text-white">
               الوحدة أو الصفحة المطلوبة غير متوفرة
             </h1>
-            <p className="text-body-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-body text-[var(--ink-soft)] leading-relaxed">
               تأكد من رقم الوحدة (من 1 إلى {UNITS_META.length})، أو اختر إحدى الوحدات المتوفرة
               أدناه.
             </p>

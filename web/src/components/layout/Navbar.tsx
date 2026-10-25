@@ -2,16 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Moon, Sun, CheckCircle2, ChevronDown } from "lucide-react";
+import { Moon, Sun, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UNITS_META } from "@/lib/units-meta";
 import { toggleTheme, useIsDark } from "@/lib/useTheme";
 
+/**
+ * ترويسة الكتاب: خطّ شعري واحد، واسمٌ واحد، وفهرسُ وحدات مفتوح.
+ *
+ * أُزيلت الشعارات المتدرّجة وشارة «متاح بدون إنترنت»: الشارة كانت تُكرّر ما
+ * يقوله التطبيق فعلًا عند فتحه بلا شبكة، والشعار المتدرّج كان أول ما يجعل
+ * الواجهة تُقرأ كقالب جاهز. العنوان الآن نصّ نسخي كبير، والتنقّل كلمات.
+ */
 export default function Navbar() {
   const pathname = usePathname();
   const isDark = useIsDark();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const activeUnit = UNITS_META.find((u) => pathname === `/units/${u.id}`);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -31,57 +39,51 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-600 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-6 min-w-0">
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-bold text-title tracking-tight text-slate-900 dark:text-white">
-                  زادِي
-                </span>
-                <span className="text-label font-bold px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300">
-                  BAC
-                </span>
-              </span>
-              <span className="block text-meta text-slate-600 dark:text-slate-300 font-semibold">
-                العلوم الإسلامية
-              </span>
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--rule)] bg-[var(--background)]/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between gap-4 px-5 sm:px-8">
+        <div className="flex min-w-0 items-baseline gap-6">
+          <Link href="/" className="shrink-0" aria-label="زادِي — الصفحة الرئيسية">
+            <span className="text-title font-bold tracking-tight text-[var(--ink)]">زادِي</span>
+            <span className="ms-2 hidden text-meta font-medium text-[var(--ink-faint)] sm:inline">
+              العلوم الإسلامية
             </span>
           </Link>
 
-          <nav aria-label="التنقل الرئيسي" className="hidden md:flex items-center gap-1.5">
+          <nav aria-label="التنقل الرئيسي" className="hidden items-baseline gap-5 md:flex">
             <Link
               href="/"
               aria-current={pathname === "/" ? "page" : undefined}
-              className={`px-3.5 py-2 rounded-xl text-body-sm font-bold transition-colors ${
+              className={`text-label font-bold transition-colors ${
                 pathname === "/"
-                  ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                  : "text-slate-700 dark:text-slate-300 hover:text-teal-800 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                  ? "text-[var(--ink)] underline decoration-[var(--pine)] decoration-2 underline-offset-[6px]"
+                  : "text-[var(--ink-soft)] hover:text-[var(--ink)]"
               }`}
             >
-              الرئيسية
+              الغلاف
             </Link>
 
             <div className="relative" ref={menuRef}>
               <button
+                type="button"
                 onClick={() => setIsMenuOpen((v) => !v)}
                 aria-expanded={isMenuOpen}
                 aria-haspopup="true"
-                className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-body-sm font-bold text-slate-700 dark:text-slate-300 hover:text-teal-800 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                className="flex items-baseline gap-1 text-label font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
               >
-                <span>الوحدات الدراسية</span>
+                <span>الوحدات</span>
                 <ChevronDown
-                  className={`w-4 h-4 opacity-70 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+                  className={`h-3.5 w-3.5 opacity-60 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
                   aria-hidden="true"
                 />
+                {activeUnit && (
+                  <span className="z-num ms-1 text-meta">
+                    {activeUnit.badge.replace("وحدة ", "")}
+                  </span>
+                )}
               </button>
 
               {isMenuOpen && (
-                <div className="absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-600">
+                <div className="absolute top-full end-0 mt-2 w-72 border border-[var(--rule)] bg-[var(--sheet)] p-1">
                   {UNITS_META.map((unit) => {
                     const isActive = pathname === `/units/${unit.id}`;
                     return (
@@ -90,16 +92,14 @@ export default function Navbar() {
                         href={`/units/${unit.id}`}
                         onClick={() => setIsMenuOpen(false)}
                         aria-current={isActive ? "page" : undefined}
-                        className={`flex items-center justify-between gap-2 p-2.5 rounded-xl text-label font-bold transition-colors ${
+                        className={`flex items-baseline justify-between gap-3 px-3 py-2.5 text-label transition-colors ${
                           isActive
-                            ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            ? "bg-[var(--sunken)] font-bold text-[var(--ink)]"
+                            : "font-medium text-[var(--ink-soft)] hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
                         }`}
                       >
-                        <span className="truncate">{unit.shortTitle}</span>
-                        <span className="text-meta font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">
-                          {unit.badge}
-                        </span>
+                        <span className="min-w-0 truncate">{unit.shortTitle}</span>
+                        <span className="z-num shrink-0">{unit.badge.replace("وحدة ", "")}</span>
                       </Link>
                     );
                   })}
@@ -109,31 +109,25 @@ export default function Navbar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-label font-bold border border-emerald-200 dark:border-emerald-900/60">
-            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-            <span>متاح بدون إنترنت</span>
-          </span>
-
-          <button
-            onClick={toggleTheme}
-            aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
-            aria-pressed={isDark}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-label font-bold border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-          >
-            {isDark ? (
-              <>
-                <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                <span className="hidden sm:inline">الوضع الفاتح</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" aria-hidden="true" />
-                <span className="hidden sm:inline">الوضع الليلي</span>
-              </>
-            )}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
+          aria-pressed={isDark}
+          className="flex min-h-11 items-center gap-2 border border-[var(--rule)] px-3 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+        >
+          {isDark ? (
+            <>
+              <Sun className="h-4 w-4 text-[var(--ochre)]" aria-hidden="true" />
+              <span className="hidden sm:inline">نهاري</span>
+            </>
+          ) : (
+            <>
+              <Moon className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">ليلي</span>
+            </>
+          )}
+        </button>
       </div>
     </header>
   );

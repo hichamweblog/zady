@@ -6,7 +6,7 @@ import { insightFor, type InsightTone } from "@/lib/content-kinds";
 interface InsightCardProps {
   /** نوع البطاقة: إضاءة (فهم) أو فائدة (معلومة مساعدة) */
   tone?: InsightTone;
-  /** عنوان البطاقة إن وُجد، مثل «الشاهد الشرعي» أو «مؤشرات الاستخراج» */
+  /** عنوان البطاقة إن وُجد، مثل «مؤشرات الاستخراج» */
   title?: string;
   /** مفتاح الحقل في بيانات الدرس — يستعمل لتسمية البطاقة تلقائيًا */
   field?: string;
@@ -14,29 +14,18 @@ interface InsightCardProps {
   children: React.ReactNode;
 }
 
-const TONE_STYLE: Record<InsightTone, { label: string; card: string; chip: string; icon: string }> =
-  {
-    illumination: {
-      label: "إضاءة",
-      card: "bg-amber-50/80 dark:bg-amber-950/25",
-      chip: "bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-100",
-      icon: "text-amber-600 dark:text-amber-400",
-    },
-    benefit: {
-      label: "فائدة",
-      card: "bg-emerald-50/80 dark:bg-emerald-950/25",
-      chip: "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100",
-      icon: "text-emerald-700 dark:text-emerald-400",
-    },
-  };
+const TONE_LABEL: Record<InsightTone, string> = {
+  illumination: "إضاءة",
+  benefit: "فائدة",
+};
 
 /**
- * بطاقة «إضاءة / فائدة» — علامة المحتوى غير المفهومي داخل نص الدرس.
+ * بطاقة «إضاءة / فائدة» — علامة المحتوى غير المفهومي داخل نصّ الدرس.
  *
- * الخريطة الذهنية لا تحمل إلا العناصر المفهومية (تعريف، أقسام، آثار، أسباب…)،
- * أمّا الشواهد والكلمات المفتاحية ومؤشرات الاستخراج والملاحظات المنهجية فتبقى
- * في الدرس لأن الطالب يحتاجها للفهم، لكنها تُوسم بمصباح صغير حتى لا يخلط بين
- * ما يُحفظ كمفهوم وما هو مجرّد إضاءة أو فائدة.
+ * في اتجاه الكتاب المطبوع ليست بطاقة مستديرة ملوّنة، بل **هامش جانبي**:
+ * خطّ مغرة رقيق على الجانب، خلفية ورقية أغمق درجة، ومصباح صغير. المغرة هي
+ * اللون الوحيد المسموح به خارج الحبر والصنوبري، ولذلك تحمل معنى «انتبه، هذا
+ * ليس متنًا» بلا حاجة إلى زخرفة.
  */
 export default function InsightCard({
   tone,
@@ -47,30 +36,25 @@ export default function InsightCard({
 }: InsightCardProps) {
   const meta = field ? insightFor(field) : null;
   const resolvedTone: InsightTone = tone ?? meta?.tone ?? "illumination";
-  const style = TONE_STYLE[resolvedTone];
   const heading = title ?? meta?.label ?? "";
 
   return (
-    <div
-      className={`rounded-2xl p-4 sm:p-5 space-y-2.5 ${style.card} ${className}`}
+    <aside
+      className={`border-s-2 border-[var(--ochre)]/60 bg-[var(--sunken)] px-3.5 py-3 sm:px-4 ${className}`}
       title={meta?.hint}
       data-insight={resolvedTone}
     >
-      <div className="flex items-center gap-2 flex-wrap">
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-label font-bold ${style.chip}`}
-        >
-          <Lightbulb className={`w-4 h-4 ${style.icon}`} aria-hidden="true" />
-          <span>{style.label}</span>
+      <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span className="inline-flex items-center gap-1.5 text-meta font-bold text-[var(--ochre)]">
+          <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>{TONE_LABEL[resolvedTone]}</span>
         </span>
-        {heading && (
-          <span className="text-label font-bold text-slate-700 dark:text-slate-200">{heading}</span>
-        )}
-      </div>
+        {heading && <span className="text-meta font-bold text-[var(--ink-soft)]">{heading}</span>}
+      </p>
 
-      <div className="space-y-2 text-body leading-relaxed font-medium text-slate-800 dark:text-slate-100">
+      <div className="mt-1.5 space-y-2 text-body leading-loose font-medium text-[var(--ink-soft)]">
         {children}
       </div>
-    </div>
+    </aside>
   );
 }

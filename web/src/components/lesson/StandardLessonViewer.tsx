@@ -1,23 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import {
-  BookOpen,
-  Lightbulb,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  Copy,
-  Check,
-  CheckCircle2,
-  Circle,
-} from "lucide-react";
+import { BookOpen, ChevronDown, Copy, Check } from "lucide-react";
 import { useProgress } from "@/lib/useProgressStore";
 import { resolveSectionTitle, SECTION_TITLES } from "@/lib/section-titles";
 import { insightFor, isInsightField } from "@/lib/content-kinds";
 import InsightCard from "./InsightCard";
 import type { LessonSection } from "@/lib/types";
 
+/**
+ * «نص الدرس» — ورقة قراءة لا لوحة بطاقات.
+ *
+ * المبدأ: الصفحة مثل صفحة كتاب. مسطرة رأس، رقم المحور في الهامش، نصّ بعرض
+ * 62 محرفًا، وخطوط شعرية تفصل المحاور. لا إطار حول كل كتلة، ولا ظلّ، ولا
+ * لون يزاحم الحبر — لأن الطالب يقرأ هنا مدة أطول مما ينقر.
+ *
+ * وتُحفظ فيه قاعدتان ثابتتان من جولات سابقة:
+ *   - ما ليس عنصرًا مفهوميًا يُعرض في بطاقة مصباح (إضاءة/فائدة)، لا كنصّ درس.
+ *   - الشاهد الشرعي ليس إضاءة ولا فائدة، بل دليل: اقتباس بخطّ جانبي.
+ */
 type Content = Record<string, unknown>;
 
 const isRecord = (v: unknown): v is Content =>
@@ -34,6 +35,14 @@ function hashText(text: string): string {
   return Math.abs(hash).toString(36);
 }
 
+/** أرقام عربية-هندية للهامش */
+const AR_DIGITS = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+const arabicNumber = (n: number) =>
+  String(n)
+    .split("")
+    .map((d) => AR_DIGITS[Number(d)] ?? d)
+    .join("");
+
 interface StandardLessonViewerProps {
   unitId: number;
   learningObjective: string;
@@ -45,14 +54,12 @@ export default function StandardLessonViewer({
   learningObjective,
   sections,
 }: StandardLessonViewerProps) {
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [copiedAyah, setCopiedAyah] = useState<string | null>(null);
 
   const { toggleSectionRead, isSectionRead } = useProgress();
 
-  const toggleSection = (key: string) => {
-    setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const isOpen = (key: string) => openSections[key] !== false;
 
   const copyText = async (text: string, id: string) => {
     if (typeof navigator === "undefined" || !navigator.clipboard) return;
@@ -67,9 +74,9 @@ export default function StandardLessonViewer({
 
   if (sections.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8">
-        <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
-        <p className="font-bold text-slate-700 dark:text-slate-200">
+      <div className="border-t border-[var(--rule)] py-12 text-center">
+        <BookOpen className="mx-auto mb-3 h-8 w-8 text-[var(--rule-strong)]" aria-hidden="true" />
+        <p className="text-body font-bold text-[var(--ink)]">
           لا يوجد شرح منهجي متاح لهذه الوحدة حاليًا.
         </p>
       </div>
@@ -77,122 +84,81 @@ export default function StandardLessonViewer({
   }
 
   return (
-    <div className="space-y-6">
-      {/* الكفاءة المستهدفة */}
+    <div className="mx-auto w-full max-w-[720px] pb-10">
+      {/* الكفاءة المستهدفة: مقدّمة الكتاب، بلا صندوق */}
       {learningObjective && (
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-transparent border border-teal-200 dark:border-teal-900/60 flex items-start gap-3.5">
-          <div className="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5">
-            <Sparkles className="w-4 h-4" aria-hidden="true" />
-          </div>
-          <div className="space-y-1">
-            <h2 className="font-bold text-label uppercase tracking-wider text-teal-800 dark:text-teal-300">
-              الكفاءة المستهدفة والمؤشر الختامي للوحدة
-            </h2>
-            <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
-              {learningObjective}
-            </p>
-          </div>
-        </div>
+        <section aria-labelledby="objective-title" className="pt-7">
+          <h2 id="objective-title" className="z-kicker">
+            الكفاءة المستهدفة
+          </h2>
+          <p className="mt-2 text-body font-medium leading-loose text-[var(--ink-soft)]">
+            {learningObjective}
+          </p>
+        </section>
       )}
 
-      {/* مفتاح العلامات: يُذكر مرة واحدة فقط أعلى الدرس */}
-      <div className="flex items-start gap-2.5 px-1 text-label font-medium text-slate-600 dark:text-slate-400">
-        <Lightbulb className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />
-        <p>
-          بطاقة المصباح = <span className="font-bold">إضاءة</span> للفهم أو{" "}
-          <span className="font-bold">فائدة</span> مساعدة، ليست عنصرًا مفهوميًا يُحفظ؛ والخريطة
-          الذهنية للتعريفات والأقسام وحدها.
-        </p>
-      </div>
+      {/* مفتاح العلامات: يُذكر مرة واحدة فقط */}
+      <p className="mt-5 flex items-start gap-2 border-t border-[var(--rule)] pt-4 text-meta font-medium leading-relaxed text-[var(--ink-faint)]">
+        <span aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--ochre)]">
+          ◐
+        </span>
+        <span>
+          بطاقة <span className="font-bold text-[var(--ochre)]">إضاءة</span> أو{" "}
+          <span className="font-bold text-[var(--ochre)]">فائدة</span> ليست عنصرًا مفهوميًا يُحفظ؛
+          والخريطة الذهنية للتعريفات والأقسام وحدها.
+        </span>
+      </p>
 
-      <div className="space-y-4">
+      <div>
         {sections.map((section, idx) => {
-          const isCollapsed = !!collapsedSections[section.key];
+          const open = isOpen(section.key);
           const isRead = isSectionRead(unitId, section.key);
           const bodyId = `lesson-section-${section.key}`;
 
           return (
-            <section
-              key={section.key}
-              className={`bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 shadow-sm overflow-hidden ${
-                isRead
-                  ? "border-emerald-300 dark:border-emerald-900/60"
-                  : "border-slate-200 dark:border-slate-600"
-              }`}
-            >
-              <div className="p-5 sm:p-6 flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700">
+            <section key={section.key} className="border-t border-[var(--rule-strong)] first:mt-8">
+              <div className="flex items-start justify-between gap-4 py-4">
                 <button
                   type="button"
-                  onClick={() => toggleSection(section.key)}
-                  aria-expanded={!isCollapsed}
+                  onClick={() => setOpenSections((prev) => ({ ...prev, [section.key]: !open }))}
+                  aria-expanded={open}
                   aria-controls={bodyId}
-                  className="flex items-center gap-3 text-right flex-1 min-w-0"
+                  className="group flex min-w-0 flex-1 items-baseline gap-3 text-right"
                 >
-                  <span
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-label shrink-0 border transition-colors ${
-                      isRead
-                        ? "bg-emerald-600 text-white border-emerald-600"
-                        : "bg-teal-50 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border-teal-200/60 dark:border-teal-900"
-                    }`}
-                  >
-                    {idx + 1}
+                  <span className="z-num shrink-0 pt-1 text-meta" aria-hidden="true">
+                    {arabicNumber(idx + 1)}
                   </span>
                   <span className="min-w-0">
-                    <h3 className="font-bold text-body text-slate-900 dark:text-white">
+                    <span className="block text-title font-bold leading-snug text-[var(--ink)]">
                       {section.title}
-                    </h3>
+                    </span>
                     {isRead && (
-                      <span className="text-meta text-emerald-700 dark:text-emerald-400 font-bold">
-                        تمت دراسة هذا المحور ✓
+                      <span className="mt-1 block text-meta font-bold text-[var(--pine)]">
+                        تمّت قراءته
                       </span>
                     )}
                   </span>
+                  <ChevronDown
+                    className={`ms-auto mt-1 h-4 w-4 shrink-0 text-[var(--ink-faint)] transition-transform ${open ? "rotate-180" : ""}`}
+                    aria-hidden="true"
+                  />
                 </button>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => toggleSectionRead(unitId, section.key)}
-                    aria-pressed={isRead}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-label font-bold transition-all ${
-                      isRead
-                        ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                    }`}
-                    title={isRead ? "إلغاء وسم الإتمام" : "تحديد كمكتمل"}
-                  >
-                    {isRead ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                        <span className="hidden sm:inline">مكتمل</span>
-                      </>
-                    ) : (
-                      <>
-                        <Circle className="w-3.5 h-3.5" aria-hidden="true" />
-                        <span className="hidden sm:inline">تمييز كمقروء</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(section.key)}
-                    aria-expanded={!isCollapsed}
-                    aria-controls={bodyId}
-                    aria-label={isCollapsed ? "توسيع المحور" : "طي المحور"}
-                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    {isCollapsed ? (
-                      <ChevronDown className="w-5 h-5" aria-hidden="true" />
-                    ) : (
-                      <ChevronUp className="w-5 h-5" aria-hidden="true" />
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleSectionRead(unitId, section.key)}
+                  className={`mt-0.5 shrink-0 border px-2.5 py-1.5 text-meta font-bold transition-colors ${
+                    isRead
+                      ? "border-[var(--pine)] bg-[var(--pine)] text-[var(--paper)]"
+                      : "border-[var(--rule-strong)] text-[var(--ink-soft)] hover:bg-[var(--sunken)]"
+                  }`}
+                >
+                  {isRead ? "مقروء ✓" : "علّم كمقروء"}
+                </button>
               </div>
 
-              {!isCollapsed && (
-                <div id={bodyId} className="p-6 sm:p-8 space-y-6">
+              {open && (
+                <div id={bodyId} className="z-measure pb-8">
                   <RenderContent
                     data={section.content}
                     onCopyAyah={copyText}
@@ -226,10 +192,7 @@ const HANDLED_KEYS = new Set([
   "effects",
 ]);
 
-/**
- * محتوى بطاقة المصباح: نص، أو قائمة وسوم، أو بنية تُعرض بالشرح العادي.
- * لا نعرض هنا أي تنسيق مفهومي (تعريف/شاهد) حتى تبقى البطاقة خفيفة ودالّة.
- */
+/** محتوى بطاقة المصباح: نصّ، أو وسوم، أو بنية تُعرض بالشرح العادي */
 function InsightValue({
   value,
   onCopyAyah,
@@ -243,16 +206,14 @@ function InsightValue({
 
   if (Array.isArray(value) && value.every((item) => typeof item === "string")) {
     return (
-      <div className="flex flex-wrap gap-1.5">
+      <ul className="flex flex-wrap gap-x-3 gap-y-1">
         {value.map((item, idx) => (
-          <span
-            key={idx}
-            className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-800/60 text-slate-800 dark:text-slate-100"
-          >
+          <li key={idx} className="text-label font-bold">
             {String(item)}
-          </span>
+            {idx < value.length - 1 && <span aria-hidden="true"> ·</span>}
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
@@ -271,45 +232,29 @@ function RenderContent({
   if (data === null || data === undefined) return null;
 
   if (typeof data === "string") {
-    return <p className="text-slate-800 dark:text-slate-200 text-body leading-relaxed">{data}</p>;
+    return <p className="text-body leading-loose text-[var(--ink-soft)]">{data}</p>;
   }
 
   if (typeof data === "number" || typeof data === "boolean") {
-    return <p className="text-slate-800 dark:text-slate-200">{String(data)}</p>;
+    return <p className="text-body text-[var(--ink-soft)]">{String(data)}</p>;
   }
 
   if (Array.isArray(data)) {
     return (
-      <div className="space-y-4">
-        {data.map((item, i) =>
-          isRecord(item) || Array.isArray(item) ? (
-            <div
-              key={i}
-              className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 space-y-3"
-            >
-              {isRecord(item) && typeof item.title === "string" && (
-                <h4 className="font-bold text-body text-teal-800 dark:text-teal-300">
-                  {item.title}
-                </h4>
-              )}
+      <ul className="space-y-0">
+        {data.map((item, i) => (
+          <li key={i} className="border-b border-[var(--rule)] py-3 last:border-b-0 first:pt-0">
+            {isRecord(item) && typeof item.title === "string" && (
+              <h4 className="text-body font-bold text-[var(--ink)]">{item.title}</h4>
+            )}
+            {isRecord(item) || Array.isArray(item) ? (
               <RenderContent data={item} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />
-            </div>
-          ) : (
-            <div
-              key={i}
-              className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600"
-            >
-              <span
-                className="mt-2 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"
-                aria-hidden="true"
-              />
-              <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed">
-                {String(item)}
-              </p>
-            </div>
-          )
-        )}
-      </div>
+            ) : (
+              <p className="text-body leading-loose text-[var(--ink-soft)]">{String(item)}</p>
+            )}
+          </li>
+        ))}
+      </ul>
     );
   }
 
@@ -330,28 +275,19 @@ function RenderContent({
   ].filter((b) => b.text.length > 0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {asString(data.official_title) && (
-        <h4 className="font-bold text-body text-teal-800 dark:text-teal-300">
-          {asString(data.official_title)}
-        </h4>
+        <h4 className="text-body font-bold text-[var(--ink)]">{asString(data.official_title)}</h4>
       )}
 
       {definitionBlocks.map((block) => (
-        <div
-          key={block.label}
-          className="p-5 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 space-y-1.5 shadow-sm"
-        >
-          <span className="text-label font-bold text-teal-800 dark:text-teal-300">
-            {block.label}:
-          </span>
-          <p className="text-body text-slate-900 dark:text-slate-100 leading-relaxed font-semibold">
-            {block.text}
-          </p>
+        <div key={block.label}>
+          <p className="z-kicker">{block.label}</p>
+          <p className="mt-1 text-body font-medium leading-loose text-[var(--ink)]">{block.text}</p>
         </div>
       ))}
 
-      {/* ما يُشار إليه خلال شرح التعريف، وليس عنصرًا مفهوميًا في الدرس */}
+      {/* ما يُشار إليه خلال الشرح ولا يُعدّ عنصر درس */}
       {["relationship_linguistic_idiomatic", "core_foundation", "tawheed_categories"].map((key) => {
         const value = data[key];
         if (value === null || value === undefined || value === "") return null;
@@ -365,7 +301,7 @@ function RenderContent({
                     <span className="font-bold">{asString(tc.category)}: </span>
                     <span>{asString(tc.definition)}</span>
                     {asString(tc.example) && (
-                      <span className="mt-0.5 block text-meta font-medium text-slate-600 dark:text-slate-300">
+                      <span className="mt-0.5 block text-meta font-medium opacity-80">
                         مثال: {asString(tc.example)}
                       </span>
                     )}
@@ -384,96 +320,83 @@ function RenderContent({
       })}
 
       {asString(data.explanation) && (
-        <p className="text-body text-slate-900 dark:text-slate-100 leading-relaxed font-medium">
+        <p className="text-body leading-loose text-[var(--ink-soft)]">
           {asString(data.explanation)}
         </p>
       )}
 
+      {/* الشاهد: اقتباس بخطّ جانبي — دليلٌ لا إضاءة */}
       {proofText && (
-        <div className="p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border-r-4 border-amber-500 space-y-2.5 shadow-sm">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-label font-bold text-amber-900 dark:text-amber-300">
-              <BookOpen className="w-4 h-4 text-amber-600" aria-hidden="true" />
-              <span>{proofLabel}:</span>
-            </div>
-
+        <figure className="z-quote border-[var(--ochre)]/50">
+          <figcaption className="flex flex-wrap items-center justify-between gap-2">
+            <span className="z-kicker text-[var(--ochre)]">{proofLabel}</span>
             <button
               type="button"
               onClick={() => onCopyAyah(proofText, ayahId)}
-              className="flex items-center gap-1.5 text-label font-bold px-3 py-1.5 rounded-lg bg-amber-200/70 dark:bg-amber-900/50 text-amber-950 dark:text-amber-100 hover:bg-amber-300 transition-colors"
+              className="flex items-center gap-1.5 text-meta font-bold text-[var(--ink-faint)] transition-colors hover:text-[var(--ink)]"
             >
               {copiedAyah === ayahId ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
-                  <span>تم النسخ ✓</span>
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>نُسخ</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>نسخ الشاهد</span>
+                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>نسخ</span>
                 </>
               )}
             </button>
-          </div>
+          </figcaption>
 
-          <div className="font-quran text-title text-amber-950 dark:text-amber-100 leading-loose py-2">
+          <blockquote className="font-quran mt-2 text-title leading-loose text-[var(--ink)]">
             {proofText}
-          </div>
+          </blockquote>
 
           {asString(data.proof_anchor_phrase) && (
-            <div className="pt-2.5 border-t border-amber-200/80 dark:border-amber-900/60 flex items-center gap-2 text-body text-amber-900 dark:text-amber-300 flex-wrap">
-              <span className="font-bold px-2.5 py-1 rounded-lg bg-amber-200/80 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200">
-                محل الشاهد:
-              </span>
+            <p className="mt-2 text-body text-[var(--ink-soft)]">
+              <span className="z-kicker me-2">محل الشاهد</span>
               <span className="font-bold">«{asString(data.proof_anchor_phrase)}»</span>
-            </div>
+            </p>
           )}
-        </div>
+        </figure>
       )}
 
       {Array.isArray(data.effects) && (
-        <div className="space-y-4 pt-2">
+        <ol className="space-y-0">
           {data.effects.filter(isRecord).map((eff, i) => (
-            <div
-              key={i}
-              className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-700/90 border-2 border-slate-200 dark:border-slate-600 shadow-sm space-y-3"
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-300 text-label font-bold flex items-center justify-center shrink-0">
-                  {i + 1}
-                </span>
-                <h5 className="font-bold text-body text-slate-900 dark:text-white">
+            <li key={i} className="border-b border-[var(--rule)] py-4 first:pt-0 last:border-b-0">
+              <div className="flex items-baseline gap-2.5">
+                <span className="z-num shrink-0">{arabicNumber(i + 1)}</span>
+                <h5 className="text-body font-bold text-[var(--ink)]">
                   {asString(eff.official_title) || asString(eff.title)}
                 </h5>
               </div>
-              <p className="text-body text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+              <p className="mt-1 text-body leading-loose text-[var(--ink-soft)]">
                 {asString(eff.explanation)}
               </p>
               {asString(eff.quranic_proof_warsh) && (
-                <div className="font-quran text-title text-amber-950 dark:text-amber-100 bg-amber-50/80 dark:bg-amber-950/40 p-3.5 rounded-xl border-r-4 border-amber-500 leading-loose">
+                <p className="font-quran z-quote mt-2 border-[var(--ochre)]/40 text-title leading-loose text-[var(--ink)]">
                   {asString(eff.quranic_proof_warsh)}
-                </div>
+                </p>
               )}
               {Array.isArray(eff.key_extraction_indicators) && (
-                <InsightCard tone="illumination" title="مؤشرات الاستخراج">
-                  <div className="flex flex-wrap gap-1.5">
-                    {eff.key_extraction_indicators.map((ind, idx) => (
-                      <span
-                        key={idx}
-                        className="text-label font-semibold px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-800/60 text-slate-800 dark:text-slate-100"
-                      >
-                        {String(ind)}
-                      </span>
-                    ))}
-                  </div>
-                </InsightCard>
+                <div className="mt-3">
+                  <InsightCard tone="illumination" title="مؤشرات الاستخراج">
+                    <InsightValue
+                      value={eff.key_extraction_indicators}
+                      onCopyAyah={onCopyAyah}
+                      copiedAyah={copiedAyah}
+                    />
+                  </InsightCard>
+                </div>
               )}
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
 
-      {/* ما ليس عنصرًا مفهوميًا (كلمات مفتاحية، ملاحظات، تحذيرات…): بطاقة مصباح */}
+      {/* بقية الحقول غير المفهومية: بطاقة مصباح */}
       {Object.entries(data).map(([key, value]) => {
         const meta = insightFor(key);
         if (!meta || HANDLED_KEYS.has(key) || value === null || value === undefined) return null;
@@ -484,22 +407,20 @@ function RenderContent({
         );
       })}
 
-      {/* بقية الحقول: تُعرض بعناوين عربية من القاموس */}
+      {/* بقية الحقول المفهومية: عنوان تحريري + قيمة */}
       {Object.entries(data).map(([key, value], index) => {
         if (HANDLED_KEYS.has(key) || isInsightField(key)) return null;
         if (value === null || value === undefined) return null;
-        const isComplex = typeof value === "object";
-        if (!isComplex) return null;
+        if (typeof value !== "object") return null;
 
         return (
-          <section
-            key={key}
-            className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-2"
-          >
-            <h5 className="font-bold text-body text-slate-900 dark:text-white">
+          <section key={key} className="border-t border-[var(--rule)] pt-4">
+            <h5 className="z-kicker">
               {SECTION_TITLES[key] ?? resolveSectionTitle(key, index + 1)}
             </h5>
-            <RenderContent data={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />
+            <div className="mt-1.5">
+              <RenderContent data={value} onCopyAyah={onCopyAyah} copiedAyah={copiedAyah} />
+            </div>
           </section>
         );
       })}
