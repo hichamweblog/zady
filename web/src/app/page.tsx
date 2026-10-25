@@ -200,7 +200,7 @@ export default function HomePage() {
                   }}
                 />
 
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-600 flex items-center justify-between gap-2 flex-wrap text-label font-bold text-slate-600 dark:text-slate-300">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between gap-2 flex-wrap text-label font-bold text-slate-600 dark:text-slate-300">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="flex items-center gap-1 text-teal-700 dark:text-teal-300">
                       <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />

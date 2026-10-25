@@ -211,7 +211,7 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                 {isExpanded && (
                   <div
                     id={bodyId}
-                    className="border-t border-slate-100 dark:border-slate-600/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
+                    className="border-t border-slate-100 dark:border-slate-700/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-950/30 space-y-5"
                   >
                     {question.anchor && (
                       <div className="flex items-start gap-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">

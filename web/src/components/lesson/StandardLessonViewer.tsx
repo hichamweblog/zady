@@ -120,7 +120,7 @@ export default function StandardLessonViewer({
                   : "border-slate-200 dark:border-slate-600"
               }`}
             >
-              <div className="p-5 sm:p-6 flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-600">
+              <div className="p-5 sm:p-6 flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => toggleSection(section.key)}
@@ -494,7 +494,7 @@ function RenderContent({
         return (
           <section
             key={key}
-            className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-600 space-y-2"
+            className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-2"
           >
             <h5 className="font-bold text-body text-slate-900 dark:text-white">
               {SECTION_TITLES[key] ?? resolveSectionTitle(key, index + 1)}

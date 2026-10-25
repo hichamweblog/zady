@@ -34,7 +34,7 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-label text-slate-600 dark:text-slate-300">
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-label text-slate-600 dark:text-slate-300">
           <p>محتوى تعليمي وفق التدرّج السنوي الرسمي — يُراجَع مع أستاذ المادة.</p>
           <p className="text-slate-500 dark:text-slate-400">
             نسخة تفاعلية تعمل دون اتصال (PWA) • 2026

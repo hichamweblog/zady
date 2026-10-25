@@ -209,7 +209,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
                   {group.items.map((item, i) => (
                     <li
                       key={i}
-                      className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/60 border border-slate-100 dark:border-slate-600"
+                      className="text-body-sm text-slate-800 dark:text-slate-200 leading-relaxed p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/60 border border-slate-100 dark:border-slate-700"
                     >
                       {item}
                     </li>
@@ -308,7 +308,7 @@ function PreviousBacCard({
       </button>
 
       {open && (
-        <div className="px-4 sm:p-5 sm:pt-0 border-t border-slate-100 dark:border-slate-600 pt-4">
+        <div className="px-4 sm:p-5 sm:pt-0 border-t border-slate-100 dark:border-slate-700 pt-4">
           <span className="text-meta font-bold text-teal-800 dark:text-teal-300 block mb-2">
             الإجابة النموذجية
           </span>

@@ -471,7 +471,7 @@ function ClozeCard({ item, index }: { item: NormalizedCloze; index: number }) {
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-5 sm:p-6 shadow-sm space-y-4">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-600 gap-2 flex-wrap">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 gap-2 flex-wrap">
         <div className="flex items-center gap-2.5">
           <span className="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 text-label font-bold flex items-center justify-center">
             {index}
