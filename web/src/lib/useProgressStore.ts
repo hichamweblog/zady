@@ -22,6 +22,11 @@ export interface ProgressData {
   quizLastAttempts: Record<number, QuizAttempt>;
   /** عدد المحاولات لكل وحدة */
   quizAttemptCounts: Record<number, number>;
+  /**
+   * آخر مكان كان فيه الطالب — يُستخدم لزر «تابع من حيث توقفت».
+   * بلا هذا الحقل يضطر الطالب إلى تذكّر الوحدة والتبويب الذي تركه.
+   */
+  lastActivity: { unitId: number; tab: string; at: number } | null;
 }
 
 const STORAGE_KEY = "zady_student_progress_v3";
@@ -34,6 +39,7 @@ const EMPTY: ProgressData = {
   quizAttempts: {},
   quizLastAttempts: {},
   quizAttemptCounts: {},
+  lastActivity: null,
 };
 
 /**
@@ -61,6 +67,10 @@ function normalize(raw: unknown): ProgressData {
     quizAttempts: (parsed.quizAttempts ?? {}) as Record<number, QuizAttempt>,
     quizLastAttempts: (parsed.quizLastAttempts ?? {}) as Record<number, QuizAttempt>,
     quizAttemptCounts: (parsed.quizAttemptCounts ?? {}) as Record<number, number>,
+    lastActivity:
+      parsed.lastActivity && typeof parsed.lastActivity.unitId === "number"
+        ? parsed.lastActivity
+        : null,
   };
 }
 
@@ -138,6 +148,36 @@ function getSnapshot(): ProgressData {
 
 function getServerSnapshot(): ProgressData {
   return EMPTY;
+}
+
+/**
+ * صيغة نسبة الإتقان الواحدة المشتركة.
+ * كانت مكرّرة داخل `getUnitStats` وحدها، فأي مكان آخر يحتاج النسبة (مثل شريط
+ * التقدّم على بطاقة الوحدة في الرئيسية) كان سيعيد حسابها بصيغة قد تختلف.
+ */
+export function weightedProgress(input: {
+  sectionsDone: number;
+  sectionsTotal: number;
+  cardsDone: number;
+  cardsTotal: number;
+  quizScore: number;
+  quizTotal: number;
+  quizAttempted: boolean;
+  questionsDone: number;
+  questionsTotal: number;
+}): number {
+  const ratio = (done: number, total: number) => (total > 0 ? done / total : 0);
+  const quizRatio = input.quizAttempted ? ratio(input.quizScore, input.quizTotal) : 0;
+  return Math.min(
+    100,
+    Math.round(
+      (ratio(input.sectionsDone, input.sectionsTotal) * 0.25 +
+        ratio(input.cardsDone, input.cardsTotal) * 0.25 +
+        quizRatio * 0.25 +
+        ratio(input.questionsDone, input.questionsTotal) * 0.25) *
+        100
+    )
+  );
 }
 
 const cardKey = (unitId: number, cardId: string | number) => `u${unitId}_c_${cardId}`;
@@ -258,6 +298,13 @@ export function useProgress() {
     [data.readSections]
   );
 
+  const setLastActivity = useCallback((unitId: number, tab: string) => {
+    const previous = state.lastActivity;
+    // لا نكتب في التخزين عند كل رسم — فقط عند تغيّر الوحدة أو التبويب
+    if (previous && previous.unitId === unitId && previous.tab === tab) return;
+    mutate((prev) => ({ ...prev, lastActivity: { unitId, tab, at: Date.now() } }));
+  }, []);
+
   const getQuizAttempt = useCallback(
     (unitId: number): QuizAttempt | undefined => data.quizAttempts[unitId],
     [data.quizAttempts]
@@ -296,16 +343,17 @@ export function useProgress() {
       const quizAttempt = data.quizAttempts[unitId];
       const quizPassed = (quizAttempt?.percentage ?? 0) >= 60;
 
-      const secRatio = sectionKeys.length > 0 ? readSectionsCount / sectionKeys.length : 0;
-      const cardRatio = cardIds.length > 0 ? learnedCards / cardIds.length : 0;
-      const quizRatio = totalMcq > 0 && quizAttempt ? quizAttempt.score / totalMcq : 0;
-      const questionRatio =
-        questionIds.length > 0 ? masteredQuestions / questionIds.length : 0;
-
-      const progressPercentage = Math.min(
-        100,
-        Math.round((secRatio * 0.25 + cardRatio * 0.25 + quizRatio * 0.25 + questionRatio * 0.25) * 100)
-      );
+      const progressPercentage = weightedProgress({
+        sectionsDone: readSectionsCount,
+        sectionsTotal: sectionKeys.length,
+        cardsDone: learnedCards,
+        cardsTotal: cardIds.length,
+        quizScore: quizAttempt?.score ?? 0,
+        quizTotal: totalMcq,
+        quizAttempted: Boolean(quizAttempt),
+        questionsDone: masteredQuestions,
+        questionsTotal: questionIds.length,
+      });
 
       return {
         learnedCards,
@@ -331,6 +379,7 @@ export function useProgress() {
     toggleSectionRead,
     isSectionRead,
     saveQuizAttempt,
+    setLastActivity,
     getQuizAttempt,
     getLastQuizAttempt,
     getQuizAttemptCount,

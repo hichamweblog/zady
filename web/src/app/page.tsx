@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+import ResumeBanner from "@/components/home/ResumeBanner";
+import UnitProgressBadge from "@/components/home/UnitProgressBadge";
 import Footer from "@/components/layout/Footer";
 import { getAllUnits, getUnitTotals } from "@/lib/data-loader";
 import {
@@ -9,8 +11,6 @@ import {
   Clock,
   ArrowLeft,
   CheckSquare,
-  Zap,
-  Layers,
   ShieldCheck,
 } from "lucide-react";
 
@@ -45,11 +45,9 @@ export default function HomePage() {
               راجع العلوم الإسلامية بطريقة <span className="text-teal-300">تفاعلية</span> ومنظّمة
             </h1>
 
-            <p className="text-slate-200 text-sm sm:text-base leading-relaxed">
-              يجمع <strong className="text-white">زادِي</strong> أدوات الاستذكار الأربع في مكان
-              واحد: خرائط ذهنية تفاعلية، بطاقات حفظ وتحدّي ملء الفراغات، اختبارات
-              اختيار من متعدد بتعليل لكل سؤال، وبنك أسئلة بكالوريا مع عناصر الإجابة
-              وسلّم التنقيط حين يتوفّر.
+            <p className="text-slate-200 text-sm sm:text-base leading-relaxed max-w-2xl">
+              كل ما تحتاجه لمراجعة الوحدة في مكان واحد: خريطة، درس، بطاقات حفظ،
+              اختبار، وأسئلة بكالوريا — بترتيب واضح خطوة بعد خطوة.
             </p>
 
             <div className="flex items-center gap-3 pt-2 flex-wrap">
@@ -61,11 +59,21 @@ export default function HomePage() {
                 <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               </Link>
 
-              <span className="text-xs text-teal-200 font-medium">
-                ⚡ يعمل دون إنترنت بعد أول زيارة (PWA)
+              <Link
+                href="#units"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/25 px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-white/10"
+              >
+                <span>استعرض الوحدات</span>
+              </Link>
+              <span className="text-[11px] text-teal-200/90 font-medium">
+                يعمل دون إنترنت بعد أول زيارة
               </span>
             </div>
           </div>
+        </section>
+
+        <section aria-label="متابعة الدراسة">
+          <ResumeBanner />
         </section>
 
         {/* الأرقام */}
@@ -95,7 +103,7 @@ export default function HomePage() {
         </section>
 
         {/* الوحدات */}
-        <section className="space-y-6">
+        <section id="units" className="space-y-6 scroll-mt-24">
           <div className="space-y-1">
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
               الوحدات التعليمية المتوفرة
@@ -133,6 +141,16 @@ export default function HomePage() {
                   </p>
                 </div>
 
+                <UnitProgressBadge
+                  unitId={unit.id}
+                  totals={{
+                    sections: unit.sections.length,
+                    cards: unit.flashcards.length,
+                    questions: unit.questions.length,
+                    mcq: unit.quizQuestions.length,
+                  }}
+                />
+
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap text-xs font-bold text-slate-600 dark:text-slate-300">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="flex items-center gap-1 text-teal-700 dark:text-teal-300">
@@ -162,53 +180,48 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* طريقة الدراسة */}
-        <section className="space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+        {/*
+          كان هنا 6 بطاقات شرح (نحو 300 كلمة) تكرّر أسماء التبويبات الستة
+          وتؤجّل الوصول إلى المحتوى. صارت مسارًا بصريًا مضغوطًا في سطر واحد:
+          الطالب يرى التسلسل ولا يقرأ شرحًا لكل خطوة قبل أن يبدأ.
+        */}
+        <section aria-labelledby="path-title" className="space-y-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="path-title" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
               مسار الاستذكار داخل كل وحدة
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-              ستة أنماط متتابعة، ونسبة الإتقان تُحسب من إنجازك فيها جميعًا
+            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+              ست خطوات مرتبة — والتطبيق يقترح التالية تلقائيًا
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              { n: 1, icon: Layers, title: "الخريطة الذهنية", desc: "فهرس تفاعلي + صورة الخريطة الكاملة للتكبير.", tone: "teal" },
-              { n: 2, icon: BookOpen, title: "الدرس المنهجي", desc: "الشرح الرسمي مع الشواهد برواية ورش ومحل الشاهد وزر النسخ.", tone: "teal" },
-              { n: 3, icon: Sparkles, title: "الحفظ والاسترجاع", desc: "بطاقات بقلب ثلاثي الأبعاد، تقييم ذاتي، وتحدّي ملء الفراغات.", tone: "amber" },
-              { n: 4, icon: CheckSquare, title: "اختبار QCM", desc: "أسئلة بخيارات مخلوطة وتعليل فوري بعد كل إجابة.", tone: "blue" },
-              { n: 5, icon: HelpCircle, title: "بنك أسئلة البكالوريا", desc: "أسئلة مباشرة وأسئلة استخراج من النصوص مع عناصر الإجابة.", tone: "emerald" },
-              { n: 6, icon: Zap, title: "المراجعة السريعة", desc: "مراجعة اللحظة الأخيرة، القواعد المنهجية، وفروق المصطلحات.", tone: "rose" },
-            ].map(({ n, icon: Icon, title, desc, tone }) => (
-              <div
+              { n: 1, title: "الخريطة", hint: "تصوّر شامل" },
+              { n: 2, title: "الدرس", hint: "الشرح والشواهد" },
+              { n: 3, title: "الحفظ", hint: "بطاقات وفرواغ" },
+              { n: 4, title: "QCM", hint: "اختبار سريع" },
+              { n: 5, title: "أسئلة BAC", hint: "عناصر الإجابة" },
+              { n: 6, title: "المراجعة", hint: "قبل الامتحان" },
+            ].map(({ n, title, hint }) => (
+              <li
                 key={n}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2"
+                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
               >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs ${
-                      tone === "teal"
-                        ? "bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300"
-                        : tone === "amber"
-                          ? "bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300"
-                          : tone === "blue"
-                            ? "bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300"
-                            : tone === "emerald"
-                              ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300"
-                              : "bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300"
-                    }`}
-                  >
-                    {n}
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-xs font-black text-teal-800 dark:bg-teal-950 dark:text-teal-300">
+                  {n}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-black text-slate-900 dark:text-white">
+                    {title}
                   </span>
-                  <Icon className="w-4 h-4 text-slate-500" aria-hidden="true" />
-                </div>
-                <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">{title}</h3>
-                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{desc}</p>
-              </div>
+                  <span className="block truncate text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+                    {hint}
+                  </span>
+                </span>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
         {/* ملاحظة الأمانة العلمية */}

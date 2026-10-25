@@ -3,22 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Moon, Sun, CheckCircle2, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UNITS_META } from "@/lib/units-meta";
-
-/* مصدر حالة الثيم: كلاس <html> نفسه (مُهيّأ مسبقًا في <head> لمنع الوميض) */
-function subscribeToTheme(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}
-
-const getThemeSnapshot = () => document.documentElement.classList.contains("dark");
-const getServerThemeSnapshot = () => false;
+import { toggleTheme, useIsDark } from "@/lib/useTheme";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isDark = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, getServerThemeSnapshot);
+  const isDark = useIsDark();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -37,16 +28,6 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    const nextIsDark = !document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", nextIsDark);
-    try {
-      localStorage.setItem("zady_theme", nextIsDark ? "dark" : "light");
-    } catch {
-      /* التخزين المحلي محجوب */
-    }
   }, []);
 
   return (

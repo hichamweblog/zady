@@ -1,7 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * إستراتيجية الوضع الداكن: **بالكلاس لا بتفضيل النظام**.
+ *
+ * Tailwind v4 يجعل `dark:` تتبع `@media (prefers-color-scheme: dark)` افتراضيًا.
+ * ولأن هذا التطبيق يملك مفتاح تبديل صريحًا (كلاس `.dark` على <html>)، كان
+ * الوضع الفاتح لا يعمل عند من نظامه داكن: 162 أداة `dark:*` تبقى مفعّلة
+ * وتتجاهل المفتاح، بينما خلفية الصفحة (متغيّرات CSS) تصبح فاتحة ⇒ خليط.
+ * السطر التالي يربط كل `dark:*` بالكلاس وحده.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
+    color-scheme: light;
     --background: #f8fafc;
     --foreground: #0f172a;
     --card: #ffffff;
@@ -26,6 +38,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --background: #0b1120;
     --foreground: #f8fafc;
     --card: #131c31;

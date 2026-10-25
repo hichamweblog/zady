@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { celebrate } from "@/lib/celebrate";
 import type { NormalizedQuestion } from "@/lib/types";
+import { shortCategory } from "@/lib/labels";
 import { useProgress } from "@/lib/useProgressStore";
 
 interface BacQuizSectionProps {
@@ -148,13 +149,15 @@ export default function BacQuizSection({ unitId, questions }: BacQuizSectionProp
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 aria-pressed={selectedCategory === category}
+                title={category}
                 className={`shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   selectedCategory === category
                     ? "bg-teal-700 text-white shadow-sm"
                     : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 }`}
               >
-                {category} ({count})
+                <span className="sm:hidden">{shortCategory(category)} ({count})</span>
+                <span className="hidden sm:inline">{category} ({count})</span>
               </button>
             );
           })}

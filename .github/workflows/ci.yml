@@ -45,6 +45,15 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Guard — dark: يتبع الكلاس لا تفضيل النظام
+        run: |
+          if grep -rq "prefers-color-scheme" .next/static/chunks/*.css; then
+            echo "::error::Tailwind compiled dark: into @media (prefers-color-scheme) — مفتاح الثيم لن يعمل."
+            echo "أضف @custom-variant dark في globals.css."
+            exit 1
+          fi
+          echo "OK: dark: مربوط بكلاس .dark"
+
       - name: Smoke test (404 + صفحات الوحدات)
         run: |
           pnpm start --port 3000 &
