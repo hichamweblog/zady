@@ -249,6 +249,57 @@ test("محتوى المراجعة السريعة موجود لكل وحدة", ()
   }
 });
 
+/* ─────────────── القواعد المنهجية: مكانها المراجعة لا الدرس ─────────────── */
+
+test("«القواعد والضوابط المنهجية» ليست محورًا في الخريطة الذهنية ولا في الدرس", () => {
+  for (const file of MINDMAP_FILES) {
+    const labels = [];
+    const walk = (node) => {
+      labels.push(node.label ?? "");
+      (node.children || []).forEach(walk);
+    };
+    walk(read(file).root);
+    const offenders = labels.filter(
+      (label) => label.includes("القواعد والضوابط") || label.includes("قواعد منهجية")
+    );
+    assert.deepEqual(offenders, [], `${file}: القواعد المنهجية عُرضت كمحور درس`);
+  }
+
+  for (const file of STANDARD_FILES) {
+    const sections = Object.keys(read(file).detailed_explanation ?? {});
+    const offenders = sections.filter((key) => key.includes("methodolog"));
+    assert.deepEqual(offenders, [], `${file}: قسم درسي للقواعد المنهجية`);
+  }
+});
+
+test("نفس القواعد متاحة داخل المراجعة السريعة (معرَّفة للواجهة)", () => {
+  const withRules = STANDARD_FILES.map((file) => read(file)).filter(
+    (data) =>
+      Array.isArray(data.methodology_and_rules?.rules) && data.methodology_and_rules.rules.length
+  );
+  assert.ok(withRules.length > 0, "لا توجد قواعد منهجية في أي ملف قياسي");
+  for (const data of withRules) {
+    for (const rule of data.methodology_and_rules.rules) {
+      assert.equal(typeof rule, "string");
+      assert.ok(rule.trim().length > 20, "قاعدة منهجية فارغة أو مبتورة");
+    }
+  }
+
+  const section = fs.readFileSync(
+    path.join(
+      import.meta.dirname,
+      "..",
+      "..",
+      "src",
+      "components",
+      "revision",
+      "RevisionSection.tsx"
+    ),
+    "utf8"
+  );
+  assert.match(section, /القواعد والضوابط المنهجية/, "عنوان القسم في المراجعة السريعة");
+});
+
 /* ─────────────── أصول الواجهة ─────────────── */
 
 test("صور الخرائط الذهنية موجودة بصيغة webp وخفيفة", () => {

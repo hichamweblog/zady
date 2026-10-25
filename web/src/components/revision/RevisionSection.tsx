@@ -97,13 +97,13 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
         </section>
       )}
 
-      {/* 2. القواعد المنهجية */}
+      {/* 2. القواعد والضوابط المنهجية (مكانها المراجعة لا الدرس) */}
       {rules.length > 0 && (
         <section aria-labelledby="rules-title" className="space-y-3">
           <SectionHeading
             id="rules-title"
             icon={ListChecks}
-            title="قواعد منهجية للامتحان"
+            title="القواعد والضوابط المنهجية"
             tone="teal"
           />
           <ol className="space-y-3">

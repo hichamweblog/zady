@@ -381,9 +381,20 @@ function buildRevision(std: unknown, adv: unknown): RevisionContent {
     .filter((group) => group.items.length > 0);
 
   const methodology = isRecord(s.methodology_and_rules) ? s.methodology_and_rules : {};
+  /**
+   * «القواعد والضوابط المنهجية» ليست محورًا دراسيًا؛ مكانها الطبيعي هنا في
+   * المراجعة السريعة. والنص في البيانات يبدأ بـ«⚠️ قاعدة 1:» بينما الواجهة
+   * ترقّم القواعد بنفسها ⇒ ننزع البادئة والرمز لتفادي الترقيم المزدوج.
+   */
   const rules = Array.isArray(methodology.rules)
     ? toStringList(methodology.rules)
     : toStringList(methodology);
+  const cleanedRules = rules.map((rule) =>
+    rule
+      .replace(/^\s*\u26A0\uFE0F?\s*/u, "")
+      .replace(/^\s*(?:القاعدة|قاعدة)\s*\d+\s*[:.)\-–]\s*/u, "")
+      .trim()
+  );
 
   const differentiation: DifferentiationRow[] = asArray(a.differentiation_matrix)
     .filter(isRecord)
@@ -406,7 +417,13 @@ function buildRevision(std: unknown, adv: unknown): RevisionContent {
     }))
     .filter((q) => q.question && q.answer);
 
-  return { lastMinute, summary, rules, differentiation, previousBac };
+  return {
+    lastMinute,
+    summary,
+    rules: cleanedRules.filter((rule) => rule.length > 0),
+    differentiation,
+    previousBac,
+  };
 }
 
 function buildSections(std: unknown): LessonSection[] {
