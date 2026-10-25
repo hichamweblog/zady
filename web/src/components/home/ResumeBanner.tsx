@@ -7,6 +7,7 @@ import { useProgress } from "@/lib/useProgressStore";
 import { UNITS_META } from "@/lib/units-meta";
 
 const TAB_LABELS: Record<string, string> = {
+  video: "شرح مرئي",
   mindmap: "الخريطة الذهنية",
   lesson: "نص الدرس",
   flashcards: "الحفظ والاسترجاع",

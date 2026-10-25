@@ -17,15 +17,16 @@ import {
   findNodePath,
 } from "../../src/lib/mindmap-layout.ts";
 
-const DIR = path.join(import.meta.dirname, "..", "..", "src", "data", "lessons");
-const MINDMAP_FILES = fs
+// الخريطة صارت داخل ملف الوحدة الموحّد: src/data/units/unit-0X.json
+const DIR = path.join(import.meta.dirname, "..", "..", "src", "data", "units");
+const UNIT_FILES = fs
   .readdirSync(DIR)
-  .filter((f) => f.endsWith("_mindmap.json"))
+  .filter((f) => /^unit-\d{2}\.json$/.test(f))
   .sort();
 
-const roots = MINDMAP_FILES.map((file) => ({
+const roots = UNIT_FILES.map((file) => ({
   file,
-  root: JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8")).root,
+  root: JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8")).mindmap.root,
 }));
 
 const walk = (node, out = []) => {

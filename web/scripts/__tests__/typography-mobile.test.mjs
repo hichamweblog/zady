@@ -488,7 +488,11 @@ test("مسار التعلّم: ثلاث مراحل لا ستة أزرار متس
   assert.match(stages, /label: "استيعاب"/, "المرحلة 1: استيعاب");
   assert.match(stages, /label: "تثبيت"/, "المرحلة 2: تثبيت");
   assert.match(stages, /label: "اختبار"/, "المرحلة 3: اختبار");
-  assert.match(stages, /steps: \["lesson", "mindmap"\]/, "القراءة والخريطة في الاستيعاب");
+  assert.match(
+    stages,
+    /steps: \["video", "lesson", "mindmap"\]/,
+    "الاستيعاب: فيديو (اختياري) ثم القراءة ثم الخريطة"
+  );
 
   // الخطوات المعروضة هي خطوات المرحلة الحالية فقط
   assert.match(view, /const visibleTabs = useMemo/, "الخطوات تُفلتر بالمرحلة");

@@ -14,6 +14,47 @@ export interface MindmapNode {
   children?: MindmapNode[];
 }
 
+/** شرح مرئي للوحدة — يُعرض كخطوة أولى في مرحلة «استيعاب» */
+export interface VideoChapter {
+  /** توقيت البداية «mm:ss» */
+  at: string;
+  title: string;
+}
+
+export interface UnitVideo {
+  provider: "youtube" | "vimeo" | "file";
+  /** معرّف الفيديو عند youtube/vimeo */
+  id?: string;
+  /** مسار الملف عند provider=file */
+  src?: string;
+  title: string;
+  duration?: string;
+  poster?: string;
+  /** ملف .vtt للتفريغ بالعربية */
+  captions?: string;
+  chapters?: VideoChapter[];
+}
+
+/** شاهد شرعي محفوظ في بيانات الوحدة (محرّك الشواهد) */
+export interface UnitProof {
+  id: string;
+  surah?: string;
+  ayah?: number | string;
+  text: string;
+  anchor?: string;
+  keywords?: string[];
+  note?: string;
+}
+
+/** أصل المادة العلمية: التدرّج والمراجعة */
+export interface UnitSourceMeta {
+  curriculum?: string;
+  subject?: string;
+  reviewedBy?: string | null;
+  updatedAt?: string;
+  notes?: string;
+}
+
 export interface NormalizedFlashcard {
   id: string | number;
   question: string;
@@ -125,6 +166,11 @@ export interface UnitMeta {
 }
 
 export interface NormalizedUnit extends UnitMeta {
+  /** إصدار مخطط الملف الواحد (2 = الملف الموحّد) */
+  schemaVersion?: number;
+  source?: UnitSourceMeta;
+  video?: UnitVideo;
+  proofs?: UnitProof[];
   field: string;
   timeAllocation: string;
   targetAudience: string;

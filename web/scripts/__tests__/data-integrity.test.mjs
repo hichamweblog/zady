@@ -1,13 +1,13 @@
 /**
- * حواجز انحدار على البيانات التعليمية.
+ * حواجز انحدار على البيانات التعليمية — الوحدة في **ملف واحد**.
  *
- * كل فحص هنا يقابل خطأً وقع فعليًا في المشروع:
+ * كل فحص هنا يقابل خطأً وقع فعلًا في المشروع أو قرارًا اتُّخذ لحماية الطالب:
  *  - 70/70 سؤال QCM إجابته الخيار الأول
- *  - 38 بطاقة سؤال تُعرض بلا نص أو بلا جواب
- *  - 39 عقدة في الخرائط الذهنية بلا شرح
- *  - 90 بطاقة بلا سلم تنقيط
+ *  - 38 بطاقة بلا نص أو بلا جواب
+ *  - 39 عقدة في الخريطة بلا شرح
  *  - عناوين إنجليزية داخل واجهة عربية
- *  - تعارض @font-face يُخفي الخط العربي
+ *  - «القواعد المنهجية» تُعرض محورًا دراسيًا ومكانها المراجعة
+ *  - نصّ منسوب إلى «رواية ورش» (مرفوض شرعيًا ومنهجيًا)
  *
  * التشغيل: npm run test:data
  */
@@ -16,377 +16,316 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { validateUnitFile } from "../lib/unit-validator.mjs";
+import { readUnitsMeta } from "../lib/units-meta.mjs";
 
-const DIR = path.join(import.meta.dirname, "..", "..", "src", "data", "lessons");
-const read = (file) => JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8"));
-const files = fs.readdirSync(DIR);
+const ROOT = path.join(import.meta.dirname, "..", "..");
+const UNITS_DIR = path.join(ROOT, "src", "data", "units");
+const SCHEMA_FILE = path.join(ROOT, "src", "data", "schema", "unit.schema.json");
+const SRC = path.join(ROOT, "src");
 
-const QUIZ_FILES = files.filter((f) => f.endsWith("_quiz.json")).sort();
-const QUESTION_FILES = files.filter((f) => f.endsWith("_questions.json")).sort();
-const MINDMAP_FILES = files.filter((f) => f.endsWith("_mindmap.json")).sort();
-const STANDARD_FILES = files.filter((f) => f.endsWith("_standard.json")).sort();
-const ADVANCED_FILES = files.filter((f) => f.endsWith("_advanced.json")).sort();
-
-const flatQuestions = (raw) => {
-  const out = [];
-  const walk = (node) => {
-    if (!node || typeof node !== "object") return;
-    if (Array.isArray(node)) {
-      node.forEach(walk);
-      return;
-    }
-    if (node.question_text !== undefined || node.question !== undefined) {
-      out.push(node);
-      return;
-    }
-    Object.values(node).forEach(walk);
-  };
-  walk(raw);
-  return out;
-};
+const FILES = fs
+  .readdirSync(UNITS_DIR)
+  .filter((f) => /^unit-\d{2}\.json$/.test(f))
+  .sort();
+const UNITS = FILES.map((file) => ({
+  file: path.join(UNITS_DIR, file),
+  data: JSON.parse(fs.readFileSync(path.join(UNITS_DIR, file), "utf8")),
+}));
+const META = readUnitsMeta(ROOT);
+const read = (rel) => fs.readFileSync(path.join(SRC, rel), "utf8");
 
 const leaves = (node, out = []) => {
   if (!(node.children || []).length) out.push(node);
-  (node.children || []).forEach((child) => leaves(child, out));
+  for (const child of node.children || []) leaves(child, out);
   return out;
 };
 
+const walkNodes = (node, out = []) => {
+  out.push(node);
+  for (const child of node.children || []) walkNodes(child, out);
+  return out;
+};
+
+/* ─────────────── المخطط: عقد الملف الواحد ─────────────── */
+
+test("مخطط الوحدة الموحّد موجود ومعلن الإصدار 2", () => {
+  assert.ok(existsSync(SCHEMA_FILE), "src/data/schema/unit.schema.json موجود");
+  const schema = JSON.parse(fs.readFileSync(SCHEMA_FILE, "utf8"));
+  assert.equal(schema.schemaVersion, undefined, "المخطط نفسه JSON Schema لا ملف وحدة");
+  assert.equal(schema.properties.schemaVersion.const, 2, "إصدار المخطط 2");
+  for (const key of ["unit", "lesson", "mindmap", "flashcards", "cloze", "quiz", "questionBank", "revision"]) {
+    assert.ok(schema.properties[key], `المخطط يعرّف القسم «${key}»`);
+  }
+  assert.ok(schema.$defs.video, "المخطط يعرّف الفيديو");
+});
+
+test("كل ملفات الوحدات صالحة وفق المدقّق", () => {
+  assert.equal(UNITS.length, 4, "أربع وحدات");
+  for (const { file, data } of UNITS) {
+    const errors = validateUnitFile(data, { meta: META.find((m) => m.id === data.unit.id) });
+    assert.deepEqual(errors, [], `${path.basename(file)}:\n- ${errors.join("\n- ")}`);
+  }
+});
+
+test("لا ملفات قديمة موزّعة (خمسة ملفات لكل وحدة) بعد التوحيد", () => {
+  assert.equal(
+    existsSync(path.join(ROOT, "src", "data", "lessons")),
+    false,
+    "‏src/data/lessons حُذف: الملف الواحد هو المصدر"
+  );
+});
+
+test("القالب `_template.json` صالح ويوثّق الفيديو والشواهد", () => {
+  const template = JSON.parse(fs.readFileSync(path.join(UNITS_DIR, "_template.json"), "utf8"));
+  assert.deepEqual(validateUnitFile(template), [], "القالب يمرّ من المدقّق نفسه");
+  assert.ok(template.unit.video, "القالب يبيّن كيف يُضاف الفيديو");
+  assert.ok(Array.isArray(template.unit.video.chapters), "القالب يبيّن الفصول");
+  assert.ok(Array.isArray(template.proofs) && template.proofs.length > 0, "القالب يبيّن الشواهد");
+});
+
+/* ─────────────── اكتمال المادة ─────────────── */
+
+test("أعداد المادة العلمية لم تنقص بعد التوحيد", () => {
+  const totals = UNITS.reduce(
+    (acc, { data }) => ({
+      sections: acc.sections + data.lesson.sections.length,
+      cards: acc.cards + data.flashcards.length,
+      cloze: acc.cloze + data.cloze.length,
+      quiz: acc.quiz + data.quiz.length,
+      bank: acc.bank + data.questionBank.length,
+    }),
+    { sections: 0, cards: 0, cloze: 0, quiz: 0, bank: 0 }
+  );
+  assert.deepEqual(totals, {
+    sections: 14,
+    cards: 131,
+    cloze: 24,
+    quiz: 70,
+    bank: 104,
+  });
+});
+
 /* ─────────────── أسئلة QCM ─────────────── */
 
-test("كل ملفات QCM تستخدم الإجابة الصحيحة الموجودة فعلًا بين الخيارات", () => {
-  assert.ok(QUIZ_FILES.length === 4, "يجب أن توجد 4 ملفات QCM");
-  for (const file of QUIZ_FILES) {
-    const data = read(file);
-    for (const question of data.questions) {
+test("الإجابة الصحيحة موجودة بين الخيارات ولها تعليل", () => {
+  for (const { file, data } of UNITS) {
+    for (const question of data.quiz) {
       assert.ok(
         question.options.includes(question.correct_answer),
-        `${file} :: ${question.question_id}: الإجابة الصحيحة ليست ضمن الخيارات`
+        `${path.basename(file)} :: ${question.question_id}: الإجابة ليست بين الخيارات`
       );
-      assert.equal(
-        question.options.length,
-        4,
-        `${file} :: ${question.question_id}: عدد الخيارات ليس 4`
-      );
-      assert.ok(question.explanation?.trim(), `${file} :: ${question.question_id}: لا يوجد تعليل`);
-      assert.ok(question.question?.trim(), `${file} :: ${question.question_id}: نص السؤال فارغ`);
+      assert.equal(question.options.length, 4, `${question.question_id}: عدد الخيارات ليس 4`);
+      assert.ok(question.explanation?.trim(), `${question.question_id}: لا يوجد تعليل`);
     }
   }
 });
 
-test("موضع الإجابة الصحيحة موزّع على الخيارات الأربعة (لا انحياز للموضع الأول)", () => {
+test("موضع الإجابة الصحيحة موزّع على الخيارات الأربعة", () => {
   const totals = [0, 0, 0, 0];
   let all = 0;
-  for (const file of QUIZ_FILES) {
-    for (const question of read(file).questions) {
-      const index = question.options.indexOf(question.correct_answer);
-      totals[index] += 1;
+  for (const { data } of UNITS) {
+    for (const question of data.quiz) {
+      totals[question.options.indexOf(question.correct_answer)] += 1;
       all += 1;
     }
   }
-  assert.equal(all, 70, "عدد أسئلة QCM الإجمالي يجب أن يبقى 70");
+  assert.equal(all, 70, "إجمالي أسئلة QCM");
   for (const [position, count] of totals.entries()) {
-    assert.ok(count / all >= 0.15, `الموضع ${position} يحتوي ${count}/${all} فقط — التوزيع منحاز`);
-    assert.ok(count / all <= 0.35, `الموضع ${position} يحتوي ${count}/${all} — تركيز مفرط`);
+    assert.ok(count / all >= 0.15, `الموضع ${position}: ${count}/${all} — انحياز`);
+    assert.ok(count / all <= 0.35, `الموضع ${position}: ${count}/${all} — تركيز مفرط`);
   }
 });
 
-test("لا أسئلة QCM مكرّرة داخل الوحدة", () => {
-  for (const file of QUIZ_FILES) {
+test("لا سؤال QCM مكرّر داخل الوحدة", () => {
+  for (const { file, data } of UNITS) {
     const seen = new Set();
-    for (const question of read(file).questions) {
+    for (const question of data.quiz) {
       const key = question.question.trim();
-      assert.ok(!seen.has(key), `${file}: سؤال مكرّر → ${key.slice(0, 60)}`);
+      assert.ok(!seen.has(key), `${path.basename(file)}: سؤال مكرّر → ${key.slice(0, 60)}`);
       seen.add(key);
     }
   }
 });
 
-/* ─────────────── بنك أسئلة البكالوريا ─────────────── */
+/* ─────────────── بنك الأسئلة ─────────────── */
 
-test("كل سؤال في بنك الأسئلة له نص وجواب غير فارغين", () => {
-  for (const file of QUESTION_FILES) {
-    const questions = flatQuestions(read(file));
-    assert.ok(questions.length > 0, `${file}: لا أسئلة`);
-    for (const question of questions) {
-      const label = question.question_id || question.id;
-      const questionText = question.question_text || question.question;
-      const answer =
-        question.model_answer ||
-        question.answer ||
-        question.official_solution ||
-        question.solution ||
-        question.guidance ||
-        (Array.isArray(question.model_answers) && question.model_answers.length > 0 ? "ok" : "");
-
-      // أسئلة الاستخراج تُبنى من النص + المحل، فلا تُشترط فيها صياغة سؤال صريحة
-      const hasExtractionContext = Boolean(
-        question.text_warsh ||
-        question.verse_text ||
-        question.ayah_text_warsh ||
-        question.text_proof
-      );
-      assert.ok(
-        questionText || hasExtractionContext,
-        `${file} :: ${label}: لا نص للسؤال ولا نص شرعي`
-      );
-      assert.ok(answer, `${file} :: ${label}: لا توجد إجابة`);
+test("كل سؤال في البنك له نص وعناصر إجابة وتصنيف داخلي", () => {
+  for (const { file, data } of UNITS) {
+    assert.ok(data.questionBank.length > 0, `${path.basename(file)}: لا أسئلة`);
+    for (const question of data.questionBank) {
+      assert.ok(question.question?.trim(), `${question.id}: بلا نص`);
+      assert.ok(question.modelAnswer?.trim(), `${question.id}: بلا عناصر إجابة`);
+      assert.ok(question.category?.trim(), `${question.id}: بلا تصنيف`);
     }
   }
 });
 
-test("معرّفات الأسئلة موجودة وفريدة داخل كل ملف", () => {
-  for (const file of QUESTION_FILES) {
-    const ids = flatQuestions(read(file)).map((q) => q.question_id || q.id);
-    assert.ok(
-      ids.every(Boolean),
-      `${file}: توجد أسئلة بلا معرّف (سيولّد معرّفًا عشوائيًا عند العرض)`
-    );
-    assert.equal(new Set(ids).size, ids.length, `${file}: معرّفات مكرّرة`);
+test("معرّفات أسئلة البنك فريدة داخل كل وحدة", () => {
+  for (const { file, data } of UNITS) {
+    const ids = data.questionBank.map((q) => q.id);
+    assert.equal(new Set(ids).size, ids.length, `${path.basename(file)}: معرّفات مكرّرة`);
   }
 });
 
-/* ─────────────── الخرائط الذهنية ─────────────── */
+/* ─────────────── الخريطة الذهنية ─────────────── */
 
-test("كل عقدة طرفية في الخرائط الذهنية لها شرح", () => {
-  for (const file of MINDMAP_FILES) {
-    const root = read(file).root;
-    const missing = leaves(root).filter((node) => !node.details?.trim());
-    assert.deepEqual(
-      missing.map((n) => n.id),
-      [],
-      `${file}: عقد بلا شرح`
-    );
+test("كل عقدة طرفية لها شرح، والمعرّفات فريدة", () => {
+  for (const { file, data } of UNITS) {
+    const missing = leaves(data.mindmap.root).filter((node) => !node.details?.trim());
+    assert.deepEqual(missing.map((n) => n.id), [], `${path.basename(file)}: عقد بلا شرح`);
+    const all = walkNodes(data.mindmap.root);
+    assert.equal(new Set(all.map((n) => n.id)).size, all.length, "معرّفات مكرّرة");
   }
 });
 
-test("الخريطة الذهنية عناصر مفهومية فقط: لا شواهد ولا كلمات مفتاحية", () => {
-  const NON_CONCEPT_KEYS = ["proof", "keywords", "note", "tip", "pedagogical_note"];
-  const NOT_CONCEPT_LABEL = [/﴿/, /\[/, /\d+\s*[.)]\s/, /^أول(?:اً|ا)\s*:/, /^القسم\s*\d/];
-
-  for (const file of MINDMAP_FILES) {
-    const walk = (node, depth = 0) => {
-      for (const key of NON_CONCEPT_KEYS) {
-        assert.equal(
-          node[key],
-          undefined,
-          `${file} :: ${node.id}: «${key}» ليس عنصرًا مفهوميًا ومكانه نص الدرس`
-        );
+test("الخريطة عناصر مفهومية فقط: لا شواهد ولا كلمات مفتاحية", () => {
+  for (const { file, data } of UNITS) {
+    for (const node of walkNodes(data.mindmap.root)) {
+      for (const key of ["proof", "keywords", "note", "tip", "pedagogical_note"]) {
+        assert.equal(node[key], undefined, `${path.basename(file)} :: ${node.id}: «${key}» ليس مفهومًا`);
       }
-      for (const rx of NOT_CONCEPT_LABEL) {
-        assert.ok(
-          !rx.test(node.label),
-          `${file} :: ${node.id}: التسمية «${node.label}» تحمل زخرفة غير مفهومية`
-        );
-      }
-      (node.children || []).forEach((child) => walk(child, depth + 1));
-    };
-    walk(read(file).root);
+    }
   }
 });
 
 test("خريطة الوحدة 01 = عناصر التدرّج الرسمي وحدها", () => {
-  const root = read("unit01_aqidah_mindmap.json").root;
-  const labels = [];
-  const walk = (node) => {
-    labels.push(node.label);
-    (node.children || []).forEach(walk);
-  };
-  walk(root);
-
-  // «توجيهات خاصة بالأستاذ (ليست عناصر مفاهيمية)» في التدرّج: العلاقة بين
-  // المعنيين، أصول العقيدة، أقسام التوحيد — تُذكر في الشرح ولا تكون عناصر درس.
+  const root = UNITS[0].data.mindmap.root;
+  const labels = walkNodes(root).map((n) => n.label);
   for (const notAnElement of ["العلاقة بين", "أصول العقيدة", "أقسام التوحيد", "توحيد الربوبية"]) {
-    assert.ok(
-      !labels.some((label) => label.includes(notAnElement)),
-      `«${notAnElement}» ليس عنصرًا مفاهيميًا ولا يدخل الخريطة`
-    );
+    assert.ok(!labels.some((label) => label.includes(notAnElement)), `«${notAnElement}» ليس عنصرًا`);
   }
-
-  // البنية الرسمية: التعريف (لغوي + اصطلاحي) ثم آثار الفرد (3) ثم آثار المجتمع (3)
   assert.equal(root.children.length, 3, "ثلاثة محاور فقط");
   assert.deepEqual(
     root.children.map((child) => (child.children || []).length),
     [2, 3, 3],
-    "٨ عناصر مفهومية: تعريفان وستة آثار"
+    "ثمانية عناصر مفهومية"
   );
-});
-
-test("كل عنصر مفهومي في الخريطة له شرح، والشرح نصّ لا قائمة", () => {
-  for (const file of MINDMAP_FILES) {
-    const walk = (node) => {
-      if (node.details !== undefined) {
-        assert.equal(typeof node.details, "string", `${file} :: ${node.id}: الشرح ليس نصًّا`);
-      }
-      (node.children || []).forEach(walk);
-    };
-    walk(read(file).root);
-  }
-});
-
-test("معرّفات عقد الخرائط فريدة", () => {
-  for (const file of MINDMAP_FILES) {
-    const ids = [];
-    const walk = (node) => {
-      ids.push(node.id);
-      (node.children || []).forEach(walk);
-    };
-    walk(read(file).root);
-    assert.equal(new Set(ids).size, ids.length, `${file}: معرّفات عقد مكرّرة`);
-  }
-});
-
-test("لا يُنسب أي نص شرعي إلى رواية معيّنة (نصّ التطبيق غير مضبوط على رواية)", () => {
-  for (const file of files.filter((f) => f.endsWith(".json"))) {
-    const raw = fs.readFileSync(path.join(DIR, file), "utf8");
-    assert.ok(!raw.includes("ورش"), `${file}: العبارة «رواية ورش» يجب أن تبقى محذوفة`);
-  }
 });
 
 /* ─────────────── البطاقات وملء الفراغات ─────────────── */
 
 test("كل بطاقة حفظ لها وجه وظهر غير فارغين", () => {
-  for (const file of ADVANCED_FILES) {
-    const data = read(file);
-    const key = Object.keys(data).find((k) => k.includes("flashcards"));
-    assert.ok(key, `${file}: لا يوجد مفتاح بطاقات`);
-    for (const card of data[key]) {
-      assert.ok(
-        (card.front || card.q || card.question || "").trim(),
-        `${file} :: ${card.card_id || card.id}: وجه فارغ`
-      );
-      assert.ok(
-        (card.back || card.a || card.answer || "").trim(),
-        `${file} :: ${card.card_id || card.id}: ظهر فارغ`
-      );
+  for (const { file, data } of UNITS) {
+    for (const card of data.flashcards) {
+      assert.ok(String(card.question).trim(), `${path.basename(file)} :: ${card.id}: وجه فارغ`);
+      assert.ok(String(card.answer).trim(), `${card.id}: ظهر فارغ`);
     }
   }
 });
 
 test("أقنعة ملء الفراغات مطابقة لمفاتيح الإجابات", () => {
-  for (const file of ADVANCED_FILES) {
-    const data = read(file);
-    for (const node of data.concept_nodes || []) {
-      const cloze = node.cloze_active_recall;
-      if (!cloze) continue;
-      const masks = (cloze.text_with_masks.match(/\{mask\d+\}/g) || []).map((m) =>
+  for (const { file, data } of UNITS) {
+    for (const item of data.cloze) {
+      const masks = (item.text_with_masks.match(/\{mask\d+\}/g) || []).map((m) =>
         m.replace(/[{}]/g, "")
       );
-      const keys = Object.keys(cloze.answers || {});
       assert.deepEqual(
         [...masks].sort(),
-        [...keys].sort(),
-        `${file} :: ${node.concept_id}: الأقنعة لا تطابق مفاتيح الإجابات`
+        Object.keys(item.answers).sort(),
+        `${path.basename(file)} :: ${item.id}: الأقنعة لا تطابق الإجابات`
       );
     }
   }
 });
 
-/* ─────────────── الدروس المنهجية ─────────────── */
+/* ─────────────── الدرس والمراجعة ─────────────── */
 
-test("كل قسم درسي له عنوان عربي (لا مفاتيح إنجليزية معروضة)", () => {
-  // نفس قاموس العناوين المستخدم في العرض
-  const titlesSource = fs.readFileSync(
-    path.join(DIR, "..", "..", "lib", "section-titles.ts"),
-    "utf8"
-  );
-
-  for (const file of STANDARD_FILES) {
-    const data = read(file);
-    for (const [key, section] of Object.entries(data.detailed_explanation || {})) {
-      const hasInlineTitle = typeof section?.title === "string" && section.title.trim();
-      assert.ok(
-        hasInlineTitle || titlesSource.includes(`${key}:`),
-        `${file}: المفتاح «${key}» سيُعرض بلا عنوان عربي`
-      );
+test("كل محور درسي له عنوان عربي ومعرّف لاتيني", () => {
+  for (const { file, data } of UNITS) {
+    for (const section of data.lesson.sections) {
+      assert.ok(section.title?.trim(), `${path.basename(file)}: محور بلا عنوان`);
+      assert.match(section.key, /^[a-z0-9_]+$/, "المفتاح لاتيني");
+      assert.ok(!/[A-Za-z]{3,}/.test(section.title), "العنوان عربي لا إنجليزي");
     }
   }
 });
 
-test("محتوى المراجعة السريعة موجود لكل وحدة", () => {
-  for (const file of ADVANCED_FILES) {
-    const data = read(file);
-    const lastMinute = data.last_minute_revision_schema;
-    assert.ok(lastMinute, `${file}: لا يوجد last_minute_revision_schema`);
-    const groups = Object.values(lastMinute).filter(
-      (value) => Array.isArray(value) && value.length > 0
-    );
-    assert.ok(groups.length > 0, `${file}: مراجعة اللحظة الأخيرة فارغة`);
-
-    const matrix = data.differentiation_matrix;
-    assert.ok(Array.isArray(matrix) && matrix.length > 0, `${file}: لا توجد مصفوفة فروق`);
-    for (const row of matrix) {
-      assert.ok(row.term_a && row.term_b && row.key_distinction, `${file}: صف فروق ناقص`);
-    }
-  }
-});
-
-/* ─────────────── القواعد المنهجية: مكانها المراجعة لا الدرس ─────────────── */
-
-test("«القواعد والضوابط المنهجية» ليست محورًا في الخريطة الذهنية ولا في الدرس", () => {
-  for (const file of MINDMAP_FILES) {
-    const labels = [];
-    const walk = (node) => {
-      labels.push(node.label ?? "");
-      (node.children || []).forEach(walk);
-    };
-    walk(read(file).root);
-    const offenders = labels.filter(
-      (label) => label.includes("القواعد والضوابط") || label.includes("قواعد منهجية")
-    );
-    assert.deepEqual(offenders, [], `${file}: القواعد المنهجية عُرضت كمحور درس`);
+test("«القواعد والضوابط المنهجية» في المراجعة لا في محاور الدرس", () => {
+  for (const { file, data } of UNITS) {
+    const offenders = data.lesson.sections.filter((s) => s.key.includes("methodolog"));
+    assert.deepEqual(offenders, [], `${path.basename(file)}: قسم منهجي داخل الدرس`);
+    const labels = walkNodes(data.mindmap.root).map((n) => n.label);
+    assert.ok(!labels.some((label) => label.includes("القواعد والضوابط")), "قواعد في الخريطة");
   }
 
-  for (const file of STANDARD_FILES) {
-    const sections = Object.keys(read(file).detailed_explanation ?? {});
-    const offenders = sections.filter((key) => key.includes("methodolog"));
-    assert.deepEqual(offenders, [], `${file}: قسم درسي للقواعد المنهجية`);
-  }
-});
-
-test("نفس القواعد متاحة داخل المراجعة السريعة (معرَّفة للواجهة)", () => {
-  const withRules = STANDARD_FILES.map((file) => read(file)).filter(
-    (data) =>
-      Array.isArray(data.methodology_and_rules?.rules) && data.methodology_and_rules.rules.length
-  );
-  assert.ok(withRules.length > 0, "لا توجد قواعد منهجية في أي ملف قياسي");
-  for (const data of withRules) {
-    for (const rule of data.methodology_and_rules.rules) {
-      assert.equal(typeof rule, "string");
+  const withRules = UNITS.filter(({ data }) => data.revision.rules.length > 0);
+  assert.ok(withRules.length > 0, "القواعد متاحة في المراجعة");
+  for (const { data } of withRules) {
+    for (const rule of data.revision.rules) {
       assert.ok(rule.trim().length > 20, "قاعدة منهجية فارغة أو مبتورة");
     }
   }
-
-  const section = fs.readFileSync(
-    path.join(
-      import.meta.dirname,
-      "..",
-      "..",
-      "src",
-      "components",
-      "revision",
-      "RevisionSection.tsx"
-    ),
-    "utf8"
+  assert.match(
+    read("components/revision/RevisionSection.tsx"),
+    /القواعد والضوابط المنهجية/,
+    "عنوان القسم في المراجعة السريعة"
   );
-  assert.match(section, /القواعد والضوابط المنهجية/, "عنوان القسم في المراجعة السريعة");
+});
+
+test("محتوى المراجعة السريعة كامل لكل وحدة", () => {
+  for (const { file, data } of UNITS) {
+    assert.ok(data.revision.lastMinute.length > 0, `${path.basename(file)}: لا مراجعة لحظة أخيرة`);
+    assert.ok(data.revision.differentiation.length > 0, `${path.basename(file)}: لا مصفوفة فروق`);
+    for (const row of data.revision.differentiation) {
+      assert.ok(row.termA && row.termB && row.distinction, "صف فروق ناقص");
+    }
+  }
+});
+
+/* ─────────────── قواعد المحتوى الثابتة ─────────────── */
+
+test("لا يُنسب أي نص شرعي إلى رواية معيّنة", () => {
+  for (const file of fs.readdirSync(UNITS_DIR).filter((f) => f.endsWith(".json"))) {
+    const raw = fs.readFileSync(path.join(UNITS_DIR, file), "utf8");
+    assert.ok(!raw.includes("ورش"), `${file}: «ورش» ممنوعة`);
+    assert.ok(!raw.includes("WARSH"), `${file}: معرّفات WARSH القديمة ممنوعة`);
+  }
+});
+
+/* ─────────────── الفيديو ─────────────── */
+
+test("الفيديو اختياري، وإن وُجد فلا يظهر إلا كخطوة داخل مرحلة الاستيعاب", () => {
+  const view = read("app/units/[unitId]/UnitClientView.tsx");
+  assert.match(view, /steps: \["video", "lesson", "mindmap"\]/, "الفيديو أول خطوة في الاستيعاب");
+  assert.match(view, /\.\.\.\(unit\.video/, "الخطوة تُضاف شرطيًا");
+  // لوحة العرض نفسها شرطية: وحدة بلا فيديو لا تُصدر أي عنصر فارغ في DOM
+  assert.match(
+    view,
+    /\{unit\.video && \(\s*<div\s+role="tabpanel"\s+id="panel-video"/,
+    "لوحة العرض تُركّب شرطيًا"
+  );
+  assert.match(view, /<VideoLesson video=\{unit\.video\} \/>/, "تُعرض عند وجود فيديو");
+
+  for (const { file, data } of UNITS) {
+    if (!data.unit.video) continue;
+    assert.ok(data.unit.video.title, `${path.basename(file)}: فيديو بلا عنوان`);
+  }
+});
+
+test("مكوّن الفيديو: لا يُحمّل طرفًا ثالثًا قبل النقر، ويحترم الخصوصية", () => {
+  const video = read("components/lesson/VideoLesson.tsx");
+  assert.match(video, /useState/, "حالة تشغيل صريحة (واجهة قبل التحميل)");
+  assert.match(video, /youtube-nocookie\.com/, "نطاق يوتيوب بلا كوكيز تتبّع");
+  assert.match(video, /loading="lazy"/, "الإطار يُحمّل عند الحاجة");
+  assert.match(video, /<track/, "مسار تفريغ للفيديو المحلي");
+  assert.match(video, /aspect-video/, "نسبة 16:9 بلا قفز تخطيط");
 });
 
 /* ─────────────── أصول الواجهة ─────────────── */
 
 test("صور الخرائط الذهنية موجودة بصيغة webp وخفيفة", () => {
-  const publicDir = path.join(DIR, "..", "..", "..", "public", "lessons");
+  const publicDir = path.join(ROOT, "public", "lessons");
   for (const id of [1, 2, 3, 4]) {
     const file = path.join(publicDir, `unit0${id}_mindmap.webp`);
-    assert.ok(fs.existsSync(file), `الصورة مفقودة: ${file}`);
+    assert.ok(existsSync(file), `الصورة مفقودة: ${file}`);
     const sizeKb = fs.statSync(file).size / 1024;
     assert.ok(sizeKb < 250, `unit0${id} حجمها ${sizeKb.toFixed(0)}KB — يجب أن تبقى تحت 250KB`);
   }
 });
 
 test("أيقونات PWA المطلوبة موجودة في المانيفست", () => {
-  const manifest = JSON.parse(
-    fs.readFileSync(path.join(DIR, "..", "..", "..", "public", "manifest.json"), "utf8")
-  );
+  const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "public", "manifest.json"), "utf8"));
   const sizes = manifest.icons.map((icon) => icon.sizes);
   assert.ok(sizes.includes("192x192"), "أيقونة 192 مفقودة");
   assert.ok(sizes.includes("512x512"), "أيقونة 512 مفقودة");
@@ -396,20 +335,14 @@ test("أيقونات PWA المطلوبة موجودة في المانيفست",
   );
 });
 
-/* ------------------------------------------------------------------ */
-/* عامل الخدمة (Service Worker)                                        */
-/* ------------------------------------------------------------------ */
+/* ─────────────── عامل الخدمة ─────────────── */
 
 test("عامل الخدمة المولَّد يحقن بصمة البناء في اسم الكاش", async () => {
   const { buildServiceWorker } = await import("../../src/lib/service-worker.ts").catch(() => ({}));
   if (!buildServiceWorker) {
-    // Node لا يحمّل TS مباشرة: نتحقق من النص المصدري بدل التنفيذ
-    const src = fs.readFileSync(
-      new URL("../../src/lib/service-worker.ts", import.meta.url),
-      "utf8"
-    );
+    const src = fs.readFileSync(new URL("../../src/lib/service-worker.ts", import.meta.url), "utf8");
     assert.match(src, /export function buildServiceWorker/, "الدالة المولِّدة موجودة");
-    assert.match(src, /zady-\\\$\\{VERSION\\}/, "اسم الكاش مشتق من بصمة البناء");
+    assert.match(src, /zady-\\\$\{VERSION\}/, "اسم الكاش مشتق من بصمة البناء");
     assert.match(src, /Promise\.allSettled/, "التحميل المسبق لا يفشل ككتلة واحدة");
     assert.doesNotMatch(
       src,
@@ -419,18 +352,15 @@ test("عامل الخدمة المولَّد يحقن بصمة البناء في
     return;
   }
 
-  const withSha = buildServiceWorker("abc123");
-  assert.match(withSha, /const VERSION = "abc123"/);
-  const sanitized = buildServiceWorker("../../evil;drop");
-  assert.doesNotMatch(sanitized, /evil;drop/, "بصمة البناء تُنقّى من المحارف الخطرة");
-  assert.match(buildServiceWorker(""), /const VERSION = "dev"/, "قيمة احتياطية آمنة");
+  assert.match(buildServiceWorker("abc123"), /const VERSION = "abc123"/);
+  assert.doesNotMatch(buildServiceWorker("../../evil;drop"), /evil;drop/);
+  assert.match(buildServiceWorker(""), /const VERSION = "dev"/);
 });
 
 test("لم يبقَ sw.js ثابت في public (يُولَّد من مسار /sw.js)", () => {
-  const publicSw = new URL("../../public/sw.js", import.meta.url);
-  assert.equal(existsSync(publicSw), false, "public/sw.js يجب أن يبقى محذوفًا");
+  assert.equal(existsSync(path.join(ROOT, "public", "sw.js")), false, "public/sw.js محذوف");
   assert.equal(
-    existsSync(new URL("../../src/app/sw.js/route.ts", import.meta.url)),
+    existsSync(path.join(SRC, "app", "sw.js", "route.ts")),
     true,
     "مسار /sw.js المولِّد موجود"
   );

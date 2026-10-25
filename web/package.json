@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint",
     "test:data": "node --test \"scripts/__tests__/*.test.mjs\"",
-    "verify": "npm run typecheck && npm run lint && npm run test:data"
+    "verify": "npm run typecheck && npm run lint && npm run data:check && npm run test:data",
+    "data:check": "node scripts/check-units.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

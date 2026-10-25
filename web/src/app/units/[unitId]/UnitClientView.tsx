@@ -12,18 +12,20 @@ import {
   CheckSquare,
   Zap,
   ArrowLeft,
+  PlayCircle,
 } from "lucide-react";
 import type { ClientUnit, UnitMeta } from "@/lib/types";
 import MindmapViewer from "@/components/mindmap/MindmapViewer";
 import StandardLessonViewer from "@/components/lesson/StandardLessonViewer";
 import ReadingRule from "@/components/lesson/ReadingRule";
+import VideoLesson from "@/components/lesson/VideoLesson";
 import FlashcardSection from "@/components/flashcards/FlashcardSection";
 import BacQuizSection from "@/components/quiz/BacQuizSection";
 import McqQuizViewer from "@/components/quiz/McqQuizViewer";
 import RevisionSection from "@/components/revision/RevisionSection";
 import { useProgress } from "@/lib/useProgressStore";
 
-type TabId = "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz" | "revision";
+type TabId = "video" | "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz" | "revision";
 
 /**
  * مسار التعلّم: ثلاث مراحل لا ستّة أزرار متساوية.
@@ -31,7 +33,7 @@ type TabId = "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz" | "revision";
  * إسناد كل خطوة إلى مرحلتها هو ما يجعل الشريط يقول للطالب أين هو.
  */
 const STAGES: { id: string; label: string; steps: TabId[] }[] = [
-  { id: "absorb", label: "استيعاب", steps: ["lesson", "mindmap"] },
+  { id: "absorb", label: "استيعاب", steps: ["video", "lesson", "mindmap"] },
   { id: "anchor", label: "تثبيت", steps: ["flashcards"] },
   { id: "test", label: "اختبار", steps: ["mcq", "quiz", "revision"] },
 ];
@@ -104,6 +106,7 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
   /** إتمام كل خطوة — يُعرض كعلامة ✓ على التبويب (لا تخمين: مدعوم ببيانات التقدّم) */
   const stepDone = useMemo<Record<TabId, boolean>>(
     () => ({
+      video: false,
       mindmap: sectionKeys.length > 0 && sectionKeys.every((key) => isSectionRead(unit.id, key)),
       lesson: sectionKeys.length > 0 && sectionKeys.every((key) => isSectionRead(unit.id, key)),
       flashcards: cardIds.length > 0 && cardIds.every((id) => isFlashcardLearned(unit.id, id)),
@@ -125,6 +128,16 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
 
   const tabs = useMemo<{ id: TabId; label: string; icon: typeof Layers; count: number | null }[]>(
     () => [
+      ...(unit.video
+        ? [
+            {
+              id: "video" as TabId,
+              label: "شرح مرئي",
+              icon: PlayCircle,
+              count: null,
+            },
+          ]
+        : []),
       { id: "lesson", label: "نص الدرس", icon: BookOpen, count: null },
       { id: "mindmap", label: "الخريطة الذهنية", icon: Layers, count: null },
       {
@@ -384,6 +397,18 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
 
       {/* المحتوى */}
       <div ref={contentRef} className="min-h-[500px] scroll-mt-36">
+        {unit.video && (
+          <div
+            role="tabpanel"
+            id="panel-video"
+            aria-labelledby="tab-video"
+            hidden={activeTab !== "video"}
+            className={activeTab === "video" ? "" : "hidden"}
+          >
+            <VideoLesson video={unit.video} />
+          </div>
+        )}
+
         <div
           role="tabpanel"
           id="panel-lesson"
