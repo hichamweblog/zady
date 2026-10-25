@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useMemo, useState, type CSSProperties } from "react";
-import { ChevronLeft, CornerDownLeft, Sparkles } from "lucide-react";
+import { ChevronLeft, CornerDownLeft, ListTree, Sparkles } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
 import { buildFocusLayout, findMindmapNode, findNodePath } from "@/lib/mindmap-layout";
 import MindmapInfoSheet from "./MindmapInfoSheet";
+import MindmapIndexSheet from "./MindmapIndexSheet";
 
 interface MindmapFocusMapProps {
   root: MindmapNode;
@@ -26,6 +27,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
   const [focusId, setFocusId] = useState(root.id);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [returnFocus, setReturnFocus] = useState<string | null>(null);
+  const [indexOpen, setIndexOpen] = useState(false);
 
   const focused = useMemo(() => findMindmapNode(root, focusId) ?? root, [root, focusId]);
   const trail = useMemo(() => findNodePath(root, focused.id), [root, focused.id]);
@@ -67,6 +69,18 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
     [root]
   );
 
+  /** الانتقال من الفهرس: يغلق الفهرس ويضع التركيز على العنصر المختار */
+  const focusFromIndex = useCallback(
+    (id: string) => {
+      setIndexOpen(false);
+      if (id !== focusId) {
+        setReturnFocus(focusId);
+        setFocusId(id);
+      }
+    },
+    [focusId]
+  );
+
   const connector = (x: number, y: number) => {
     const midX = (50 + x * 100) / 2;
     return `M 50 50 C ${midX} 50, ${midX} ${y * 100}, ${x * 100} ${y * 100}`;
@@ -74,32 +88,43 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
 
   return (
     <div className="space-y-3">
-      {/* مسار التتبّع: أين أنا الآن، وكيف أعود */}
-      <nav
-        aria-label="مسار المحاور"
-        className="flex flex-wrap items-center gap-1.5 text-label font-bold"
-      >
-        {trail.map((node, index) => {
-          const isCurrent = index === trail.length - 1;
-          return (
-            <span key={node.id} className="flex items-center gap-1.5">
-              {index > 0 && <ChevronLeft className="h-4 w-4 text-slate-400" aria-hidden="true" />}
-              <button
-                type="button"
-                onClick={() => setFocusId(node.id)}
-                aria-current={isCurrent ? "true" : undefined}
-                className={`max-w-40 truncate rounded-lg px-1.5 py-1 transition-colors ${
-                  isCurrent
-                    ? "bg-teal-700 text-white"
-                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-                }`}
-              >
-                {node.label}
-              </button>
-            </span>
-          );
-        })}
-      </nav>
+      {/* مسار التتبّع + الفهرس: أين أنا الآن، وكيف أصل إلى أي محور */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <nav
+          aria-label="مسار المحاور"
+          className="flex min-w-0 flex-wrap items-center gap-1.5 text-label font-bold"
+        >
+          {trail.map((node, index) => {
+            const isCurrent = index === trail.length - 1;
+            return (
+              <span key={node.id} className="flex items-center gap-1.5">
+                {index > 0 && <ChevronLeft className="h-4 w-4 text-slate-400" aria-hidden="true" />}
+                <button
+                  type="button"
+                  onClick={() => setFocusId(node.id)}
+                  aria-current={isCurrent ? "true" : undefined}
+                  className={`max-w-40 truncate rounded-lg px-1.5 py-1 transition-colors ${
+                    isCurrent
+                      ? "bg-teal-700 text-white"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {node.label}
+                </button>
+              </span>
+            );
+          })}
+        </nav>
+
+        <button
+          type="button"
+          onClick={() => setIndexOpen(true)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-label font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+        >
+          <ListTree className="h-4 w-4" aria-hidden="true" />
+          <span>الفهرس</span>
+        </button>
+      </div>
 
       <div className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_50%_42%,#ecfdf5,#ffffff_74%)] p-4 dark:bg-[radial-gradient(circle_at_50%_42%,#093330,#020617_74%)] sm:p-6 lg:h-[600px] lg:p-0">
         {/* وصلات خفيفة: خط شعرة واحد لكل ابن، بلا إطارات حول العناصر */}
@@ -182,6 +207,14 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           اضغط عنصرًا ليصبح هو المركز ويظهر شرحه · اضغط خارج البطاقة للرجوع
         </p>
       </div>
+
+      <MindmapIndexSheet
+        root={root}
+        open={indexOpen}
+        currentId={focused.id}
+        onClose={() => setIndexOpen(false)}
+        onSelect={focusFromIndex}
+      />
 
       <MindmapInfoSheet node={activeNode} onClose={closeSheet} onNavigate={navigateTo} />
     </div>

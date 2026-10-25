@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { ArrowRight, BookOpen, X } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
+import { useSheetA11y } from "./useSheetA11y";
 
 interface MindmapInfoSheetProps {
   node: MindmapNode | null;
@@ -22,26 +23,8 @@ interface MindmapInfoSheetProps {
  */
 export default function MindmapInfoSheet({ node, onClose, onNavigate }: MindmapInfoSheetProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const nodeId = node?.id ?? null;
 
-  useEffect(() => {
-    if (!nodeId) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      previouslyFocused?.focus?.();
-    };
-  }, [nodeId, onClose]);
+  useSheetA11y(Boolean(node), onClose, closeRef);
 
   if (!node) return null;
 

@@ -239,11 +239,12 @@ test("بنك الأسئلة: لا تصنيفات ولا عدّاد لكل نوع
   assert.ok(!mcq.includes('"list"'), "لا حالة عرض قائمة متبقية");
 });
 
-test("«المصورة» معطَّلة مؤقتًا كما طلب المستخدم", () => {
+test("«المصورة» مفعَّلة باسمها الجديد", () => {
   const text = readSrc("components", "mindmap", "MindmapViewer.tsx");
-  assert.match(text, /VISUAL_MAP_ENABLED = false/, "التبويب معطَّل حتى تُعاد الصور");
-  assert.match(text, /label: "المصورة"/, "اسم التبويب صار «المصورة»");
-  assert.match(text, /disabled=\{isDisabled\}/, "الزر معطَّل فعليًا لا مخفيًا");
+  assert.match(text, /label: "المصورة"/, "اسم التبويب «المصورة»");
+  assert.ok(!text.includes("قريبًا"), "لم تبقَ شارة «قريبًا»");
+  assert.ok(!text.includes("VISUAL_MAP_ENABLED"), "لم يبقَ مفتاح تعطيل");
+  assert.match(text, /MindmapImageView/, "عارض الصورة مركّب");
 });
 
 test("الخريطة صارت بلا React Flow ولا لوحة تفاصيل جانبية", () => {
@@ -251,16 +252,43 @@ test("الخريطة صارت بلا React Flow ولا لوحة تفاصيل ج�
   const files = fs.readdirSync(dir);
   assert.ok(!files.includes("MindmapGraph.tsx"), "حُذف رسم React Flow القديم");
   assert.ok(!files.includes("MindmapDetailsPanel.tsx"), "حُذفت اللوحة الجانبية");
-  for (const name of ["MindmapOutline.tsx", "MindmapFocusMap.tsx", "MindmapInfoSheet.tsx"]) {
+  for (const name of [
+    "MindmapFocusMap.tsx",
+    "MindmapInfoSheet.tsx",
+    "MindmapIndexSheet.tsx",
+    "MindmapImageView.tsx",
+  ]) {
     assert.ok(files.includes(name), `${name} موجود`);
   }
   const pkg = fs.readFileSync(path.join(ROOT, "package.json"), "utf8");
   assert.ok(!pkg.includes("@xyflow/react"), "حزمة الرسم الثقيلة أُزيلت من التبعيات");
 });
 
-test("بطاقة الشرح تُغلق بالضغط خارجها وبمفتاح Esc", () => {
-  const sheet = readSrc("components", "mindmap", "MindmapInfoSheet.tsx");
-  assert.match(sheet, /onClick=\{onClose\}/, "الضغط خارج البطاقة يغلقها");
-  assert.match(sheet, /Escape/, "مفتاح Esc يغلقها");
-  assert.match(sheet, /aria-modal="true"/, "معرَّفة كحوار للقارئات");
+test("لا تكرار: وضعان فقط، والفهرس أداة تنقّل لا وضع عرض ثانٍ", () => {
+  const viewer = readSrc("components", "mindmap", "MindmapViewer.tsx");
+  const modes = [...viewer.matchAll(/id: "(map|image|outline)"/g)].map((m) => m[1]);
+  assert.deepEqual(modes, ["map", "image"], "وضعان: الخريطة والمصورة");
+  assert.ok(
+    !fs.existsSync(path.join(SRC, "components", "mindmap", "MindmapOutline.tsx")),
+    "حُذف وضع «المحاور» المكرّر"
+  );
+  const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
+  assert.match(map, /MindmapIndexSheet/, "الفهرس متاح من داخل الخريطة");
+});
+
+test("كل نوافذ الخريطة تُغلق بالضغط خارجها وبمفتاح Esc", () => {
+  const hook = readSrc("components", "mindmap", "useSheetA11y.ts");
+  assert.match(hook, /Escape/, "مفتاح Esc موحّد في خطّاف واحد");
+  assert.match(hook, /overflow = "hidden"/, "تمرير الصفحة يُقفل خلف النافذة");
+  assert.match(hook, /focus\(\)/, "التركيز يعود إلى مكانه بعد الإغلاق");
+
+  for (const [file, modal] of [
+    ["MindmapInfoSheet.tsx", 'aria-modal="true"'],
+    ["MindmapIndexSheet.tsx", 'aria-modal="true"'],
+  ]) {
+    const text = readSrc("components", "mindmap", file);
+    assert.match(text, /useSheetA11y/, `${file}: يستخدم الخطّاف المشترك`);
+    assert.match(text, /onClick=\{onClose\}/, `${file}: الضغط خارج النافذة يغلقها`);
+    assert.ok(text.includes(modal), `${file}: معرَّفة كحوار للقارئات`);
+  }
 });
