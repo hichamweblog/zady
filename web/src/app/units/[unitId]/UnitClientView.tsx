@@ -274,7 +274,7 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => selectTabAndScroll(tab.id)}
                 title={tab.label}
-                className={`relative flex min-w-0 flex-1 basis-[calc(50%-0.4rem)] items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 transition-all sm:basis-auto sm:flex-none sm:gap-2 sm:px-3.5 ${
+                className={`relative flex min-w-0 grow basis-[calc(50%_-_0.4rem)] items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 transition-all sm:grow-0 sm:basis-auto sm:gap-2 sm:px-3.5 ${
                   isActive
                     ? "bg-teal-700 text-white shadow-sm shadow-teal-700/25"
                     : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -294,7 +294,7 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
                   )}
                 </span>
 
-                <span className="whitespace-nowrap text-label font-bold">
+                <span className="text-center text-label leading-tight font-bold">
                   <span className="me-1 hidden text-meta opacity-70 sm:inline">{index + 1}.</span>
                   {tab.label}
                 </span>
