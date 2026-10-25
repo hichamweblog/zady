@@ -246,9 +246,7 @@ export function useProgress() {
         const isBetter = !previousBest || percentage >= previousBest.percentage;
         return {
           ...prev,
-          quizAttempts: isBetter
-            ? { ...prev.quizAttempts, [unitId]: attempt }
-            : prev.quizAttempts,
+          quizAttempts: isBetter ? { ...prev.quizAttempts, [unitId]: attempt } : prev.quizAttempts,
           quizLastAttempts: { ...prev.quizLastAttempts, [unitId]: attempt },
           quizAttemptCounts: {
             ...prev.quizAttemptCounts,

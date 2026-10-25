@@ -34,11 +34,7 @@ test("سكربت تهيئة الثيم يقرأ الاختيار المحفوظ 
   const script = layout.match(/const THEME_SCRIPT = `([\s\S]*?)`;/);
   assert.ok(script, "THEME_SCRIPT موجود");
   assert.match(script[1], /zady_theme/, "يقرأ الاختيار من localStorage");
-  assert.doesNotMatch(
-    script[1],
-    /prefers-color-scheme/,
-    "لا يفرض الوضع الداكن بحسب نظام التشغيل"
-  );
+  assert.doesNotMatch(script[1], /prefers-color-scheme/, "لا يفرض الوضع الداكن بحسب نظام التشغيل");
 });
 
 test("كل +لا يوجد+ مكوّن يضبط الثيم مباشرة بدل useTheme", () => {
@@ -57,11 +53,7 @@ test("كل +لا يوجد+ مكوّن يضبط الثيم مباشرة بدل us
     }
   };
   walk(dir);
-  assert.deepEqual(
-    offenders,
-    [],
-    "تبديل الثيم يجب أن يمرّ عبر toggleTheme في src/lib/useTheme.ts"
-  );
+  assert.deepEqual(offenders, [], "تبديل الثيم يجب أن يمرّ عبر toggleTheme في src/lib/useTheme.ts");
 });
 
 test("color-scheme مضبوط حتى تتبع عناصر النظام (الحقول، أشرطة التمرير)", () => {

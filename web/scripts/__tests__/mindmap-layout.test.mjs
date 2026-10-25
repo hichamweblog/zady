@@ -56,10 +56,7 @@ test("الاتجاه RTL: الجذر أقصى اليمين والأبناء يس
     assert.ok(root, `${file}: الجذر موجود`);
     for (const node of layout.nodes) {
       if (node.id === root.id) continue;
-      assert.ok(
-        node.x < root.x,
-        `${file}: العقدة «${node.label}» يجب أن تكون يسار الجذر`
-      );
+      assert.ok(node.x < root.x, `${file}: العقدة «${node.label}» يجب أن تكون يسار الجذر`);
     }
     // كل ابن يسار أبيه
     const byId = new Map(layout.nodes.map((n) => [n.id, n]));

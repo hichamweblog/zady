@@ -54,7 +54,9 @@ for (const file of FILES) {
     distribution[i] = (distribution[i] ?? 0) + 1;
   }
   fs.writeFileSync(full, `${JSON.stringify(data, null, 2)}\n`, "utf8");
-  console.log(`${file}: ${data.questions.length} سؤالاً | توزيع المواضع ${JSON.stringify(distribution)}`);
+  console.log(
+    `${file}: ${data.questions.length} سؤالاً | توزيع المواضع ${JSON.stringify(distribution)}`
+  );
 }
 
 console.log(`\nتمت معالجة ${totalQuestions} سؤالاً في ${FILES.length} ملفات.`);

@@ -57,12 +57,12 @@ test("لا نص أصغر من 13px في أي مكوّن", () => {
   assert.ok(px >= 13, `أصغر مقاس يجب أن يكون ≥ 13px (الحالي ${px}px)`);
 });
 
-test("المتن الافتراضي 17px وليس 14 أو 16", () => {
+test("المتن الافتراضي 18px على الأقل (قراءة من الهاتف)", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
   const body = css.match(/--text-body:\s*([\d.]+)rem/);
   assert.ok(body, "--text-body معرّف");
   const px = Number.parseFloat(body[1]) * 16;
-  assert.ok(px >= 17, `متن التطبيق يجب أن يكون ≥ 17px (الحالي ${px}px)`);
+  assert.ok(px >= 18, `متن التطبيق يجب أن يكون ≥ 18px (الحالي ${px}px)`);
   assert.match(
     css,
     /body\s*\{[^}]*font-size:\s*var\(--text-body\)/,
@@ -125,13 +125,22 @@ test("شريط خطوات الوحدة لا يعتمد على تمرير أفق�
     path.join(SRC, "app", "units", "[unitId]", "UnitClientView.tsx"),
     "utf8"
   );
-  const tablist = view.slice(view.indexOf('role="tablist"'), view.indexOf("</div>", view.indexOf('role="tablist"')));
+  const tablist = view.slice(
+    view.indexOf('role="tablist"'),
+    view.indexOf("</div>", view.indexOf('role="tablist"'))
+  );
   assert.doesNotMatch(
     tablist,
     /overflow-x-auto/,
     "التبويبات كانت تُقطع على الهاتف: استخدم شبكة بدل التمرير"
   );
-  assert.match(tablist, /grid-cols-6/, "ست خطوات في شبكة على الهاتف");
+  assert.match(tablist, /flex-wrap/, "التبويبات تلتف على الهاتف بدل أن تُقطع");
+  assert.doesNotMatch(
+    tablist,
+    /whitespace-nowrap[^"]*hidden|hidden[^"]*whitespace-nowrap/,
+    "أسماء الخطوات تظهر على الهاتف كاملة، لا أيقونات فقط"
+  );
+  assert.match(tablist, /text-label/, "اسم الخطوة يظهر بنص مقروء على الهاتف");
 });
 
 test("يوجد شريط تنقّل سفلي للهاتف ومركّب في التخطيط", () => {
@@ -195,9 +204,46 @@ test("لا تعارض في @font-face بين ملفات بنفس العائلة 
   }
 
   const duplicates = faces.filter((f, i) => faces.indexOf(f) !== i);
-  assert.deepEqual(
-    duplicates,
-    [],
-    "كل (عائلة + وزن) يجب أن يظهر مرة واحدة، وإلا فملف يُلغي آخر"
+  assert.deepEqual(duplicates, [], "كل (عائلة + وزن) يجب أن يظهر مرة واحدة، وإلا فملف يُلغي آخر");
+});
+
+/* ------------------------------------------------------------------ */
+/* 4) لا اختصارات «اكشف كل شيء» ولا تصنيفات داخلية للطالب              */
+/* ------------------------------------------------------------------ */
+
+const readSrc = (...parts) => fs.readFileSync(path.join(SRC, ...parts), "utf8");
+
+test("لا زر «إظهار جميع الفراغات» أو «إخفاء الكل» في تحدي الفراغات", () => {
+  const text = readSrc("components", "flashcards", "FlashcardSection.tsx");
+  for (const phrase of ["إظهار جميع الفراغات", "إخفاء الكل"]) {
+    assert.ok(!text.includes(phrase), `حُذف «${phrase}»: الطالب يكتب الإجابة بنفسه`);
+  }
+  assert.match(text, /onChange=/, "الفراغات حقول كتابة لا أزرار كشف");
+  assert.match(text, /إظهار الإجابة الصحيحة/, "بعد الخطأ يمكنه رؤية الإجابة الصحيحة");
+});
+
+test("لا تنبيه منهجي متكرر داخل كل بطاقة فراغ", () => {
+  const text = readSrc("components", "flashcards", "FlashcardSection.tsx");
+  assert.ok(!text.includes("تنبيه منهجي"), "التنبيه المتكرر أُزيل");
+  assert.ok(!text.includes("تجنب استخدام المترادفات"), "نص التنبيه أُزيل");
+});
+
+test("بنك الأسئلة: لا تصنيفات ولا عدّاد لكل نوع ولا «استعراض جميع الأسئلة»", () => {
+  const bank = readSrc("components", "quiz", "BacQuizSection.tsx");
+  const mcq = readSrc("components", "quiz", "McqQuizViewer.tsx");
+  assert.ok(!bank.includes("selectedCategory"), "لا شرائح تصنيف ظاهرة للطالب");
+  assert.ok(!bank.includes("question.category"), "لا شارة تصنيف على السؤال نفسه");
+  assert.ok(!bank.includes("بنك أسئلة البكالوريا"), "الاسم صار «بنك الأسئلة»");
+  assert.match(bank, /بنك الأسئلة/, "العنوان الجديد موجود");
+  assert.ok(!mcq.includes("استعراض جميع الأسئلة"), "حُذف وضع القائمة من اختبار QCM");
+  assert.ok(!mcq.includes('"list"'), "لا حالة عرض قائمة متبقية");
+});
+
+test("الخريطة البصرية معطَّلة مؤقتًا", () => {
+  const text = readSrc("components", "mindmap", "MindmapViewer.tsx");
+  assert.match(text, /VISUAL_MAP_ENABLED = false/, "التبويب معطَّل حتى تُعاد الصور");
+  assert.ok(
+    !/onClick=\{\(\) => setViewMode\("image"\)\}/.test(text),
+    "لا طريق للوصول إلى صور غير جاهزة"
   );
 });

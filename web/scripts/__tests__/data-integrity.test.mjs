@@ -62,7 +62,11 @@ test("كل ملفات QCM تستخدم الإجابة الصحيحة الموج�
         question.options.includes(question.correct_answer),
         `${file} :: ${question.question_id}: الإجابة الصحيحة ليست ضمن الخيارات`
       );
-      assert.equal(question.options.length, 4, `${file} :: ${question.question_id}: عدد الخيارات ليس 4`);
+      assert.equal(
+        question.options.length,
+        4,
+        `${file} :: ${question.question_id}: عدد الخيارات ليس 4`
+      );
       assert.ok(question.explanation?.trim(), `${file} :: ${question.question_id}: لا يوجد تعليل`);
       assert.ok(question.question?.trim(), `${file} :: ${question.question_id}: نص السؤال فارغ`);
     }
@@ -81,14 +85,8 @@ test("موضع الإجابة الصحيحة موزّع على الخيارات 
   }
   assert.equal(all, 70, "عدد أسئلة QCM الإجمالي يجب أن يبقى 70");
   for (const [position, count] of totals.entries()) {
-    assert.ok(
-      count / all >= 0.15,
-      `الموضع ${position} يحتوي ${count}/${all} فقط — التوزيع منحاز`
-    );
-    assert.ok(
-      count / all <= 0.35,
-      `الموضع ${position} يحتوي ${count}/${all} — تركيز مفرط`
-    );
+    assert.ok(count / all >= 0.15, `الموضع ${position} يحتوي ${count}/${all} فقط — التوزيع منحاز`);
+    assert.ok(count / all <= 0.35, `الموضع ${position} يحتوي ${count}/${all} — تركيز مفرط`);
   }
 });
 
@@ -118,13 +116,14 @@ test("كل سؤال في بنك الأسئلة له نص وجواب غير فا�
         question.official_solution ||
         question.solution ||
         question.guidance ||
-        (Array.isArray(question.model_answers) && question.model_answers.length > 0
-          ? "ok"
-          : "");
+        (Array.isArray(question.model_answers) && question.model_answers.length > 0 ? "ok" : "");
 
       // أسئلة الاستخراج تُبنى من النص + المحل، فلا تُشترط فيها صياغة سؤال صريحة
       const hasExtractionContext = Boolean(
-        question.text_warsh || question.verse_text || question.ayah_text_warsh || question.text_proof
+        question.text_warsh ||
+        question.verse_text ||
+        question.ayah_text_warsh ||
+        question.text_proof
       );
       assert.ok(
         questionText || hasExtractionContext,
@@ -283,7 +282,10 @@ test("عامل الخدمة المولَّد يحقن بصمة البناء في
   const { buildServiceWorker } = await import("../../src/lib/service-worker.ts").catch(() => ({}));
   if (!buildServiceWorker) {
     // Node لا يحمّل TS مباشرة: نتحقق من النص المصدري بدل التنفيذ
-    const src = fs.readFileSync(new URL("../../src/lib/service-worker.ts", import.meta.url), "utf8");
+    const src = fs.readFileSync(
+      new URL("../../src/lib/service-worker.ts", import.meta.url),
+      "utf8"
+    );
     assert.match(src, /export function buildServiceWorker/, "الدالة المولِّدة موجودة");
     assert.match(src, /zady-\\\$\\{VERSION\\}/, "اسم الكاش مشتق من بصمة البناء");
     assert.match(src, /Promise\.allSettled/, "التحميل المسبق لا يفشل ككتلة واحدة");

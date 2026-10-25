@@ -21,32 +21,32 @@
  * يتفاوت بين بطاقة وأخرى بلا سبب، وكثير منه يصغر عن حدّ القراءة.
  *
  * القاعدة الآن:
- *   - المتن 17px (نص عربي طويل يحتاج أكبر من 16px لاتيني).
- *   - أصغر نص في التطبيق 13px، ولا يوجد 10px أو 11px إطلاقًا.
+ *   - المتن 18px (الطالب يقرأ من الهاتف؛ 16px لاتيني لا يكفي لعربية مشكولة).
+ *   - أصغر نص في التطبيق 14px، ولا يوجد 10px أو 11px أو 12px إطلاقًا.
  *   - ستة مقاسات فقط: meta · label · body-sm · body · title · display.
  *
  * المتغيّرات معرّفة هنا، والأصناف (utilities) في نهاية الملف.
  */
 @theme {
-  --text-meta: 0.8125rem; /* 13px — شارات وتواريخ فقط */
-  --text-meta--line-height: 1.5;
+  --text-meta: 0.875rem; /* 14px — شارات وتواريخ فقط */
+  --text-meta--line-height: 1.55;
 
-  --text-label: 0.875rem; /* 14px — تسميات الحقول والأزرار الصغيرة */
-  --text-label--line-height: 1.6;
+  --text-label: 0.9375rem; /* 15px — تسميات الحقول والأزرار الصغيرة */
+  --text-label--line-height: 1.65;
 
-  --text-body-sm: 0.9375rem; /* 15px — نص ثانوي كثيف */
+  --text-body-sm: 1rem; /* 16px — نص ثانوي كثيف */
   --text-body-sm--line-height: 1.8;
 
-  --text-body: 1.0625rem; /* 17px — المتن (الافتراضي) */
+  --text-body: 1.125rem; /* 18px — المتن (الافتراضي) */
   --text-body--line-height: 1.85;
 
-  --text-title: 1.25rem; /* 20px — عناوين الأقسام */
+  --text-title: 1.3125rem; /* 21px — عناوين الأقسام */
   --text-title--line-height: 1.5;
 
-  --text-heading: 1.5rem; /* 24px — عناوين على الشاشات الكبيرة */
+  --text-heading: 1.625rem; /* 26px — عناوين على الشاشات الكبيرة */
   --text-heading--line-height: 1.45;
 
-  --text-display: 1.625rem; /* 26px — عنوان الصفحة */
+  --text-display: 1.875rem; /* 30px — عنوان الصفحة */
   --text-display--line-height: 1.35;
 }
 
@@ -108,7 +108,8 @@ html {
 }
 
 body {
-  font-family: var(--font-body), var(--font-latin), "Noto Naskh Arabic", "Segoe UI", Arial, sans-serif;
+  font-family:
+    var(--font-body), var(--font-latin), "Noto Naskh Arabic", "Segoe UI", Arial, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
   /* المتن الموحّد: كل نص بلا صنف حجم يأخذ هذا */

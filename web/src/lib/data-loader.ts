@@ -198,12 +198,7 @@ function normalizeQuestion(
   index: number,
   extractionPrompt: string
 ): NormalizedQuestion {
-  const text = pickString(
-    raw.text_proof,
-    raw.text_warsh,
-    raw.verse_text,
-    raw.ayah_text_warsh
-  );
+  const text = pickString(raw.text_proof, raw.text_warsh, raw.verse_text, raw.ayah_text_warsh);
   const reference = buildReference(raw);
   const explicitQuestion = pickString(raw.question_text, raw.question);
 
@@ -293,7 +288,10 @@ function extractFlashcards(rawAdv: unknown): NormalizedFlashcard[] {
   return list
     .filter(isRecord)
     .map((c, index) => ({
-      id: (typeof c.card_id === "string" && c.card_id) || (typeof c.id === "string" && c.id) || `card_${index + 1}`,
+      id:
+        (typeof c.card_id === "string" && c.card_id) ||
+        (typeof c.id === "string" && c.id) ||
+        `card_${index + 1}`,
       question: pickString(c.front, c.q, c.question),
       answer: pickString(c.back, c.a, c.answer),
       section: pickString(c.section) || undefined,
@@ -364,7 +362,9 @@ function buildRevision(std: unknown, adv: unknown): RevisionContent {
   const s = isRecord(std) ? std : {};
   const a = isRecord(adv) ? adv : {};
 
-  const lastMinuteRaw = isRecord(a.last_minute_revision_schema) ? a.last_minute_revision_schema : {};
+  const lastMinuteRaw = isRecord(a.last_minute_revision_schema)
+    ? a.last_minute_revision_schema
+    : {};
   const lastMinute = Object.entries(lastMinuteRaw)
     .map(([key, value], i) => ({
       title: LAST_MINUTE_LABELS[key] ?? `محور المراجعة ${i + 1}`,
@@ -474,8 +474,7 @@ const SOURCES: UnitSource[] = [
     questions: u4_q,
     quiz: u4_quiz,
     mindmapImage: "/lessons/unit04_mindmap.webp",
-    extractionPrompt:
-      "استخرج من النص الشرعي التالي فائدة تخص العقل، مع تحديد محل الشاهد.",
+    extractionPrompt: "استخرج من النص الشرعي التالي فائدة تخص العقل، مع تحديد محل الشاهد.",
   },
 ];
 

@@ -40,7 +40,10 @@ export function shortCategory(category: string): string {
   }
 
   // احتياط: أول ثلاث كلمات دون تجاوز الحد
-  const words = category.replace(/\([^)]*\)/g, "").trim().split(/\s+/);
+  const words = category
+    .replace(/\([^)]*\)/g, "")
+    .trim()
+    .split(/\s+/);
   let out = "";
   for (const word of words) {
     if ((out + " " + word).trim().length > MAX) break;

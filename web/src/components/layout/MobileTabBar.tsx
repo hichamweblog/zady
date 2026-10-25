@@ -28,9 +28,7 @@ export default function MobileTabBar() {
 
   const itemClass = (active: boolean) =>
     `flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-meta font-bold transition-colors ${
-      active
-        ? "text-teal-800 dark:text-teal-300"
-        : "text-slate-600 dark:text-slate-400"
+      active ? "text-teal-800 dark:text-teal-300" : "text-slate-600 dark:text-slate-400"
     }`;
 
   return (
@@ -39,11 +37,7 @@ export default function MobileTabBar() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 md:hidden"
     >
       <div className="mx-auto flex max-w-lg items-stretch gap-1 px-2 py-1">
-        <Link
-          href="/"
-          aria-current={isHome ? "page" : undefined}
-          className={itemClass(isHome)}
-        >
+        <Link href="/" aria-current={isHome ? "page" : undefined} className={itemClass(isHome)}>
           <Home className="h-5 w-5" aria-hidden="true" />
           <span>الرئيسية</span>
         </Link>
