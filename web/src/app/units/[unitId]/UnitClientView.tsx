@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Layers,
@@ -11,25 +11,41 @@ import {
   Users,
   ChevronRight,
   ChevronLeft,
-  CheckCircle2,
   CheckSquare,
+  Zap,
 } from "lucide-react";
-import { NormalizedUnit } from "@/lib/types";
+import type { ClientUnit, UnitMeta } from "@/lib/types";
 import MindmapViewer from "@/components/mindmap/MindmapViewer";
 import StandardLessonViewer from "@/components/lesson/StandardLessonViewer";
 import FlashcardSection from "@/components/flashcards/FlashcardSection";
 import BacQuizSection from "@/components/quiz/BacQuizSection";
 import McqQuizViewer from "@/components/quiz/McqQuizViewer";
+import RevisionSection from "@/components/revision/RevisionSection";
 import { useProgress } from "@/lib/useProgressStore";
-import { UNITS } from "@/lib/data-loader";
 
-export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
-  const [activeTab, setActiveTab] = useState<
-    "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz"
-  >("mindmap");
+type TabId = "mindmap" | "lesson" | "flashcards" | "mcq" | "quiz" | "revision";
+
+interface UnitClientViewProps {
+  unit: ClientUnit;
+  previousUnit?: UnitMeta;
+  nextUnit?: UnitMeta;
+}
+
+export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitClientViewProps) {
+  const [activeTab, setActiveTab] = useState<TabId>("mindmap");
+  /**
+   * التبويبات تُركَّب عند أول زيارة ثم تبقى مركّبة (keep-alive):
+   * - تبديل التبويب لم يعد يمحو تقدّم الجلسة (إجابات QCM، موضع البطاقة…)
+   * - التبويبات الثقيلة لا تُصيَّر في HTML الأولي فيبقى حجم الصفحة معقولًا
+   * - «الخريطة» و«الدرس» مصيَّران خادميًا لأنهما محتوى المادة القابل للفهرسة
+   */
+  const [mountedTabs, setMountedTabs] = useState<Set<TabId>>(
+    () => new Set<TabId>(["mindmap", "lesson"])
+  );
+  const tabListRef = useRef<HTMLDivElement>(null);
   const { getUnitStats } = useProgress();
 
-  const sectionKeys = Object.keys(unit.standardData?.detailed_explanation || {});
+  const sectionKeys = unit.sections.map((s) => s.key);
   const cardIds = unit.flashcards.map((c) => c.id);
   const questionIds = unit.questions.map((q) => q.id);
   const stats = getUnitStats(
@@ -40,66 +56,70 @@ export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
     unit.quizQuestions.length
   );
 
-  const prevUnit = UNITS.find((u) => u.id === unit.id - 1);
-  const nextUnit = UNITS.find((u) => u.id === unit.id + 1);
+  const selectTab = useCallback((id: TabId) => {
+    setActiveTab(id);
+    setMountedTabs((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }, []);
 
-  const tabs = [
-    {
-      id: "mindmap",
-      label: "1. الخريطة الذهنية",
-      icon: Layers,
-      count: unit.mindmapRoot.children?.length || 4,
-      unitLabel: "محاور",
+  const tabs = useMemo<{ id: TabId; label: string; icon: typeof Layers; count: number | null }[]>(
+    () => [
+      { id: "mindmap", label: "الخريطة الذهنية", icon: Layers, count: unit.mindmapRoot.children?.length ?? 0 },
+      { id: "lesson", label: "الدرس المنهجي", icon: BookOpen, count: unit.sections.length },
+      { id: "flashcards", label: "الحفظ والاسترجاع", icon: Sparkles, count: unit.flashcards.length },
+      { id: "mcq", label: "اختبار QCM", icon: CheckSquare, count: unit.quizQuestions.length },
+      { id: "quiz", label: "بنك أسئلة البكالوريا", icon: HelpCircle, count: unit.questions.length },
+      {
+        id: "revision",
+        label: "المراجعة السريعة",
+        icon: Zap,
+        count:
+          unit.revision.lastMinute.length +
+          unit.revision.differentiation.length +
+          unit.revision.previousBac.length,
+      },
+    ],
+    [unit]
+  );
+
+  /** تنقّل لوحة المفاتيح بين التبويبات (RTL: يمين = السابق) */
+  const onTabsKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+      const currentIndex = tabs.findIndex((t) => t.id === activeTab);
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex + 1) % tabs.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = tabs.length - 1;
+      const nextTab = tabs[nextIndex];
+      selectTab(nextTab.id);
+      tabListRef.current?.querySelector<HTMLButtonElement>(`#tab-${nextTab.id}`)?.focus();
     },
-    {
-      id: "lesson",
-      label: "2. الدرس المنهجي",
-      icon: BookOpen,
-      count: null,
-    },
-    {
-      id: "flashcards",
-      label: "3. الحفظ والاسترجاع",
-      icon: Sparkles,
-      count: unit.flashcards.length,
-      unitLabel: "بطاقة",
-    },
-    {
-      id: "mcq",
-      label: "4. اختبار الـ QCM",
-      icon: CheckSquare,
-      count: unit.quizQuestions?.length || 0,
-      unitLabel: "سؤال",
-    },
-    {
-      id: "quiz",
-      label: "5. بنك أسئلة البكالوريا",
-      icon: HelpCircle,
-      count: unit.questions.length,
-      unitLabel: "سؤال",
-    },
-  ] as const;
+    [activeTab, tabs, selectTab]
+  );
 
   return (
     <div className="space-y-8">
-      {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-        <Link href="/" className="hover:text-teal-600 transition-colors">
+      {/* مسار التتبّع */}
+      <nav aria-label="مسار التصفح" className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <Link href="/" className="hover:text-teal-700 dark:hover:text-teal-300 transition-colors">
           الرئيسية
         </Link>
-        <span>/</span>
-        <span className="text-teal-600 dark:text-teal-400">{unit.badge}</span>
-      </div>
+        <span aria-hidden="true">/</span>
+        <span className="text-teal-700 dark:text-teal-300">{unit.badge}</span>
+      </nav>
 
-      {/* Unit Hero Card */}
+      {/* بطاقة الوحدة */}
       <div className="bg-gradient-to-br from-white via-slate-50 to-teal-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-teal-950/20 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="px-3 py-1 rounded-xl bg-teal-600 text-white text-xs font-black shadow-sm shadow-teal-600/30">
+              <span className="px-3 py-1 rounded-xl bg-teal-700 text-white text-xs font-black shadow-sm shadow-teal-700/30">
                 {unit.badge}
               </span>
-              <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">
+              <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold">
                 {unit.field}
               </span>
             </div>
@@ -108,33 +128,40 @@ export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
               {unit.title}
             </h1>
 
-            <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+            <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-300 flex-wrap">
               <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                <Clock className="w-4 h-4 text-teal-700 dark:text-teal-400" aria-hidden="true" />
                 <span>المدة التقديرية: {unit.timeAllocation}</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                <Users className="w-4 h-4 text-teal-700 dark:text-teal-400" aria-hidden="true" />
                 <span>المستهدف: {unit.targetAudience}</span>
               </span>
             </div>
           </div>
 
-          {/* Progress widget */}
+          {/* نسبة الإتقان — تتحدّث فورًا بفضل المخزن المشترك */}
           <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm min-w-[240px] space-y-2.5">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-slate-700 dark:text-slate-300">نسبة الإتقان للوحدة</span>
-              <span className="text-teal-600 dark:text-teal-400 text-sm font-black">
+              <span className="text-slate-700 dark:text-slate-200">نسبة الإتقان للوحدة</span>
+              <span className="text-teal-700 dark:text-teal-300 text-sm font-black">
                 {stats.progressPercentage}%
               </span>
             </div>
-            <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div
+              role="progressbar"
+              aria-valuenow={stats.progressPercentage}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`نسبة إتقان ${unit.shortTitle}`}
+              className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
+            >
               <div
                 style={{ width: `${stats.progressPercentage}%` }}
                 className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full transition-all duration-500"
               />
             </div>
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium pt-1 flex-wrap gap-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300 font-medium pt-1 flex-wrap gap-2">
               <span>{stats.readSectionsCount}/{sectionKeys.length} محاور</span>
               <span>{stats.learnedCards} بطاقة</span>
               <span>{stats.masteredQuestions} سؤال BAC</span>
@@ -142,29 +169,44 @@ export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
           </div>
         </div>
 
-        {/* 5 Study Mode Tabs Bar */}
-        <div className="pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none">
-          {tabs.map((tab) => {
+        {/* شريط التبويبات الستة */}
+        <div
+          ref={tabListRef}
+          role="tablist"
+          aria-label="أنماط الدراسة في الوحدة"
+          onKeyDown={onTabsKeyDown}
+          className="pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none"
+        >
+          {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                id={`tab-${tab.id}`}
+                role="tab"
+                type="button"
+                aria-selected={isActive}
+                aria-controls={`panel-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => selectTab(tab.id)}
                 className={`relative shrink-0 flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all ${
                   isActive
-                    ? "bg-teal-600 text-white shadow-md shadow-teal-600/20"
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700/60"
+                    ? "bg-teal-700 text-white shadow-md shadow-teal-700/20"
+                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700/60"
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                <span>
+                  <span className="text-slate-600 dark:text-slate-400 font-bold me-1">{index + 1}.</span>
+                  {tab.label}
+                </span>
                 {tab.count !== null && (
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
                       isActive
                         ? "bg-white/20 text-white"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     {tab.count}
@@ -176,53 +218,71 @@ export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
         </div>
       </div>
 
-      {/* Tab Panels */}
+      {/*
+        كل التبويبات تبقى مركّبة ويُخفى غير النشط بـ CSS.
+        سابقًا كانت تُركّب شرطيًا فكان تبديل التبويب يمحو تقدّم الجلسة
+        (إجابات QCM، موضع البطاقة، بحث بنك الأسئلة…).
+      */}
       <div className="min-h-[500px]">
-        {activeTab === "mindmap" && (
+        <div role="tabpanel" id="panel-mindmap" aria-labelledby="tab-mindmap" hidden={activeTab !== "mindmap"} className={activeTab === "mindmap" ? "" : "hidden"}>
           <MindmapViewer
             rootNode={unit.mindmapRoot}
             imageSrc={unit.mindmapImage}
             unitTitle={unit.shortTitle}
           />
-        )}
+        </div>
 
-        {activeTab === "lesson" && (
-          <StandardLessonViewer unitId={unit.id} standardData={unit.standardData} />
-        )}
-
-        {activeTab === "flashcards" && (
-          <FlashcardSection
+        <div role="tabpanel" id="panel-lesson" aria-labelledby="tab-lesson" hidden={activeTab !== "lesson"} className={activeTab === "lesson" ? "" : "hidden"}>
+          <StandardLessonViewer
             unitId={unit.id}
-            flashcards={unit.flashcards}
-            clozeItems={unit.clozeItems}
+            learningObjective={unit.learningObjective}
+            sections={unit.sections}
           />
-        )}
+        </div>
 
-        {activeTab === "mcq" && (
-          <McqQuizViewer
-            unitId={unit.id}
-            unitTitle={unit.shortTitle}
-            questions={unit.quizQuestions}
-          />
-        )}
+        <div role="tabpanel" id="panel-flashcards" aria-labelledby="tab-flashcards" hidden={activeTab !== "flashcards"} className={activeTab === "flashcards" ? "" : "hidden"}>
+          {mountedTabs.has("flashcards") && (
+            <FlashcardSection
+              unitId={unit.id}
+              flashcards={unit.flashcards}
+              clozeItems={unit.clozeItems}
+            />
+          )}
+        </div>
 
-        {activeTab === "quiz" && (
-          <BacQuizSection unitId={unit.id} questions={unit.questions} />
-        )}
+        <div role="tabpanel" id="panel-mcq" aria-labelledby="tab-mcq" hidden={activeTab !== "mcq"} className={activeTab === "mcq" ? "" : "hidden"}>
+          {mountedTabs.has("mcq") && (
+            <McqQuizViewer
+              unitId={unit.id}
+              unitTitle={unit.shortTitle}
+              questions={unit.quizQuestions}
+            />
+          )}
+        </div>
+
+        <div role="tabpanel" id="panel-quiz" aria-labelledby="tab-quiz" hidden={activeTab !== "quiz"} className={activeTab === "quiz" ? "" : "hidden"}>
+          {mountedTabs.has("quiz") && (
+            <BacQuizSection unitId={unit.id} questions={unit.questions} />
+          )}
+        </div>
+
+        <div role="tabpanel" id="panel-revision" aria-labelledby="tab-revision" hidden={activeTab !== "revision"} className={activeTab === "revision" ? "" : "hidden"}>
+          {mountedTabs.has("revision") && <RevisionSection revision={unit.revision} />}
+        </div>
       </div>
 
-      {/* Previous & Next Unit Navigation */}
+      {/* التنقّل بين الوحدات */}
       <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
-        {prevUnit ? (
+        {previousUnit ? (
           <Link
-            href={`/units/${prevUnit.id}`}
+            href={`/units/${previousUnit.id}`}
             className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-teal-500 transition-all group"
           >
-            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-teal-600 transition-colors" />
+            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-teal-700 transition-colors" aria-hidden="true" />
             <div className="text-right">
-              <span className="text-[10px] font-bold text-slate-400 block">الوحدة السابقة</span>
-              <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-teal-600 transition-colors">
-                {prevUnit.shortTitle}
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">الوحدة السابقة</span>
+              <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
+                {previousUnit.shortTitle}
               </span>
             </div>
           </Link>
@@ -236,12 +296,12 @@ export default function UnitClientView({ unit }: { unit: NormalizedUnit }) {
             className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-teal-500 transition-all group"
           >
             <div className="text-left">
-              <span className="text-[10px] font-bold text-slate-400 block">الوحدة الموالية</span>
-              <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-teal-600 transition-colors">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">الوحدة الموالية</span>
+              <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
                 {nextUnit.shortTitle}
               </span>
             </div>
-            <ChevronLeft className="w-5 h-5 text-slate-400 group-hover:text-teal-600 transition-colors" />
+            <ChevronLeft className="w-5 h-5 text-slate-400 group-hover:text-teal-700 transition-colors" aria-hidden="true" />
           </Link>
         ) : (
           <div />

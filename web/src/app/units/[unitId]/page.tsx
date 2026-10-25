@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllUnits, getUnitById } from "@/lib/data-loader";
+import { getAdjacentUnits } from "@/lib/units-meta";
 import UnitClientView from "./UnitClientView";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
+/**
+ * المسارات تُبنى مسبقًا لهذه الوحدات فقط؛ أي معرّف آخر يُرجع 404 حقيقية.
+ * سابقًا كانت /units/99 تُرجع HTTP 200 مع صفحة «غير موجودة» (خطأ SEO).
+ */
+export const dynamicParams = false;
+
 export function generateStaticParams() {
-  const units = getAllUnits();
-  return units.map((u) => ({
-    unitId: u.id.toString(),
-  }));
+  return getAllUnits().map((unit) => ({ unitId: unit.id.toString() }));
 }
 
 export async function generateMetadata({
@@ -17,23 +21,38 @@ export async function generateMetadata({
 }: {
   params: Promise<{ unitId: string }>;
 }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const unitId = parseInt(resolvedParams.unitId, 10);
-  const unit = getUnitById(unitId);
+  const { unitId } = await params;
+  const unit = getUnitById(Number.parseInt(unitId, 10));
 
   if (!unit) {
-    return {
-      title: "الوحدة غير موجودة | زادِي",
-    };
+    return { title: "الوحدة غير موجودة" };
   }
 
+  const description = `${unit.learningObjective} — مراجعة تفاعلية: خرائط ذهنية، بطاقات حفظ، اختبار QCM، وأسئلة بكالوريا.`;
+
   return {
-    title: `${unit.title} | زادِي للعلوم الإسلامية`,
-    description: `${unit.learningObjective} - مراجعة تفاعلية، بطاقات استرجاع، خريطة ذهنية، واختبارات معتمدة.`,
+    title: unit.title,
+    description,
+    alternates: { canonical: `/units/${unit.id}` },
     openGraph: {
-      title: `${unit.title} | زادِي`,
-      description: unit.learningObjective,
-      images: [unit.mindmapImage],
+      type: "article",
+      title: unit.title,
+      description,
+      url: `/units/${unit.id}`,
+      images: [
+        {
+          url: `/og/unit-0${unit.id}.png`,
+          width: 1200,
+          height: 630,
+          alt: unit.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: unit.title,
+      description,
+      images: [`/og/unit-0${unit.id}.png`],
     },
   };
 }
@@ -43,19 +62,53 @@ export default async function UnitPage({
 }: {
   params: Promise<{ unitId: string }>;
 }) {
-  const resolvedParams = await params;
-  const unitId = parseInt(resolvedParams.unitId, 10);
-  const unit = getUnitById(unitId);
+  const { unitId } = await params;
+  const unit = getUnitById(Number.parseInt(unitId, 10));
 
   if (!unit) {
     notFound();
   }
 
+  const { prev, next } = getAdjacentUnits(unit.id);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    name: unit.title,
+    inLanguage: "ar",
+    educationalLevel: "secondary",
+    about: unit.field,
+    description: unit.learningObjective,
+    teaches: unit.sections.map((section) => section.title),
+    isAccessibleForFree: true,
+    provider: { "@type": "Organization", name: "زادِي", url: "https://zady.app" },
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <UnitClientView unit={unit} />
+      <main
+        id="main-content"
+        className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        <UnitClientView unit={unit} previousUnit={prev} nextUnit={next} />
+
+        {/* محتوى خادمي للزحف والقراءة السريعة دون JavaScript */}
+        <noscript>
+          <section className="mt-8 space-y-4">
+            <h2 className="text-xl font-black">{unit.title}</h2>
+            <p className="text-sm">{unit.learningObjective}</p>
+            {unit.sections.map((section) => (
+              <article key={section.key}>
+                <h3 className="font-bold">{section.title}</h3>
+              </article>
+            ))}
+          </section>
+        </noscript>
       </main>
       <Footer />
     </div>

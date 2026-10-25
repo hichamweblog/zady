@@ -13,10 +13,11 @@
     --secondary: #f1f5f9;
     --secondary-foreground: #0f172a;
     --muted: #f1f5f9;
-    --muted-foreground: #475569;
+    /* كان #475569 على خلفيات فاتحة: نسبة التباين تُحسّن القراءة الطويلة */
+    --muted-foreground: #334155;
     --accent: #f8fafc;
     --accent-foreground: #0f172a;
-    --destructive: #ef4444;
+    --destructive: #dc2626;
     --destructive-foreground: #ffffff;
     --border: #e2e8f0;
     --input: #e2e8f0;
@@ -36,15 +37,20 @@
     --secondary: #1e293b;
     --secondary-foreground: #f8fafc;
     --muted: #1e293b;
-    --muted-foreground: #94a3b8;
+    --muted-foreground: #cbd5e1;
     --accent: #1e293b;
     --accent-foreground: #f8fafc;
-    --destructive: #991b1b;
-    --destructive-foreground: #f8fafc;
+    --destructive: #f87171;
+    --destructive-foreground: #0b1120;
     --border: #1e293b;
     --input: #1e293b;
     --ring: #14b8a6;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -56,11 +62,11 @@ body {
 }
 
 .font-quran {
-  font-family: var(--font-amiri), serif;
-  line-height: 2.3;
+  font-family: var(--font-amiri), "Traditional Arabic", serif;
+  line-height: 2.4;
 }
 
-/* 3D Perspective for Flashcards - without conflicting CSS transition */
+/* بطاقة ثلاثية الأبعاد */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -78,21 +84,54 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* إخفاء شريط التمرير في صفوف التبويبات */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
+/* مؤشر تركيز واضح لمستخدمي لوحة المفاتيح */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* شريط تمرير مخصّص */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #94a3b8;
   border-radius: 9999px;
 }
-
 .dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #475569;
+}
+
+/* احترام تفضيل تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* تباين أعلى لأزرار وخلفيات تُستخدم كثيرًا */
+@media (prefers-contrast: more) {
+  .dark {
+    --muted-foreground: #e2e8f0;
+  }
 }

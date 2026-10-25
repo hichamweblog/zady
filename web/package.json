@@ -6,21 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run lint",
+    "test:data": "node --test \"scripts/__tests__/*.test.mjs\"",
+    "verify": "npm run typecheck && npm run lint && npm run test:data"
   },
   "dependencies": {
-    "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
-    "clsx": "^2.1.1",
-    "framer-motion": "^14.6.0",
     "lucide-react": "^1.61.0",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "tailwind-merge": "^3.7.0"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -29,5 +30,8 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@11.5.0"
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=20.9.0"
+  }
 }

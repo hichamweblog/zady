@@ -3,145 +3,149 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Moon, Sun, CheckCircle2, ChevronDown } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { UNITS } from "@/lib/data-loader";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { UNITS_META } from "@/lib/units-meta";
+
+/* مصدر حالة الثيم: كلاس <html> نفسه (مُهيّأ مسبقًا في <head> لمنع الوميض) */
+function subscribeToTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => observer.disconnect();
+}
+
+const getThemeSnapshot = () => document.documentElement.classList.contains("dark");
+const getServerThemeSnapshot = () => false;
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const isDark = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, getServerThemeSnapshot);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Default to Light Mode unless explicitly set to dark in localStorage
-    const savedTheme = localStorage.getItem("zady_theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      setIsDark(false);
-    }
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("zady_theme", "light");
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("zady_theme", "dark");
-      setIsDark(true);
+  const toggleTheme = useCallback(() => {
+    const nextIsDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", nextIsDark);
+    try {
+      localStorage.setItem("zady_theme", nextIsDark ? "dark" : "light");
+    } catch {
+      /* التخزين المحلي محجوب */
     }
-  };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">
-                  زادِي
-                </span>
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-6 min-w-0">
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="flex items-center gap-1.5">
+                <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">زادِي</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300">
                   BAC
                 </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+              </span>
+              <span className="block text-[11px] text-slate-600 dark:text-slate-300 font-semibold">
                 العلوم الإسلامية
-              </p>
-            </div>
+              </span>
+            </span>
           </Link>
 
-          {/* Quick Units Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-1.5">
+          <nav aria-label="التنقل الرئيسي" className="hidden md:flex items-center gap-1.5">
             <Link
               href="/"
+              aria-current={pathname === "/" ? "page" : undefined}
               className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-colors ${
                 pathname === "/"
                   ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                  : "text-slate-700 dark:text-slate-300 hover:text-teal-700 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                  : "text-slate-700 dark:text-slate-300 hover:text-teal-800 hover:bg-slate-100 dark:hover:bg-slate-800/60"
               }`}
             >
               الرئيسية
             </Link>
 
-            <div className="relative group" ref={menuRef}>
+            <div className="relative" ref={menuRef}>
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => setIsMenuOpen((v) => !v)}
                 aria-expanded={isMenuOpen}
                 aria-haspopup="true"
-                className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-teal-700 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-teal-800 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
               >
                 <span>الوحدات الدراسية</span>
-                <ChevronDown className="w-4 h-4 opacity-70" />
+                <ChevronDown
+                  className={`w-4 h-4 opacity-70 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+                  aria-hidden="true"
+                />
               </button>
 
-              <div
-                className={`absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-all ${
-                  isMenuOpen ? "block" : "hidden group-hover:block"
-                }`}
-              >
-                {UNITS.map((u) => {
-                  const isActive = pathname === `/units/${u.id}`;
-                  return (
-                    <Link
-                      key={u.id}
-                      href={`/units/${u.id}`}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        isActive
-                          ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
-                    >
-                      <span className="truncate">{u.shortTitle}</span>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">
-                        {u.badge}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
+              {isMenuOpen && (
+                <div className="absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800">
+                  {UNITS_META.map((unit) => {
+                    const isActive = pathname === `/units/${unit.id}`;
+                    return (
+                      <Link
+                        key={unit.id}
+                        href={`/units/${unit.id}`}
+                        onClick={() => setIsMenuOpen(false)}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`flex items-center justify-between gap-2 p-2.5 rounded-xl text-xs font-bold transition-colors ${
+                          isActive
+                            ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        <span className="truncate">{unit.shortTitle}</span>
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                          {unit.badge}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </nav>
         </div>
 
-        {/* Action badges & Theme toggle */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-900/60">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-900/60">
+            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             <span>متاح بدون إنترنت</span>
-          </div>
+          </span>
 
           <button
             onClick={toggleTheme}
-            aria-label="تبديل المظهر"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
+            aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
+            aria-pressed={isDark}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             {isDark ? (
               <>
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                 <span className="hidden sm:inline">الوضع الفاتح</span>
               </>
             ) : (
               <>
-                <Moon className="w-4 h-4 text-slate-600" />
+                <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" aria-hidden="true" />
                 <span className="hidden sm:inline">الوضع الليلي</span>
               </>
             )}
@@ -149,35 +153,40 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Units Horizontal Scroll */}
-      <div className="md:hidden border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none bg-slate-50 dark:bg-slate-900/50">
+      {/* تنقّل الوحدات على الهاتف */}
+      <nav
+        aria-label="الوحدات الدراسية"
+        className="md:hidden border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none bg-slate-50 dark:bg-slate-900/50"
+      >
         <Link
           href="/"
+          aria-current={pathname === "/" ? "page" : undefined}
           className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold ${
             pathname === "/"
-              ? "bg-teal-600 text-white shadow-xs"
+              ? "bg-teal-700 text-white"
               : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
           }`}
         >
           الرئيسية
         </Link>
-        {UNITS.map((u) => {
-          const isActive = pathname === `/units/${u.id}`;
+        {UNITS_META.map((unit) => {
+          const isActive = pathname === `/units/${unit.id}`;
           return (
             <Link
-              key={u.id}
-              href={`/units/${u.id}`}
+              key={unit.id}
+              href={`/units/${unit.id}`}
+              aria-current={isActive ? "page" : undefined}
               className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold ${
                 isActive
-                  ? "bg-teal-600 text-white shadow-xs"
+                  ? "bg-teal-700 text-white"
                   : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
               }`}
             >
-              {u.shortTitle}
+              {unit.shortTitle}
             </Link>
           );
         })}
-      </div>
+      </nav>
     </header>
   );
 }
