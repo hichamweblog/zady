@@ -1,0 +1,161 @@
+{
+  "$schema": "../schema/unit.schema.json",
+  "schemaVersion": 2,
+  "source": {
+    "curriculum": "التدرّج السنوي الرسمي — العلوم الإسلامية، السنة الثالثة ثانوي",
+    "subject": "العلوم الإسلامية",
+    "reviewedBy": null,
+    "updatedAt": "2026-10-25",
+    "notes": "قالب للنسخ: انسخه إلى unit-05.json ثم املأ كل «…». لا يُحمَّل في التطبيق لأنه لا يطابق unit-XX.json."
+  },
+
+  "unit": {
+    "id": 5,
+    "slug": "new-unit-slug",
+    "title": "الوحدة 05: عنوان الوحدة كما في التدرّج",
+    "shortTitle": "عنوان قصير",
+    "badge": "الوحدة 05",
+    "field": "العلوم الإسلامية",
+    "timeAllocation": "ساعتان",
+    "targetAudience": "جميع الشعب (علوم تجريبية، رياضيات، تقني رياضي، تسيير وإقتصاد، آداب وفلسفة، لغات أجنبية)",
+    "learningObjective": "أن يكون الطالب قادرًا على … (جملة واحدة قابلة للقياس).",
+    "mindmapImage": "/lessons/unit05_mindmap.webp",
+
+    "video": {
+      "provider": "youtube",
+      "id": "XXXXXXXXXXX",
+      "title": "شرح الوحدة 05 — مدخل ومفاهيم",
+      "duration": "12:40",
+      "poster": "/lessons/unit05-video.webp",
+      "chapters": [
+        { "at": "00:00", "title": "المدخل: لماذا هذه الوحدة؟" },
+        { "at": "03:20", "title": "التعريفات الأساسية" },
+        { "at": "08:05", "title": "إشكاليات وأخطاء شائعة" }
+      ]
+    }
+  },
+
+  "lesson": {
+    "sections": [
+      {
+        "key": "section_1_definition",
+        "title": "أولاً: التعريف",
+        "content": {
+          "title": "أولاً: التعريف",
+          "linguistic_definition": "التعريف اللغوي: …",
+          "idiomatic_definition": "التعريف الاصطلاحي: …",
+          "relationship_linguistic_idiomatic": "العلاقة بين التعريفين: …",
+          "quranic_proof": "﴿ … ﴾",
+          "proof_anchor_phrase": "محل الشاهد: …",
+          "note": "إضاءة: ما يظهر تحت هذا المفتاح يُعرض بطاقةً لا عنصرًا مفهوميًا."
+        }
+      },
+      {
+        "key": "section_2_elements",
+        "title": "ثانياً: العناصر والأقسام",
+        "content": {
+          "title": "ثانياً: العناصر والأقسام",
+          "effects": [
+            { "title": "العنصر الأول", "explanation": "شرح موجز للعنصر الأول." },
+            { "title": "العنصر الثاني", "explanation": "شرح موجز للعنصر الثاني." }
+          ]
+        }
+      }
+    ]
+  },
+
+  "mindmap": {
+    "root": {
+      "id": "root",
+      "label": "عنوان الوحدة",
+      "node_type": "root",
+      "details": "شرح جذع الخريطة بجملة واحدة.",
+      "children": [
+        {
+          "id": "branch_1",
+          "label": "المحور الأول",
+          "details": "شرح المحور الأول.",
+          "children": [
+            { "id": "leaf_1", "label": "عنصر مفهومي", "details": "شرح العنصر المفهومي." }
+          ]
+        }
+      ]
+    }
+  },
+
+  "flashcards": [
+    { "id": "card_1", "question": "سؤال بطاقة…", "answer": "الجواب المختصر…", "section": "التعريف" }
+  ],
+
+  "cloze": [
+    {
+      "id": "c1",
+      "concept_id": "CONCEPT_01",
+      "concept_title": "عنوان المفهوم",
+      "text_with_masks": "النصّ وفيه {mask1} ثم {mask2}.",
+      "answers": { "mask1": "الكلمة الأولى", "mask2": "الكلمة الثانية" },
+      "prohibited_synonyms": ["مرادف مرفوض"]
+    }
+  ],
+
+  "quiz": [
+    {
+      "question_id": "Q01",
+      "question": "نصّ سؤال الاختيار من متعدّد؟",
+      "options": ["الخيار الأول", "الخيار الثاني", "الخيار الثالث", "الخيار الرابع"],
+      "correct_answer": "الخيار الثالث",
+      "hint": "تلميح اختياري يظهر عند الطلب فقط.",
+      "explanation": "لماذا هذه الإجابة صحيحة وما الخطأ الشائع في غيرها."
+    }
+  ],
+
+  "questionBank": [
+    {
+      "id": "B01",
+      "category": "الأسئلة المباشرة والمفاهيمية",
+      "question": "سؤال بنك الأسئلة…",
+      "modelAnswer": "عناصر الإجابة كما في سلّم التنقيط.",
+      "scoringRubric": [
+        { "criterion": "ذكر التعريف", "points": 1 },
+        { "criterion": "ذكر المثال", "points": 1 }
+      ],
+      "officialMarks": 2,
+      "session": "بكالوريا 2024 — الموضوع الأول"
+    }
+  ],
+
+  "revision": {
+    "lastMinute": [
+      { "title": "ملخص الوحدة في 60 ثانية", "items": ["نقطة أولى…", "نقطة ثانية…"] }
+    ],
+    "summary": [
+      { "title": "تعريفات لا بد من حفظها", "items": ["تعريف أول…"] }
+    ],
+    "rules": ["القاعدة المنهجية الأولى: …"],
+    "differentiation": [
+      {
+        "id": "d1",
+        "termA": "المصطلح الأول",
+        "termB": "المصطلح الثاني",
+        "distinction": "الفارق الجوهري بينهما.",
+        "pitfall": "الخطأ الشائع: الخلط بينهما.",
+        "examinerWarning": "ما يتنبّه له المصحّح."
+      }
+    ],
+    "previousBac": [
+      { "session": "بكالوريا 2023", "question": "سؤال سابق…", "answer": "عناصر الإجابة…" }
+    ]
+  },
+
+  "proofs": [
+    {
+      "id": "PROOF_01",
+      "surah": "اسم السورة",
+      "ayah": 1,
+      "text": "نصّ الآية كما هو مضبوط بالتشكيل.",
+      "anchor": "الجزء الذي يُستشهد به.",
+      "keywords": ["كلمة", "أخرى"],
+      "note": "إضاءة تعليمية على الشاهد."
+    }
+  ]
+}

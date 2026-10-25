@@ -1,18 +1,48 @@
 {
   "name": "زادِي - العلوم الإسلامية للبكالوريا",
   "short_name": "زادِي",
-  "description": "تطبيق تعليمي تفاعلي للتحضير الممتاز لبكالوريا العلوم الإسلامية",
+  "description": "تطبيق تعليمي تفاعلي للتحضير الممتاز لبكالوريا العلوم الإسلامية: خرائط ذهنية، بطاقات حفظ، اختبارات، وأسئلة بكالوريا.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#090d16",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
   "theme_color": "#0d9488",
   "dir": "rtl",
   "lang": "ar",
+  "categories": ["education"],
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الوحدة 01: العقيدة",
+      "short_name": "العقيدة",
+      "url": "/units/1"
+    },
+    {
+      "name": "الوحدة 04: العقل",
+      "short_name": "العقل",
+      "url": "/units/4"
     }
   ]
 }

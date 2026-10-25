@@ -1,0 +1,20 @@
+# توحيد نهايات الأسطر للنصوص
+*.json    text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.mjs     text eol=lf
+*.md      text eol=lf
+*.css     text eol=lf
+*.yml     text eol=lf
+
+# أصول ثنائية
+*.png     binary
+*.jpg     binary
+*.webp    binary
+*.woff2   binary
+*.ico     binary
+*.pdf     binary
+*.docx    binary
+
+# ملاحظة: ملفات resources/ (≈116MB) تضخّم المستودع. المستحسن نقلها إلى تخزين
+# خارجي أو تفعيل Git LFS (git lfs install && git lfs track "resources/*.pdf").

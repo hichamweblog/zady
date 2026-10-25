@@ -1,246 +1,248 @@
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
+import ResumeBanner from "@/components/home/ResumeBanner";
+import UnitProgressBadge from "@/components/home/UnitProgressBadge";
 import Footer from "@/components/layout/Footer";
-import { UNITS } from "@/lib/data-loader";
-import {
-  BookOpen,
-  Sparkles,
-  Layers,
-  HelpCircle,
-  Clock,
-  ArrowLeft,
-  CheckSquare,
-} from "lucide-react";
+import { getAllUnits, getUnitTotals } from "@/lib/data-loader";
+import { ArrowLeft, BookOpen, Layers, ListChecks, Sparkles, Target } from "lucide-react";
+
+/**
+ * الغلاف — واجهة بسيطة وواضحة:
+ *   عنوان واحد، سطر شرح، إجراء واحد، ثم الأرقام عارية (بلا صناديق)،
+ *   ثم بطاقات الوحدات، ثم مسار التعلّم في ثلاث مراحل.
+ *
+ * لماذا اختفت الصناديق؟ لأن كل عنصر محاط بإطار يجعل الشاشة شبكة مربّعات
+ * متشابهة الأهمية. هنا: عنوان كبير، أرقام بلا حواف، وبطاقة واحدة لكل وحدة.
+ */
+const STREAMS = ["علوم تجريبية", "رياضيات", "تقني رياضي", "تسيير واقتصاد"];
+
+const STAGES = [
+  {
+    n: "١",
+    title: "استيعاب",
+    hint: "اقرأ النصّ كاملًا، ثم ثبّت البنية على الخريطة الذهنية.",
+    steps: ["نصّ الدرس", "الخريطة الذهنية"],
+    icon: BookOpen,
+  },
+  {
+    n: "٢",
+    title: "تثبيت",
+    hint: "بطاقات استرجاع وتحدّي فراغات: تستدعي المفهوم قبل أن تراه.",
+    steps: ["بطاقات الحفظ", "ملء الفراغات"],
+    icon: Layers,
+  },
+  {
+    n: "٣",
+    title: "اختبار",
+    hint: "QCM فوري، ثم أسئلة بكالوريا بعناصر الإجابة، ثم مراجعة سريعة.",
+    steps: ["اختبار QCM", "بنك الأسئلة", "المراجعة"],
+    icon: Target,
+  },
+];
 
 export default function HomePage() {
-  const totalFlashcards = UNITS.reduce((acc, u) => acc + u.flashcards.length, 0);
-  const totalQuestions = UNITS.reduce((acc, u) => acc + u.questions.length, 0);
-  const totalMcqQuizzes = UNITS.reduce((acc, u) => acc + u.quizQuestions.length, 0);
+  const units = getAllUnits();
+  const totals = getUnitTotals();
+
+  const numbers = [
+    { value: totals.units, label: "وحدات مقرّرة" },
+    { value: totals.flashcards, label: "بطاقة استرجاع" },
+    { value: totals.quiz, label: "سؤال اختيار" },
+    { value: totals.questions, label: "سؤال بكالوريا" },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="flex min-h-screen flex-col bg-[var(--canvas)]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12 sm:space-y-16">
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-900 via-teal-950 to-slate-950 p-8 sm:p-12 text-white border border-teal-500/20 shadow-2xl">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-teal-500/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+      <main id="main-content" className="u-wrap flex-1 space-y-12 pt-8 pb-16">
+        {/* ── الغلاف ── */}
+        <section className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <span className="u-chip">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+              العلوم الإسلامية · بكالوريا ٢٠٢٦
+            </span>
 
-          <div className="relative z-10 max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-bold">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>المنهاج الجزائري الرسمي المعتمد • بكالوريا 2026</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white">
-              طريقك نحو العلامة الكاملة <span className="text-teal-400">20/20</span> في العلوم الإسلامية
+            <h1 className="u-display mt-4 text-[clamp(1.6rem,3.6vw,2.25rem)]">
+              راجع وحدتك كاملةً، <span className="u-mark">خطوةً بخطوة</span>
             </h1>
 
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              تطبيق <strong className="text-white">زادِي</strong> يمنحك تجربة استذكار متكاملة تجمع بين **الخرائط الذهنية التفاعلية**، **بطاقات الحفظ**، **اختبارات الـ QCM**، و**أسئلة البكالوريا** مع سلم التنقيط وتوجيهات الإجابة.
+            <p className="u-measure mt-3 text-body text-[var(--ink-soft)]">
+              النصّ أوّلًا، ثم الخريطة، ثم ما يُحفظ ويُختبر. أربع وحدات مقرّرة، وتقدّمك محفوظ
+              تلقائيًا، وكل مفهوم في مكانه.
             </p>
 
-            <div className="flex items-center gap-3 pt-2 flex-wrap">
-              <Link
-                href="/units/1"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm transition-all shadow-lg shadow-teal-500/30 hover:scale-105"
-              >
-                <span>ابدأ الوحدة 01: العقيدة وأثرها</span>
-                <ArrowLeft className="w-4 h-4" />
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <Link href="/units/1" className="u-cta">
+                <span>ابدأ بالوحدة ٠١</span>
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               </Link>
-
-              <span className="text-xs text-teal-200/80 font-medium">
-                ⚡ يعمل محلياً بالكامل وبدون الحاجة لإنترنت (Offline PWA)
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* QUICK STATS METRICS */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold mb-2">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              {UNITS.length} وحدات
-            </div>
-            <p className="text-xs text-slate-500 font-medium">مكتملة ومجهزة بيداغوجياً</p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold mb-2">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              {totalFlashcards} بطاقة
-            </div>
-            <p className="text-xs text-slate-500 font-medium">استرجاع نشط (Active Recall)</p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold mb-2">
-              <CheckSquare className="w-5 h-5" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              {totalMcqQuizzes} سؤال QCM
-            </div>
-            <p className="text-xs text-slate-500 font-medium">اختيار من متعدد مع التعليل</p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold mb-2">
-              <HelpCircle className="w-5 h-5" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              {totalQuestions} سؤال BAC
-            </div>
-            <p className="text-xs text-slate-500 font-medium">مع سلم التنقيط المعتمد</p>
-          </div>
-        </section>
-
-        {/* 4 UNITS PROGRESS GRID */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                الوحدات التعليمية الأربع الأولى
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                الكتلة العقدية والفكرية الأساسية لجميع الشعب
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {UNITS.map((u) => (
-              <div
-                key={u.id}
-                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm hover:border-teal-500/50 transition-all duration-300 flex flex-col justify-between space-y-6 group"
+              <Link
+                href="#units"
+                className="text-label font-semibold text-[var(--brand-strong)] underline-offset-4 hover:underline"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 text-xs font-black border border-teal-200/50 dark:border-teal-900">
-                      {u.badge}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-slate-400 font-semibold">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{u.timeAllocation}</span>
-                    </span>
+                استعرض الوحدات
+              </Link>
+            </div>
+
+            {/* الأرقام عارية: بلا بطاقات، لأنها معلومة لا إجراء */}
+            <dl className="mt-9 flex flex-wrap gap-x-9 gap-y-4">
+              {numbers.map((stat) => (
+                <div key={stat.label}>
+                  <dt className="sr-only">{stat.label}</dt>
+                  <dd className="u-num text-[1.35rem] leading-none text-[var(--ink)]">
+                    {stat.value}
+                  </dd>
+                  <dd className="mt-1 text-meta text-[var(--ink-faint)]">{stat.label}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <p className="mt-6 text-meta text-[var(--ink-faint)]">
+              لكل الشعب: {STREAMS.join(" · ")} وغيرها
+            </p>
+          </div>
+
+          {/* المنتج قبل الكلام: خريطة الوحدة الأولى الحقيقية */}
+          <div className="relative">
+            <div className="overflow-hidden rounded-2xl bg-[var(--surface)] p-1.5 shadow-[var(--shadow-hover)] ring-1 ring-black/[0.04] dark:ring-white/10">
+              <Image
+                src="/lessons/unit01_mindmap.webp"
+                alt="خريطة الوحدة الأولى: العقيدة الإسلامية وأثرها"
+                width={2000}
+                height={1023}
+                className="h-auto w-full rounded-xl"
+                priority
+              />
+            </div>
+            <span className="u-chip absolute -bottom-3 right-4 bg-[var(--surface)] shadow-[var(--shadow-md)]">
+              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+              ١١ مفهومًا
+            </span>
+          </div>
+        </section>
+
+        <ResumeBanner />
+
+        {/* ── الوحدات ── */}
+        <section id="units" className="scroll-mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="u-kicker">الفهرس</p>
+              <h2 className="u-display mt-1 text-heading">الوحدات المتوفرة</h2>
+            </div>
+            <p className="text-label text-[var(--ink-faint)]">
+              {units.length} وحدات · الكتلة العقدية والفكرية
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {units.map((unit) => (
+              <article
+                key={unit.id}
+                className="u-card u-card-hover flex flex-col gap-4 p-5 text-start"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-2 text-meta font-semibold text-[var(--brand-strong)]">
+                      <span className="u-num">{String(unit.id).padStart(2, "0")}</span>
+                      <span aria-hidden="true" className="h-1 w-1 rounded-full bg-current" />
+                      <span className="truncate">{unit.timeAllocation}</span>
+                    </p>
+                    <h3 className="mt-1 text-title font-semibold text-[var(--ink)]">
+                      {unit.shortTitle}
+                    </h3>
                   </div>
-
-                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                    {u.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
-                    {u.learningObjective}
-                  </p>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--brand-soft)] text-[var(--brand-strong)]">
+                    <BookOpen className="h-4 w-4" aria-hidden="true" />
+                  </span>
                 </div>
 
-                {/* Sub features pills */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-xs font-bold text-slate-500">
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1 text-teal-600 dark:text-teal-400">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>{u.flashcards.length} بطاقة</span>
+                <p className="line-clamp-2 text-body-sm text-[var(--ink-soft)]">
+                  {unit.learningObjective}
+                </p>
+
+                <div className="mt-auto space-y-3 border-t border-[var(--hairline)] pt-3">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-meta text-[var(--ink-faint)]">
+                    <span className="inline-flex items-center gap-1">
+                      <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                      {unit.sections.length} محاور
                     </span>
-                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                      <CheckSquare className="w-3.5 h-3.5" />
-                      <span>{u.quizQuestions.length} QCM</span>
+                    <span className="inline-flex items-center gap-1">
+                      <ListChecks className="h-3.5 w-3.5" aria-hidden="true" />
+                      {unit.flashcards.length} بطاقة
                     </span>
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <HelpCircle className="w-3.5 h-3.5" />
-                      <span>{u.questions.length} سؤال</span>
-                    </span>
+                    <span>{unit.quizQuestions.length} اختيار</span>
+                    <span>{unit.questions.length} سؤال</span>
                   </div>
+
+                  <UnitProgressBadge
+                    unitId={unit.id}
+                    totals={{
+                      sections: unit.sections.length,
+                      cards: unit.flashcards.length,
+                      questions: unit.questions.length,
+                      mcq: unit.quizQuestions.length,
+                    }}
+                  />
 
                   <Link
-                    href={`/units/${u.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black hover:bg-teal-600 dark:hover:bg-teal-400 dark:hover:text-slate-950 transition-colors shadow-sm"
+                    href={`/units/${unit.id}`}
+                    className="group inline-flex items-center gap-1.5 text-label font-semibold text-[var(--brand-strong)] transition-colors hover:text-[var(--primary)]"
+                    aria-label={`افتح ${unit.title}`}
                   >
-                    <span>دخول الوحدة</span>
-                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>افتح الوحدة</span>
+                    <ArrowLeft
+                      className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+                      aria-hidden="true"
+                    />
                   </Link>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* 5-STAGE PEDAGOGICAL ROADMAP */}
-        <section className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 shadow-sm space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">
-              منهجية المذاكرة الذكية داخل زادِي
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              دورة تعلّم متكاملة من 5 خطوات صممت خصيصاً لضمان عدم نسيان أي معلومة حتى يوم الامتحان
-            </p>
-          </div>
+        {/* ── المسار ── */}
+        <section aria-labelledby="path-title">
+          <p className="u-kicker" id="path-title">
+            كيف تعمل الوحدة
+          </p>
+          <h2 className="u-display mt-1 text-heading">ثلاث مراحل، بهذا الترتيب</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 flex items-center justify-center font-black text-xs">
-                1
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                الخريطة الذهنية
-              </h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                استيعاب الصورة الكلية والروابط المنطقية بين عناصر الوحدة.
-              </p>
-            </div>
+          <ol className="mt-5 grid gap-4 sm:grid-cols-3">
+            {STAGES.map(({ n, title, hint, steps, icon: Icon }) => (
+              <li key={title} className="u-card flex flex-col gap-3 p-5">
+                <div className="flex items-center justify-between">
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--brand-soft)] text-label font-semibold text-[var(--brand-strong)]">
+                    {n}
+                  </span>
+                  <Icon className="h-4 w-4 text-[var(--ink-faint)]" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="text-title font-semibold text-[var(--ink)]">{title}</h3>
+                  <p className="mt-1 text-body-sm text-[var(--ink-soft)]">{hint}</p>
+                </div>
+                <p className="mt-auto flex flex-wrap gap-1.5">
+                  {steps.map((step) => (
+                    <span
+                      key={step}
+                      className="u-chip bg-[var(--surface-2)] text-[var(--ink-soft)]"
+                    >
+                      {step}
+                    </span>
+                  ))}
+                </p>
+              </li>
+            ))}
+          </ol>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 flex items-center justify-center font-black text-xs">
-                2
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                الدرس المنهجي
-              </h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                قراءة الشرح المنهجي بدقة وضبط الآيات برواية ورش ومحل الشاهد.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-black text-xs">
-                3
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                الاسترجاع النشط
-              </h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                تثبيت الحفظ عبر بطاقات الفلاش ثلاثية الأبعاد وتحدي ملء الفراغات.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-black text-xs">
-                4
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                اختبار الـ QCM
-              </h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                اختبار الفهم السريع مع التلميحات الذكية والتفسير الفوري لكل خيار.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center font-black text-xs">
-                5
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                محاكي البكالوريا
-              </h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                حل الأسئلة والاطلاع على سلم التنقيط وتنبيهات المصححين.
-              </p>
-            </div>
-          </div>
+          <p className="u-measure mt-4 text-meta text-[var(--ink-faint)]">
+            ما يظهر في بطاقة مصباح ليس عنصرًا مفهوميًا: إضاءة للفهم أو فائدة مساعدة، لا يُحفظ كتعريف
+            — والخريطة للتعريفات والأقسام وحدها.
+          </p>
         </section>
       </main>
 

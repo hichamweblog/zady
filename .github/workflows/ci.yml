@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  verify:
+    name: Typecheck · Lint · Data tests · Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint (0 أخطاء مسموحة)
+        run: pnpm lint --max-warnings=0
+
+      - name: Data integrity tests
+        run: pnpm test:data
+
+      - name: Build
+        run: pnpm build
+
+      - name: Guard — dark: يتبع الكلاس لا تفضيل النظام
+        run: |
+          if grep -rq "prefers-color-scheme" .next/static/chunks/*.css; then
+            echo "::error::Tailwind compiled dark: into @media (prefers-color-scheme) — مفتاح الثيم لن يعمل."
+            echo "أضف @custom-variant dark في globals.css."
+            exit 1
+          fi
+          echo "OK: dark: مربوط بكلاس .dark"
+
+      - name: Smoke test (404 + صفحات الوحدات)
+        run: |
+          pnpm start --port 3000 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3000/ >/dev/null && break
+            sleep 1
+          done
+          set -e
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/)" = "200"
+          for u in 1 2 3 4; do
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/units/$u)" = "200"
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/units/99)" = "404"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/sitemap.xml)" = "200"
+          echo "Smoke test passed"

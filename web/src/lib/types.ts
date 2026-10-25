@@ -1,11 +1,58 @@
+/** أنواع البيانات المشتركة بين الخادم والعميل */
+
+/**
+ * عقدة في الخريطة الذهنية — **عنصر مفهومي فقط**: تسمية المفهوم وشرحه.
+ * لا تحمل شواهد ولا كلمات مفتاحية ولا ملاحظات منهجية؛ فهذه مكانها نص الدرس
+ * مع علامة المصباح (إضاءة/فائدة).
+ */
 export interface MindmapNode {
   id: string;
   label: string;
   color?: string;
   details?: string;
-  proof?: string;
   node_type?: string;
   children?: MindmapNode[];
+}
+
+/** شرح مرئي للوحدة — يُعرض كخطوة أولى في مرحلة «استيعاب» */
+export interface VideoChapter {
+  /** توقيت البداية «mm:ss» */
+  at: string;
+  title: string;
+}
+
+export interface UnitVideo {
+  provider: "youtube" | "vimeo" | "file";
+  /** معرّف الفيديو عند youtube/vimeo */
+  id?: string;
+  /** مسار الملف عند provider=file */
+  src?: string;
+  title: string;
+  duration?: string;
+  poster?: string;
+  /** ملف .vtt للتفريغ بالعربية */
+  captions?: string;
+  chapters?: VideoChapter[];
+}
+
+/** شاهد شرعي محفوظ في بيانات الوحدة (محرّك الشواهد) */
+export interface UnitProof {
+  id: string;
+  surah?: string;
+  ayah?: number | string;
+  text: string;
+  anchor?: string;
+  keywords?: string[];
+  note?: string;
+}
+
+/** أصل المادة العلمية: التدرّج والمراجعة */
+export interface UnitSourceMeta {
+  curriculum?: string;
+  subject?: string;
+  reviewedBy?: string | null;
+  updatedAt?: string;
+  notes?: string;
 }
 
 export interface NormalizedFlashcard {
@@ -35,12 +82,21 @@ export interface NormalizedQuestion {
   id: string;
   category: string;
   type?: string;
-  section?: string;
   question: string;
   modelAnswer: string;
+  /** بنود سلم التنقيط التفصيلية إن وُجدت في المصدر */
   scoringRubric?: QuestionRubricItem[];
+  /** العلامة المخصّصة للسؤال في سلم التنقيط الوزاري (إن وُجدت) */
+  officialMarks?: number;
   examinerNotes?: string;
-  ayahText?: string;
+  /** نص الشاهد الشرعي (آية أو حديث) المرفق بالسؤال */
+  text?: string;
+  /** المرجع: [السورة: الآية] أو مصدر الحديث */
+  reference?: string;
+  /** محل الشاهد من النص */
+  anchor?: string;
+  /** مصدر السؤال: «بكالوريا 2024 - الموضوع الأول»… */
+  session?: string;
 }
 
 export interface QuizQuestion {
@@ -63,30 +119,58 @@ export interface QuizData {
   questions: QuizQuestion[];
 }
 
-export interface StandardUnitData {
-  unit_id: number;
-  unit_title: string;
-  field?: string;
-  time_allocation?: string;
-  target_audience?: string;
-  learning_objective?: string;
-  detailed_explanation: Record<string, any>;
+/** قسم من الدرس المنهجي بعد التطبيع */
+export interface LessonSection {
+  key: string;
+  title: string;
+  content: unknown;
 }
 
-export interface AdvancedUnitData {
-  schema_version?: string;
-  architecture_type?: string;
-  unit_metadata?: Record<string, any>;
-  concept_nodes?: any[];
-  [key: string]: any;
+/** بطاقة «وجوب التمييز بين مصطلحين» */
+export interface DifferentiationRow {
+  id: string;
+  termA: string;
+  termB: string;
+  distinction: string;
+  pitfall?: string;
+  examinerWarning?: string;
 }
 
-export interface NormalizedUnit {
+/** سؤال بكالوريا سابق جاهز للمراجعة */
+export interface PreviousBacItem {
+  session: string;
+  question: string;
+  answer: string;
+}
+
+/** محتوى تبويب «المراجعة السريعة» المجمّع من الملفات المتقدمة */
+export interface RevisionContent {
+  /** مراجعة اللحظة الأخيرة: مجموعات من النقاط المفتاحية */
+  lastMinute: { title: string; items: string[] }[];
+  /** ملخص الحفظ: مجموعات مفتاح/قيمة أو قوائم */
+  summary: { title: string; items: string[] }[];
+  /** قواعد منهجية للامتحان */
+  rules: string[];
+  /** مصفوفة الفروق بين المصطلحات */
+  differentiation: DifferentiationRow[];
+  /** أسئلة بكالوريا سابقة (من ملف standard) */
+  previousBac: PreviousBacItem[];
+}
+
+export interface UnitMeta {
   id: number;
   slug: string;
   title: string;
   shortTitle: string;
   badge: string;
+}
+
+export interface NormalizedUnit extends UnitMeta {
+  /** إصدار مخطط الملف الواحد (2 = الملف الموحّد) */
+  schemaVersion?: number;
+  source?: UnitSourceMeta;
+  video?: UnitVideo;
+  proofs?: UnitProof[];
   field: string;
   timeAllocation: string;
   targetAudience: string;
@@ -97,6 +181,9 @@ export interface NormalizedUnit {
   clozeItems: NormalizedCloze[];
   questions: NormalizedQuestion[];
   quizQuestions: QuizQuestion[];
-  standardData: StandardUnitData;
-  advancedData: AdvancedUnitData;
+  sections: LessonSection[];
+  revision: RevisionContent;
 }
+
+/** ما يمرَّر إلى مكوّنات العميل — بلا تكرار للبيانات الخام */
+export type ClientUnit = NormalizedUnit;

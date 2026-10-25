@@ -2,181 +2,134 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Moon, Sun, CheckCircle2, ChevronDown } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { UNITS } from "@/lib/data-loader";
+import { Moon, Sun, ChevronDown, BookOpen } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { UNITS_META } from "@/lib/units-meta";
+import { toggleTheme, useIsDark } from "@/lib/useTheme";
 
+/**
+ * الترويسة — شريط أبيض لاصق، شعار مربّع نعنعي، وروابط نصّية ثم زرّ ليلي حبّوبي.
+ * لا شعارات متدرّجة ولا شارات حالة مكرّرة: الشريط يجب أن يبقى أخفّ من المحتوى.
+ */
 export default function Navbar() {
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const isDark = useIsDark();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const activeUnit = UNITS_META.find((u) => pathname === `/units/${u.id}`);
 
   useEffect(() => {
-    // Default to Light Mode unless explicitly set to dark in localStorage
-    const savedTheme = localStorage.getItem("zady_theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      setIsDark(false);
-    }
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("zady_theme", "light");
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("zady_theme", "dark");
-      setIsDark(true);
-    }
-  };
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">
-                  زادِي
-                </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300">
-                  BAC
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--hairline)] bg-[var(--canvas)]/80 backdrop-blur-xl">
+      <div className="u-wrap flex h-14 items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-6">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="زادِي">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand-strong)] text-white shadow-[var(--shadow-sm)] dark:text-[var(--brand-ink)]">
+              <BookOpen className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <span className="leading-tight">
+              <span className="block text-label font-bold tracking-normal text-[var(--ink)]">
+                زادِي
+              </span>
+              <span className="block text-meta font-bold text-[var(--ink-faint)]">
                 العلوم الإسلامية
-              </p>
-            </div>
+              </span>
+            </span>
           </Link>
 
-          {/* Quick Units Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-1.5">
+          <nav aria-label="التنقل الرئيسي" className="hidden items-center gap-1 md:flex">
             <Link
               href="/"
-              className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-colors ${
+              aria-current={pathname === "/" ? "page" : undefined}
+              className={`rounded-lg px-3 py-2 text-label font-semibold transition-colors ${
                 pathname === "/"
-                  ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                  : "text-slate-700 dark:text-slate-300 hover:text-teal-700 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                  ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                  : "text-[var(--ink-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
               }`}
             >
               الرئيسية
             </Link>
 
-            <div className="relative group" ref={menuRef}>
+            <div className="relative" ref={menuRef}>
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                type="button"
+                onClick={() => setIsMenuOpen((v) => !v)}
                 aria-expanded={isMenuOpen}
                 aria-haspopup="true"
-                className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-teal-700 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                className="flex items-center gap-1 rounded-lg px-3 py-2 text-label font-semibold text-[var(--ink-soft)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
               >
-                <span>الوحدات الدراسية</span>
-                <ChevronDown className="w-4 h-4 opacity-70" />
+                <span>الوحدات</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 opacity-70 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+                  aria-hidden="true"
+                />
+                {activeUnit && <span className="u-chip ms-1 py-0">{activeUnit.id}</span>}
               </button>
 
-              <div
-                className={`absolute top-full right-0 mt-1 w-72 p-2 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-all ${
-                  isMenuOpen ? "block" : "hidden group-hover:block"
-                }`}
-              >
-                {UNITS.map((u) => {
-                  const isActive = pathname === `/units/${u.id}`;
-                  return (
-                    <Link
-                      key={u.id}
-                      href={`/units/${u.id}`}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        isActive
-                          ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
-                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
-                    >
-                      <span className="truncate">{u.shortTitle}</span>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">
-                        {u.badge}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
+              {isMenuOpen && (
+                <div className="absolute end-0 top-full mt-2 w-72 rounded-2xl bg-[var(--surface)] p-1.5 shadow-[var(--shadow-float)] ring-1 ring-black/[0.04] dark:ring-white/10">
+                  {UNITS_META.map((unit) => {
+                    const isActive = pathname === `/units/${unit.id}`;
+                    return (
+                      <Link
+                        key={unit.id}
+                        href={`/units/${unit.id}`}
+                        onClick={() => setIsMenuOpen(false)}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-label transition-colors ${
+                          isActive
+                            ? "bg-[var(--brand-soft)] font-semibold text-[var(--brand-strong)]"
+                            : "font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]"
+                        }`}
+                      >
+                        <span className="min-w-0 truncate">{unit.shortTitle}</span>
+                        <span className="u-num text-meta text-[var(--ink-faint)]">
+                          {String(unit.id).padStart(2, "0")}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </nav>
         </div>
 
-        {/* Action badges & Theme toggle */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-900/60">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>متاح بدون إنترنت</span>
-          </div>
-
-          <button
-            onClick={toggleTheme}
-            aria-label="تبديل المظهر"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
-          >
-            {isDark ? (
-              <>
-                <Sun className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">الوضع الفاتح</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-4 h-4 text-slate-600" />
-                <span className="hidden sm:inline">الوضع الليلي</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Units Horizontal Scroll */}
-      <div className="md:hidden border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none bg-slate-50 dark:bg-slate-900/50">
-        <Link
-          href="/"
-          className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold ${
-            pathname === "/"
-              ? "bg-teal-600 text-white shadow-xs"
-              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-          }`}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
+          aria-pressed={isDark}
+          className="flex min-h-10 items-center gap-2 rounded-lg bg-[var(--surface-2)] px-2.5 text-label font-semibold text-[var(--ink-soft)] transition-colors hover:bg-[var(--surface-3)] hover:text-[var(--ink)]"
         >
-          الرئيسية
-        </Link>
-        {UNITS.map((u) => {
-          const isActive = pathname === `/units/${u.id}`;
-          return (
-            <Link
-              key={u.id}
-              href={`/units/${u.id}`}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold ${
-                isActive
-                  ? "bg-teal-600 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-              }`}
-            >
-              {u.shortTitle}
-            </Link>
-          );
-        })}
+          {isDark ? (
+            <>
+              <Sun className="h-4 w-4 text-[var(--amber)]" aria-hidden="true" />
+              <span className="hidden sm:inline">نهاري</span>
+            </>
+          ) : (
+            <>
+              <Moon className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">ليلي</span>
+            </>
+          )}
+        </button>
       </div>
     </header>
   );
