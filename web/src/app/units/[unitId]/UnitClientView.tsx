@@ -233,8 +233,15 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
         </div>
 
         <div className="flex shrink-0 items-center gap-3 self-start rounded-2xl bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-card)] sm:self-auto">
-          <div className="relative h-11 w-11 shrink-0" aria-hidden="true">
-            <svg viewBox="0 0 40 40" className="h-11 w-11 -rotate-90">
+          <div
+            className="relative h-11 w-11 shrink-0"
+            role="progressbar"
+            aria-valuenow={stats.progressPercentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`نسبة إتقان ${unit.shortTitle}`}
+          >
+            <svg viewBox="0 0 40 40" className="h-11 w-11 -rotate-90" aria-hidden="true">
               <circle
                 cx="20"
                 cy="20"
@@ -255,20 +262,16 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
                 strokeDasharray={`${stats.progressPercentage} 100`}
               />
             </svg>
-            <span className="u-num absolute inset-0 grid place-items-center text-meta text-[var(--ink)]">
+            <span
+              aria-hidden="true"
+              className="u-num absolute inset-0 grid place-items-center text-meta text-[var(--ink)]"
+            >
               {stats.progressPercentage}%
             </span>
           </div>
           <div className="min-w-0">
             <p className="text-label font-semibold text-[var(--ink)]">تقدّمك في الوحدة</p>
-            <p
-              className="text-meta text-[var(--ink-faint)]"
-              role="progressbar"
-              aria-valuenow={stats.progressPercentage}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`نسبة إتقان ${unit.shortTitle}`}
-            >
+            <p className="text-meta text-[var(--ink-faint)]">
               {doneCount} من {tabs.length} خطوات مكتملة
             </p>
           </div>
