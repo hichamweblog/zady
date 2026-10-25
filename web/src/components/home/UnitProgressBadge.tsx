@@ -49,16 +49,16 @@ export default function UnitProgressBadge({ unitId, totals }: UnitProgressBadgeP
   }, [data, totals, unitId]);
 
   if (percentage === 0) {
-    return <span className="z-kicker">لم تبدأ بعد</span>;
+    return <span className="text-meta font-bold text-[var(--ink-faint)]">لم تبدأ بعد</span>;
   }
 
   return (
     <span className="block">
       <span className="flex items-baseline justify-between gap-2">
-        <span className="z-kicker">تقدّمك</span>
-        <span className="z-num text-[var(--pine)]">{percentage}%</span>
+        <span className="text-meta font-bold text-[var(--ink-faint)]">تقدّمك</span>
+        <span className="u-num text-meta text-[var(--pine)]">{percentage}%</span>
       </span>
-      <span className="mt-1.5 block h-[2px] w-full bg-[var(--rule)]">
+      <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-[var(--sunken)]">
         <span className="block h-full bg-[var(--pine)]" style={{ width: `${percentage}%` }} />
       </span>
     </span>

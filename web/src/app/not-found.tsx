@@ -13,7 +13,7 @@ export default function NotFound() {
         id="main-content"
         className="flex-1 flex flex-col items-center justify-center p-6 text-center"
       >
-        <div className="max-w-lg w-full z-sheet p-8 shadow-xl space-y-6">
+        <div className="max-w-lg w-full u-card p-8 shadow-xl space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto border border-teal-200 dark:border-teal-900">
             <BookOpen className="w-8 h-8" aria-hidden="true" />
           </div>

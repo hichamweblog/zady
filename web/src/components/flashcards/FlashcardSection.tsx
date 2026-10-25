@@ -243,7 +243,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
           <button
             onClick={handleShuffle}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
           >
             <Shuffle className="w-3.5 h-3.5" aria-hidden="true" />
             <span>خلط</span>
@@ -375,7 +375,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={handlePrev}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
         >
           <ChevronRight className="w-4 h-4" aria-hidden="true" />
           <span>السابق</span>
@@ -383,7 +383,7 @@ function FlashcardsDeck({ unitId, cards }: { unitId: number; cards: NormalizedFl
 
         <button
           onClick={handleNext}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-label transition-all shadow-sm"
         >
           <span>التالي</span>
           <ChevronLeft className="w-4 h-4" aria-hidden="true" />
@@ -568,7 +568,7 @@ function ClozeCard({ item, index }: { item: NormalizedCloze; index: number }) {
         <button
           type="button"
           onClick={checkAll}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-teal-700 text-white font-bold text-label hover:bg-teal-800 transition-all shadow-sm shadow-teal-700/20"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-teal-700 text-white font-bold text-label hover:bg-teal-800 transition-all shadow-sm shadow-teal-700/20"
         >
           <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
           <span>تحقّق</span>

@@ -134,15 +134,18 @@ test("شريط خطوات الوحدة لا يعتمد على تمرير أفق�
     /overflow-x-auto/,
     "التبويبات كانت تُقطع على الهاتف: استخدم شبكة بدل التمرير"
   );
-  assert.match(tablist, /flex-wrap/, "التبويبات تلتف على الهاتف بدل أن تُقطع");
+  assert.match(tablist, /u-tabs/, "شريط الخطوات يستخدم فئة الفهرس المقسّم");
+  const cssTabs = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
+  const uTabsRule = cssTabs.slice(cssTabs.indexOf(".u-tabs {"));
+  assert.match(uTabsRule.slice(0, 220), /flex-wrap:\s*wrap/, "الفهرس يلتف على الهاتف بدل أن يُقطع");
   assert.doesNotMatch(
     tablist,
     /whitespace-nowrap[^"]*hidden|hidden[^"]*whitespace-nowrap/,
     "أسماء الخطوات تظهر على الهاتف كاملة، لا أيقونات فقط"
   );
   assert.match(
-    tablist + view,
-    /text-label|z-index-item/,
+    tablist + view + cssTabs,
+    /text-label|u-tab/,
     "اسم الخطوة يظهر بنص مقروء على الهاتف"
   );
 });
@@ -352,7 +355,11 @@ test("المحتوى غير المفهومي في الدرس موسوم بمصب
   ]) {
     assert.ok(kinds.includes(`${key}:`) || kinds.includes(`${key}`), `الحقل ${key} مصنّف`);
   }
-  assert.match(kinds, /_note.*_tip.*_guidance/s, "أي حقل جديد ينتهي بـ_note/_tip/_guidance يُعدّ إضاءة");
+  assert.match(
+    kinds,
+    /_note.*_tip.*_guidance/s,
+    "أي حقل جديد ينتهي بـ_note/_tip/_guidance يُعدّ إضاءة"
+  );
 });
 
 test("الدرس يمرّر كل حقل غير مفهومي إلى بطاقة المصباح", () => {
@@ -396,7 +403,10 @@ test("الخريطة الذهنية لا تعرض الشواهد ولا الكل
   assert.match(sheet, /node.details/, "تعرض شرح المفهوم وحده");
 
   const types = readSrc("lib", "types.ts");
-  const nodeType = types.slice(types.indexOf("interface MindmapNode"), types.indexOf("interface MindmapNode") + 400);
+  const nodeType = types.slice(
+    types.indexOf("interface MindmapNode"),
+    types.indexOf("interface MindmapNode") + 400
+  );
   assert.ok(!nodeType.includes("proof"), "نوع عقدة الخريطة لا يحمل حقل شاهد");
 });
 
@@ -409,65 +419,85 @@ test("الخريطة تُعلن أنها خريطة مفاهيم، ولا تُس
 test("نصوص الدرس كلها بمقاس واحد، لا مقاس أصغر في درس دون آخر", () => {
   const viewer = readSrc("components", "lesson", "StandardLessonViewer.tsx");
   const card = readSrc("components", "lesson", "InsightCard.tsx");
-  assert.ok(
-    !viewer.includes("text-body-sm"),
-    "الدرس: لا نصّ بمقاس 16px بجانب نصوص 18px"
-  );
+  assert.ok(!viewer.includes("text-body-sm"), "الدرس: لا نصّ بمقاس 16px بجانب نصوص 18px");
   assert.ok(!card.includes("text-body-sm"), "بطاقة المصباح: النص بمقاس نص الدرس");
   assert.match(viewer, /font-quran[^"]*text-title/, "النص القرآني بمقاس واحد ثابت في كل الدروس");
   assert.ok(!viewer.includes("sm:text-heading"), "لا يقفز مقاس الشاهد على الشاشات الكبيرة");
 });
 
-test("الوضع الليلي: حبر دافئ لا أزرق ليلي، وبنية تُرى بلا ظلال", () => {
+test("الوضع الليلي: حبر دافئ لا أزرق ليلي، وسطوح متدرّجة تُرى بقوّة التباين", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
 
-  // صفحة وورقة: درجتان متقاربتان لكنهما مفصولتان، ونصّ فاتح عالي التباين
-  assert.match(css, /--background: #f4efe3/, "ورق دافئ في النهار (لا أبيض نقي)");
-  assert.match(css, /--background: #0f1109/, "فحميّ مائل للأخضر في الليل (لا أزرق)");
-  assert.match(css, /--card: #1a1c13/, "الورقة الليلية أفتح من الصفحة بدرجة");
-  assert.match(css, /--foreground: #efeada/, "حبر الليل كريمي لا أبيض ساطع");
+  // ورق كريمي في النهار، وأخضر فحميّ في الليل — لا أبيض نقي ولا أزرق نليلي
+  assert.match(css, /--paper: #faf7f1/, "ورق كريمي دافئ في النهار (لا أبيض نقي)");
+  assert.match(css, /--paper: #0b1310/, "فحميّ مائل للأخضر في الليل (لا أزرق)");
+  assert.match(css, /--sheet: #14211c/, "السطح الليلي أفتح من الصفحة بدرجة");
+  assert.match(css, /--ink: #ecf3ef/, "حبر الليل فاتح عالي التباين لا أبيض ساطع");
 
-  // لا ظلال: العمق من الخطوط الشعرية
-  assert.match(css, /--shadow-sm: none/, "لا ظلّ على الأسطح");
-  assert.match(css, /--shadow-lg: none/, "ولا ظلّ كبير");
+  // العمق الآن ظلّ ناعم مشتقّ من حبر النظام — لا أسود صريح ولا ظلّ ضخم
+  assert.match(css, /--shadow-card:/, "ظلّ البطاقة معرَّف كمتغيّر واحد");
+  assert.match(css, /--shadow-lift:/, "وظلّ الارتفاع عند المرور");
+  assert.doesNotMatch(css, /--shadow-sm: none/, "لم يبقَ قرار «لا ظلّ» من الجولة السابقة");
 
-  // الخطوط الشعرية معرَّفة مرة واحدة وتُستعمل عبر متغيّر
-  assert.match(css, /--rule: #dad1bc/, "خطّ شعري نهاري");
-  assert.match(css, /--rule: #3f4335/, "خطّ شعري ليلي");
+  // الحدود ما زالت من النظام، فلا خطوط صلبة محليّة
+  assert.match(css, /--rule: #e4ebe6/, "حدّ نهاري من نفس العائلة اللونية");
+  assert.match(css, /--rule: #22362e/, "وحدّ ليلي");
 });
 
-test("لا تدرّجات ولا استدارات كبيرة ولا زجاج — هوية مطبوعة لا قالب", () => {
+test("لا تدرّجات ولا زجاج: الاستدارة والظلّ من سلّم النظام لا من قيم عشوائية", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  assert.match(css, /--radius-3xl: 0\.125rem/, "أقصى استدارة 2px");
-  assert.match(css, /--radius-2xl: 0\.125rem/, "وبطاقات «2xl» مثلها");
+  assert.match(css, /--radius-3xl: 1\.875rem/, "سقف الاستدارة 30px — شريط قسم لا فقاعة");
+  assert.match(css, /--radius-sm: 0\.5rem/, "وأصغر استدارة 8px على الأقل");
+  assert.match(css, /--radius-xl: 1\.25rem/, "البطاقة الداخلية 20px");
 
   const offenders = [];
   for (const file of walk(SRC, ".tsx")) {
     const text = fs.readFileSync(file, "utf8");
-    if (/bg-gradient-to-(?:r|l|br|tr)/.test(text)) offenders.push(path.basename(file));
+    if (/bg-gradient|linear-gradient/.test(text)) offenders.push(path.basename(file));
   }
-  assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن");
+  assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن — الأسطح بلون واحد");
+
+  // الأزرار والعناصر الحبّوبية تُعرَّف مرة واحدة في الطبقة الموحّدة
+  assert.match(css, /\.u-cta\s*\{/, "زرّ رئيسي واحد معرَّف مركزيًا");
+  assert.match(css, /border-radius: 999px/, "الأزرار حبّوبية بالكامل");
 });
 
-test("بطاقة الخريطة ورقةٌ بخطّ شعري، لا بطاقة بيضاء تبهت في الليل", () => {
+test("بطاقة الخريطة: سطح النظام بظلّ ناعم واستدارة، لا مستطيل عائم", () => {
   const map = readSrc("components", "mindmap", "MindmapFocusMap.tsx");
-  const start = map.indexOf("group min-w-0 border");
+  const start = map.indexOf("group min-w-0 rounded-2xl border");
   assert.ok(start > 0, "بطاقة العنصر موجودة");
-  const node = map.slice(start, start + 620);
+  const node = map.slice(start, start + 720);
   assert.match(node, /bg-\[var\(--sheet\)\]/, "خلفيتها من نظام الورق (تتلوّن تلقائيًا ليلًا)");
-  assert.match(node, /border-\[var\(--rule\)\]/, "وحدّها خطّ شعري لا ظلّ");
+  assert.match(node, /border-\[var\(--rule\)\]/, "وحدّها من نظام الحدود");
+  assert.match(
+    node,
+    /shadow-\[var\(--shadow-(?:xs|card|lift)\)\]/,
+    "وترتفع بظلّ النظام لا بظلّ أسود"
+  );
   assert.ok(!node.includes("bg-white"), "لا خلفية بيضاء صريحة");
-  assert.ok(!node.includes("shadow"), "ولا ظلّ");
+  assert.ok(!/shadow-(?:sm|md|lg|xl)\b/.test(node), "ولا ظلال Tailwind الافتراضية");
 });
 
-test("هوية «الورق والحبر»: أربعة عناصر بنيوية فقط، ومسطرة قراءة في الدرس", () => {
+test("هوية «حبر ونعنع»: طبقة u-* واحدة، ومسطرة قراءة في الدرس", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
   for (const token of ["--paper:", "--sheet:", "--rule:", "--ink:", "--pine:", "--ochre:"]) {
     assert.ok(css.includes(token), `المتغيّر ${token} معرَّف مرة واحدة`);
   }
-  assert.match(css, /\.z-sheet\s*\{/, "ورقة موحّدة");
-  assert.match(css, /\.z-hair\s*\{/, "خطّ شعري موحّد");
-  assert.match(css, /\.z-index-item\[aria-selected="true"\]::after/, "الفهرس بعلامة سفلية لا بقرص ملوّن");
+  for (const cls of [".u-card", ".u-band", ".u-chip"]) {
+    assert.match(css, new RegExp(`\\${cls}\\s*\\{`), `الفئة ${cls} معرَّفة`);
+  }
+  assert.match(css, /\.u-tab\[aria-selected="true"\]/, "الاختيار قرص أبيض داخل حاوية نعنعية");
+  assert.match(css, /\.u-quote\s*\{/, "النص الشرعي له سطحه الخاص (شاهد لا فائدة)");
+
+  // لم يبقَ من مفردات الجولة السابقة شيء
+  const legacy = [];
+  for (const file of walk(SRC, ".tsx")) {
+    const text = fs.readFileSync(file, "utf8");
+    if (/className="[^"]*\bz-(?:sheet|hair|btn|link|num|kicker|display|index-item)/.test(text)) {
+      legacy.push(path.basename(file));
+    }
+  }
+  assert.deepEqual(legacy, [], "لا مكوّنات على مفردات .z-* القديمة");
 
   const rule = readSrc("components", "lesson", "ReadingRule.tsx");
   assert.match(rule, /requestAnimationFrame/, "مسطرة القراءة تُحدَّث في إطار رسم واحد");
@@ -477,9 +507,14 @@ test("هوية «الورق والحبر»: أربعة عناصر بنيوية �
   assert.match(view, /<ReadingRule \/>/, "مسطرة القراءة مركّبة في تبويب الدرس");
 });
 
-test("طلب واحدة لكل شاشة: لا زرّان متساويان في الأهمية", () => {
+test("طلب واحدة لكل شاشة: إجراء ممتلئ واحد والباقي هادئ", () => {
   const page = readSrc("app", "page.tsx");
-  const primary = (page.match(/className="z-btn"/g) || []).length;
-  assert.equal(primary, 1, "إجراء واحد ممتلئ (حبر) في الغلاف، لا أكثر");
-  assert.match(page, /className="z-link text-label font-bold"/, "والإجراء الثاني رابط لا زرّ");
+  const primary = (page.match(/className="u-cta"/g) || []).length;
+  assert.equal(primary, 1, "إجراء واحد ممتلئ في الغلاف (البطل)، لا أكثر");
+  assert.match(page, /className="u-ghost"/, "والإجراء الثاني ثانوي بحدّ فقط");
+  assert.match(
+    page,
+    /text-label font-bold text-\[var\(--pine\)\]/,
+    "وبطاقات الوحدات تفتح برابط، لا بأربعة أزرار ممتلئة"
+  );
 });

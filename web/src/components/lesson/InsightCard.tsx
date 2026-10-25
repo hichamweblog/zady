@@ -14,7 +14,7 @@ interface InsightCardProps {
   children: React.ReactNode;
 }
 
-const TONE_LABEL: Record<InsightTone, string> = {
+const LABEL: Record<InsightTone, string> = {
   illumination: "إضاءة",
   benefit: "فائدة",
 };
@@ -22,10 +22,9 @@ const TONE_LABEL: Record<InsightTone, string> = {
 /**
  * بطاقة «إضاءة / فائدة» — علامة المحتوى غير المفهومي داخل نصّ الدرس.
  *
- * في اتجاه الكتاب المطبوع ليست بطاقة مستديرة ملوّنة، بل **هامش جانبي**:
- * خطّ مغرة رقيق على الجانب، خلفية ورقية أغمق درجة، ومصباح صغير. المغرة هي
- * اللون الوحيد المسموح به خارج الحبر والصنوبري، ولذلك تحمل معنى «انتبه، هذا
- * ليس متنًا» بلا حاجة إلى زخرفة.
+ * الشكل: سطح ذهبي فاتح مستدير مع شريحة صغيرة تحمل المصباح. الذهبي هو اللون
+ * الثاني الوحيد في النظام، ولا يُستعمل إلا لهذا المعنى (شيء ليس متنًا)، فتُقرأ
+ * البطاقة فورًا بلا حاجة إلى إطار أو عنوان صارخ.
  */
 export default function InsightCard({
   tone,
@@ -40,19 +39,19 @@ export default function InsightCard({
 
   return (
     <aside
-      className={`border-s-2 border-[var(--ochre)]/60 bg-[var(--sunken)] px-3.5 py-3 sm:px-4 ${className}`}
+      className={`rounded-2xl border border-[var(--ochre-soft)] bg-[var(--band-warm)] px-3.5 py-3 ${className}`}
       title={meta?.hint}
       data-insight={resolvedTone}
     >
-      <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <span className="inline-flex items-center gap-1.5 text-meta font-bold text-[var(--ochre)]">
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2 py-0.5 text-meta font-bold text-[var(--ochre)] dark:bg-black/25">
           <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>{TONE_LABEL[resolvedTone]}</span>
+          <span>{LABEL[resolvedTone]}</span>
         </span>
         {heading && <span className="text-meta font-bold text-[var(--ink-soft)]">{heading}</span>}
       </p>
 
-      <div className="mt-1.5 space-y-2 text-body leading-loose font-medium text-[var(--ink-soft)]">
+      <div className="mt-2 space-y-2 text-body leading-loose font-medium text-[var(--ink-soft)]">
         {children}
       </div>
     </aside>

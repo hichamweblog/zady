@@ -49,9 +49,7 @@ export default function RevisionSection({ revision }: RevisionSectionProps) {
           <Zap className="w-5 h-5" aria-hidden="true" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-title font-bold text-[var(--ink)]">
-            المراجعة السريعة قبل الامتحان
-          </h2>
+          <h2 className="text-title font-bold text-[var(--ink)]">المراجعة السريعة قبل الامتحان</h2>
           <p className="mt-1 text-body font-medium leading-relaxed text-[var(--ink-soft)]">
             خلاصة الوحدة في بطاقات مكثفة: ما يجب حفظه حرفيًا، الأخطاء الممنوعة، الفروق بين
             المصطلحات، وأسئلة بكالوريا سابقة مع إجاباتها.

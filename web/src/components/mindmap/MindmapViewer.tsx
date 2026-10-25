@@ -49,8 +49,8 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
   return (
     <div className="space-y-4">
       <div className="mx-auto w-full max-w-[980px] space-y-4">
-        <div className="flex items-baseline justify-between gap-3 border-b border-[var(--rule-strong)] pb-1">
-          <div className="flex items-baseline gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="u-tabs" role="presentation">
             {modes.map((mode) => {
               const isActive = viewMode === mode.id;
               return (
@@ -61,14 +61,14 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
                   aria-selected={isActive}
                   aria-controls={`mindmap-panel-${mode.id}`}
                   onClick={() => setViewMode(mode.id)}
-                  className="z-index-item"
+                  className="u-tab"
                 >
                   {mode.label}
                 </button>
               );
             })}
           </div>
-          <span className="z-num shrink-0">{nodeCount} مفهومًا</span>
+          <span className="u-chip shrink-0">{nodeCount} مفهومًا</span>
         </div>
 
         <p className="text-meta font-medium text-[var(--ink-faint)]">{activeHint}</p>

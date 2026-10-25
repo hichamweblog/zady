@@ -160,7 +160,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             <button
               type="button"
               onClick={goUp}
-              className="inline-flex min-h-11 items-center gap-1 border border-[var(--rule)] px-3 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+              className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--rule)] bg-[var(--sheet)] px-3.5 text-label font-bold text-[var(--ink-soft)] shadow-[var(--shadow-xs)] transition-colors hover:border-[var(--pine)] hover:text-[var(--ink)]"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
               <span>رجوع</span>
@@ -170,7 +170,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
           <button
             type="button"
             onClick={() => setIndexOpen(true)}
-            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 border border-[var(--rule)] px-3 text-label font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-[var(--pine)] px-3.5 text-label font-bold text-white shadow-[var(--shadow-card)] transition-colors hover:bg-[var(--pine-deep)] dark:text-[#06201a]"
           >
             <ListTree className="h-4 w-4" aria-hidden="true" />
             <span>الفهرس</span>
@@ -178,7 +178,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
         </div>
       </div>
 
-      <div className="relative overflow-hidden border border-[var(--rule)] bg-[var(--sheet)] p-4 sm:p-6 lg:h-[560px] lg:p-0">
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-[var(--rule)] bg-[var(--band)] p-4 shadow-[var(--shadow-card)] sm:p-6 lg:h-[560px] lg:p-0">
         {/* وصلات خفيفة: خط شعرة واحد لكل ابن، بلا إطارات حول العناصر */}
         <svg
           aria-hidden="true"
@@ -202,7 +202,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
         <button
           type="button"
           onClick={() => activate(focused)}
-          className="relative z-10 w-full bg-[var(--ink)] p-5 text-right text-[var(--paper)] transition-opacity hover:opacity-90 dark:bg-[var(--pine)] dark:text-[#0b0d07] sm:p-6 lg:absolute lg:top-1/2 lg:left-1/2 lg:w-64 lg:-translate-x-1/2 lg:-translate-y-1/2"
+          className="relative z-10 w-full rounded-2xl bg-[var(--pine)] p-5 text-right text-white shadow-[var(--shadow-lift)] transition-transform hover:-translate-y-0.5 dark:text-[#06201a] sm:p-6 lg:absolute lg:top-1/2 lg:left-1/2 lg:w-64 lg:-translate-x-1/2 lg:-translate-y-1/2"
         >
           <span className="block text-meta font-bold opacity-70">
             {trail.length > 1 ? "المحور الحالي" : "موضوع الوحدة"}
@@ -229,10 +229,10 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
                       "--y": position.y,
                     } as CSSProperties
                   }
-                  className={`group min-w-0 border px-3 py-3 text-right transition-colors ${
+                  className={`group min-w-0 rounded-2xl border px-3 py-2.5 text-right shadow-[var(--shadow-xs)] transition-all ${
                     isActive
-                      ? "border-[var(--pine)] bg-[var(--pine)] text-[var(--paper)]"
-                      : "border-[var(--rule)] bg-[var(--sheet)] text-[var(--ink)] hover:border-[var(--rule-strong)] hover:bg-[var(--sunken)]"
+                      ? "border-transparent bg-[var(--pine)] text-white shadow-[var(--shadow-lift)] dark:text-[#06201a]"
+                      : "border-[var(--rule)] bg-[var(--sheet)] text-[var(--ink)] hover:-translate-y-0.5 hover:border-[var(--pine)] hover:shadow-[var(--shadow-card)]"
                   } lg:absolute lg:top-[calc(var(--y)*100%)] lg:left-[calc(var(--x)*100%)] lg:w-44 lg:-translate-x-1/2 lg:-translate-y-1/2`}
                 >
                   <span className="line-clamp-3 block text-label leading-snug font-bold">
@@ -249,7 +249,7 @@ export default function MindmapFocusMap({ root }: MindmapFocusMapProps) {
             })}
           </div>
         ) : (
-          <p className="relative z-10 mt-3 border border-[var(--rule)] bg-[var(--sunken)] px-4 py-3 text-body font-medium text-[var(--ink-soft)] lg:absolute lg:bottom-10 lg:left-1/2 lg:mt-0 lg:max-w-md lg:-translate-x-1/2">
+          <p className="relative z-10 mt-3 rounded-2xl border border-[var(--rule)] bg-[var(--sheet)] px-4 py-3 text-body font-medium text-[var(--ink-soft)] shadow-[var(--shadow-xs)] lg:absolute lg:bottom-10 lg:left-1/2 lg:mt-0 lg:max-w-md lg:-translate-x-1/2">
             عنصر نهائي — لا فروع تحته.
           </p>
         )}

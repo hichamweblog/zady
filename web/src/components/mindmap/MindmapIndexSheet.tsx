@@ -41,7 +41,7 @@ export default function MindmapIndexSheet({
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6">
       <div
-        className="absolute inset-0 bg-[#0b0d07]/50 backdrop-blur-[1px]"
+        className="absolute inset-0 bg-[#07231c]/45 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -50,11 +50,11 @@ export default function MindmapIndexSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="mindmap-index-title"
-        className="relative z-10 flex max-h-[86vh] w-full flex-col border border-[var(--rule)] bg-[var(--sheet)] sm:max-w-lg sm:border-b-0"
+        className="relative z-10 flex max-h-[86vh] w-full flex-col rounded-t-[1.75rem] border border-[var(--rule)] bg-[var(--sheet)] shadow-[var(--shadow-lg)] sm:max-w-lg sm:rounded-[1.75rem]"
       >
         <div className="flex items-start justify-between gap-3 p-5 pb-3">
           <div className="min-w-0 space-y-1">
-            <h2 id="mindmap-index-title" className="z-display flex items-center gap-2 text-title">
+            <h2 id="mindmap-index-title" className="u-display flex items-center gap-2 text-title">
               <ListTree className="h-4 w-4 text-[var(--pine)]" aria-hidden="true" />
               <span>فهرس المحاور</span>
             </h2>

@@ -1,20 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import ResumeBanner from "@/components/home/ResumeBanner";
 import UnitProgressBadge from "@/components/home/UnitProgressBadge";
 import Footer from "@/components/layout/Footer";
 import { getAllUnits, getUnitTotals } from "@/lib/data-loader";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen, Layers, Lightbulb, ListChecks } from "lucide-react";
 
 /**
- * الصفحة الرئيسية — **غلاف كتاب وفهرسه**، لا لوحة تحكّم.
+ * الغلاف — لوحة الإلهام العربية: شريط نعنعي دافئ، عنوان كبير بتمييز ذهبي،
+ * صورة داخل إطار مستدير، ثم بطاقات مستديرة بيضاء على ورق كريمي.
  *
- * الاتجاه: ورق وحبر. لا تدرّج، لا زجاج، لا بطاقة مستديرة، ولا أيقونة زائدة.
- * الغلاف يقول ثلاثة أشياء فقط: ما هذا، لمن هو، ومن أين تبدأ. ثم يأتي الفهرس
- * في صفوف مسطّرة: رقم الوحدة في الهامش، عنوانها وهدفها، وزمنها، وسهم.
- *
- * لماذا لا شبكة بطاقات؟ لأن أربع وحدات ليست أربعة منتجات تُقارن، بل فصولًا
- * تُقرأ بالترتيب؛ والقائمة المرقّمة تُظهر الترتيب، والبطاقات تُخفيه.
+ * لماذا هذا الشكل؟
+ *   - الطالب يفتح التطبيق ليعرف «ما هذا وأين أبدأ» في ثانيتين: عنوان واحد،
+ *     سطر شرح، إجراء واحد.
+ *   - الشريط النعنعي يفصل الغلاف عن بقية الصفحة بلا صندوق إضافي.
+ *   - الصورة ليست زينة: هي خريطة الوحدة الأولى الحقيقية، فيرى الطالب المنتج
+ *     قبل أن يقرأ عنه.
  */
 const STREAMS = [
   "علوم تجريبية",
@@ -26,162 +28,199 @@ const STREAMS = [
 ];
 
 const PATH = [
-  { n: 1, title: "نص الدرس", hint: "الشرح والشواهد" },
-  { n: 2, title: "الخريطة", hint: "المفاهيم وحدها" },
-  { n: 3, title: "الحفظ", hint: "بطاقات وفراغات" },
-  { n: 4, title: "QCM", hint: "اختبار سريع" },
-  { n: 5, title: "بنك الأسئلة", hint: "عناصر الإجابة" },
-  { n: 6, title: "المراجعة", hint: "قبل الامتحان" },
+  { n: 1, title: "نص الدرس", hint: "الشرح والشواهد", icon: BookOpen },
+  { n: 2, title: "الخريطة", hint: "المفاهيم وحدها", icon: Layers },
+  { n: 3, title: "الحفظ", hint: "بطاقات وفراغات", icon: ListChecks },
+  { n: 4, title: "QCM", hint: "اختبار سريع", icon: ListChecks },
+  { n: 5, title: "بنك الأسئلة", hint: "عناصر الإجابة", icon: BookOpen },
+  { n: 6, title: "المراجعة", hint: "قبل الامتحان", icon: Lightbulb },
 ];
 
 export default function HomePage() {
   const units = getAllUnits();
   const totals = getUnitTotals();
 
-  const colophon = [
-    { value: `${totals.units}`, label: "وحدات مقرّرة" },
-    { value: `${totals.flashcards}`, label: "بطاقة استرجاع" },
-    { value: `${totals.quiz}`, label: "سؤال اختيار" },
-    { value: `${totals.questions}`, label: "سؤال بكالوريا" },
-  ];
-
   return (
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Navbar />
 
-      <main id="main-content" className="mx-auto w-full max-w-[1180px] flex-1 px-5 sm:px-8">
+      <main id="main-content" className="u-wrap flex-1 space-y-10 pb-14 sm:space-y-14">
         {/* ── الغلاف ── */}
-        <section className="z-grid border-b border-[var(--rule)] pt-10 pb-12 sm:pt-16 sm:pb-16">
-          <div className="md:col-span-8">
-            <p className="z-kicker">العلوم الإسلامية · السنة الثالثة ثانوي · بكالوريا ٢٠٢٦</p>
+        <section className="u-band relative overflow-hidden px-5 pt-8 pb-10 sm:px-9 sm:pt-12 sm:pb-14">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/45 blur-2xl"
+          />
+          <div className="relative grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <p className="u-chip bg-white/80 dark:bg-white/10">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--pine)]" aria-hidden="true" />
+                العلوم الإسلامية · بكالوريا ٢٠٢٦
+              </p>
 
-            <h1 className="z-display mt-4 text-[clamp(2.15rem,6.4vw,3.9rem)]">
-              أربعُ وحدات،
-              <br />
-              مقروءةً كما يُقرأ الكتاب.
-            </h1>
+              <h1 className="u-display mt-4 text-[clamp(1.9rem,5vw,3.15rem)]">
+                راجع وحدتك كاملة،
+                <br />
+                <span className="u-mark">خطوةً بخطوة</span> بلا تشتّت.
+              </h1>
 
-            <p className="z-measure mt-6 text-body font-medium text-[var(--ink-soft)]">
-              النصّ أولًا ثم الخريطة، ثم ما يُحفظ ويُختبر. بلا خطوات مبعثرة ولا تبويبات تسبق الفهم:
-              صفحتك تُفتح حيث توقّفت، والمفهومُ وحده يدخل الخريطة.
-            </p>
+              <p className="u-measure mt-4 text-body font-medium text-[var(--ink-soft)]">
+                النصّ أولًا ثم الخريطة، ثم ما يُحفظ ويُختبر. أربع وحدات مقرّرة، وتقدّمك محفوظ، وكل
+                مفهوم في مكانه.
+              </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link href="/units/1" className="z-btn">
-                <span>ابدأ بالوحدة ٠١</span>
-                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="#units" className="z-link text-label font-bold">
-                فهرس الوحدات
-              </Link>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link href="/units/1" className="u-cta">
+                  <span>ابدأ بالوحدة ٠١</span>
+                  <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <Link href="#units" className="u-ghost">
+                  استعرض الوحدات
+                </Link>
+              </div>
+
+              <p className="mt-4 text-meta font-medium text-[var(--ink-faint)]">
+                لكل الشعب: {STREAMS.slice(0, 4).join(" · ")} وغيرها
+              </p>
+            </div>
+
+            {/* خريطة الوحدة الأولى — المنتج قبل الكلام */}
+            <div className="relative hidden lg:block">
+              <div className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-[var(--shadow-lift)] dark:border-[var(--rule)] dark:bg-[var(--sheet)]">
+                <Image
+                  src="/lessons/unit01_mindmap.webp"
+                  alt="خريطة الوحدة الأولى: العقيدة الإسلامية وأثرها"
+                  width={2000}
+                  height={1023}
+                  className="h-auto w-full"
+                  priority
+                />
+              </div>
+              <span className="u-chip absolute -bottom-3 right-5 bg-white shadow-sm dark:bg-[var(--sheet)]">
+                <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                ١١ مفهومًا
+              </span>
+              <span className="u-chip u-chip-warm absolute -top-3 left-5 bg-white shadow-sm dark:bg-[var(--band-warm)]">
+                <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
+                إضاءات في الهامش
+              </span>
             </div>
           </div>
-
-          {/* بيانات الكتاب — في الهامش، كصفحة حقوق النشر */}
-          <aside className="md:col-span-4 md:border-s md:border-[var(--rule)] md:ps-6">
-            <p className="z-kicker md:hidden">المحتوى بالأرقام</p>
-            <dl className="md:mt-1">
-              {colophon.map((row, i) => (
-                <div
-                  key={row.label}
-                  className={`flex items-baseline justify-between gap-3 py-3 ${
-                    i === 0 ? "" : "border-t border-[var(--rule)]"
-                  }`}
-                >
-                  <dt className="text-label font-medium text-[var(--ink-soft)]">{row.label}</dt>
-                  <dd className="z-num text-title">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mt-4 text-meta font-medium text-[var(--ink-faint)]">
-              لكل الشعب: {STREAMS.join(" · ")}
-            </p>
-          </aside>
         </section>
 
-        <section aria-label="متابعة الدراسة" className="pt-6">
+        <section aria-label="متابعة الدراسة">
           <ResumeBanner />
         </section>
 
-        {/* ── الفهرس ── */}
-        <section id="units" className="scroll-mt-24 pt-8 pb-4">
-          <div className="flex items-baseline justify-between gap-3 border-b border-[var(--rule-strong)] pb-2">
-            <h2 className="z-kicker">الفهرس</h2>
-            <span className="z-num">٠١ — ٠{units.length}</span>
-          </div>
-
-          <ol>
-            {units.map((unit, index) => (
-              <li key={unit.id} className="border-b border-[var(--rule)]">
-                <Link
-                  href={`/units/${unit.id}`}
-                  className="group grid grid-cols-[2.5rem_1fr] items-start gap-x-3 gap-y-2 py-5 transition-colors hover:bg-[var(--sunken)] sm:grid-cols-[3rem_1fr_auto] sm:gap-x-5 sm:px-2"
-                >
-                  <span className="z-num pt-1 text-title tabular-nums">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span className="min-w-0">
-                    <span className="block text-title font-bold text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--pine)] group-hover:underline-offset-4">
-                      {unit.title}
-                    </span>
-                    <span className="mt-1 block text-body font-medium text-[var(--ink-soft)]">
-                      {unit.learningObjective}
-                    </span>
-                    <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-meta font-medium text-[var(--ink-faint)]">
-                      <span>{unit.timeAllocation}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{unit.sections.length} محاور</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{unit.flashcards.length} بطاقة</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{unit.quizQuestions.length} اختيار</span>
-                    </span>
-                    <span className="mt-3 block max-w-56">
-                      <UnitProgressBadge
-                        unitId={unit.id}
-                        totals={{
-                          sections: unit.sections.length,
-                          cards: unit.flashcards.length,
-                          questions: unit.questions.length,
-                          mcq: unit.quizQuestions.length,
-                        }}
-                      />
-                    </span>
-                  </span>
-
-                  <span className="col-start-2 mt-1 inline-flex items-center gap-1.5 text-label font-bold text-[var(--pine)] sm:col-start-3 sm:mt-2 sm:self-start">
-                    <span>افتح</span>
-                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ol>
+        {/* ── الأرقام ── */}
+        <section aria-label="المحتوى بالأرقام" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { value: totals.units, label: "وحدات مقرّرة" },
+            { value: totals.flashcards, label: "بطاقة استرجاع" },
+            { value: totals.quiz, label: "سؤال اختيار" },
+            { value: totals.questions, label: "سؤال بكالوريا" },
+          ].map((stat) => (
+            <div key={stat.label} className="u-card px-4 py-4 text-center sm:px-5">
+              <div className="u-num text-[clamp(1.6rem,4vw,2.1rem)] text-[var(--pine)]">
+                {stat.value}
+              </div>
+              <p className="mt-0.5 text-meta font-bold text-[var(--ink-faint)]">{stat.label}</p>
+            </div>
+          ))}
         </section>
 
-        {/* ── المسار: سطر واحد، بلا صناديق ── */}
-        <section aria-labelledby="path-title" className="py-10 sm:py-14">
-          <h2 id="path-title" className="z-kicker">
-            ترتيب الاستذكار داخل الوحدة
-          </h2>
-          <ol className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-2">
-            {PATH.map(({ n, title, hint }) => (
-              <li key={n} className="flex items-baseline gap-2">
-                <span className="z-num">{n}</span>
-                <span className="text-body font-bold text-[var(--ink)]">{title}</span>
-                <span className="text-meta font-medium text-[var(--ink-faint)]">{hint}</span>
-                {n < PATH.length && (
-                  <span aria-hidden="true" className="text-[var(--rule-strong)]">
-                    /
+        {/* ── الوحدات ── */}
+        <section id="units" className="scroll-mt-24 space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="u-kicker">الفهرس</p>
+              <h2 className="u-display mt-1 text-title sm:text-heading">الوحدات المتوفرة</h2>
+            </div>
+            <p className="text-label font-medium text-[var(--ink-faint)]">
+              {units.length} وحدات · الكتلة العقدية والفكرية
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            {units.map((unit) => (
+              <article key={unit.id} className="u-card u-card-hover flex flex-col gap-4 p-5 sm:p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--pine-soft)] text-title font-bold text-[var(--pine-deep)]">
+                    {String(unit.id).padStart(2, "0")}
                   </span>
-                )}
+                  <span className="u-chip">{unit.timeAllocation}</span>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-title font-bold leading-snug text-[var(--ink)]">
+                    {unit.title}
+                  </h3>
+                  <p className="text-body leading-relaxed font-medium text-[var(--ink-soft)]">
+                    {unit.learningObjective}
+                  </p>
+                </div>
+
+                <div className="mt-auto space-y-3 border-t border-[var(--rule)] pt-3">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-meta font-bold text-[var(--ink-faint)]">
+                    <span>{unit.sections.length} محاور</span>
+                    <span>{unit.flashcards.length} بطاقة</span>
+                    <span>{unit.quizQuestions.length} اختيار</span>
+                    <span>{unit.questions.length} سؤال</span>
+                  </div>
+
+                  <UnitProgressBadge
+                    unitId={unit.id}
+                    totals={{
+                      sections: unit.sections.length,
+                      cards: unit.flashcards.length,
+                      questions: unit.questions.length,
+                      mcq: unit.quizQuestions.length,
+                    }}
+                  />
+
+                  <Link
+                    href={`/units/${unit.id}`}
+                    className="group inline-flex items-center gap-1.5 text-label font-bold text-[var(--pine)] transition-colors hover:text-[var(--pine-deep)]"
+                    aria-label={`افتح ${unit.title}`}
+                  >
+                    <span>افتح الوحدة</span>
+                    <ArrowLeft
+                      className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ── المسار ── */}
+        <section aria-labelledby="path-title" className="u-band px-5 py-7 sm:px-8 sm:py-9">
+          <p className="u-kicker" id="path-title">
+            داخل كل وحدة
+          </p>
+          <h2 className="u-display mt-1 text-title sm:text-heading">ستّ خطوات بهذا الترتيب</h2>
+
+          <ol className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+            {PATH.map(({ n, title, hint, icon: Icon }) => (
+              <li
+                key={n}
+                className="rounded-2xl bg-[var(--sheet)] px-3 py-3 shadow-[var(--shadow-xs)]"
+              >
+                <span className="flex items-center justify-between">
+                  <Icon className="h-4 w-4 text-[var(--pine)]" aria-hidden="true" />
+                  <span className="u-num text-meta text-[var(--ink-faint)]">٠{n}</span>
+                </span>
+                <span className="mt-2 block text-label font-bold text-[var(--ink)]">{title}</span>
+                <span className="block text-meta font-medium text-[var(--ink-faint)]">{hint}</span>
               </li>
             ))}
           </ol>
-          <p className="mt-5 max-w-[60ch] text-meta font-medium text-[var(--ink-faint)]">
-            ما يظهر في بطاقة مصباح ليس عنصرًا مفهوميًا: إضاءةٌ للفهم أو فائدةٌ مساعدة، لا يُحفظ
-            كتعريف — والخريطة للتعريفات والأقسام وحدها.
+
+          <p className="u-measure mt-4 text-meta font-medium text-[var(--ink-faint)]">
+            ما يظهر في بطاقة مصباح ليس عنصرًا مفهوميًا: إضاءة للفهم أو فائدة مساعدة، لا يُحفظ كتعريف
+            — والخريطة للتعريفات والأقسام وحدها.
           </p>
         </section>
       </main>

@@ -178,13 +178,16 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
     <div className="space-y-5">
       {/* مسار التتبّع — سطر صغير أعلى العنوان */}
       <nav aria-label="مسار التصفح" className="flex items-baseline gap-2 text-label font-medium">
-        <Link href="/" className="z-link">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-meta font-bold text-[var(--ink-soft)] transition-colors hover:bg-[var(--sunken)] hover:text-[var(--ink)]"
+        >
           الغلاف
         </Link>
         <span aria-hidden="true" className="text-[var(--rule-strong)]">
           /
         </span>
-        <span className="z-num">{unit.badge.replace("وحدة ", "")}</span>
+        <span className="u-num">{unit.badge.replace("وحدة ", "")}</span>
         <span className="text-[var(--ink-soft)]">{unit.shortTitle}</span>
       </nav>
 
@@ -194,20 +197,25 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
  بأرقامها وعدّاداتها. صار: عنوان + سطر معلومة واحد + شريط تقدّم واحد.
  التفاصيل الكاملة (المستهدف، عدّادات كل خطوة) انتقلت إلى مكانها الطبيعي.
  */}
-      <header className="border-b border-[var(--rule-strong)] pb-5">
-        <div className="z-grid items-end">
-          <div className="md:col-span-9">
-            <p className="z-kicker">
-              {unit.timeAllocation} · {unit.targetAudience}
-            </p>
-            <h1 className="z-display mt-2 text-[clamp(1.6rem,4.2vw,2.5rem)]">{unit.title}</h1>
+      <header className="u-band px-5 py-6 sm:px-8 sm:py-7">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="u-chip bg-white/85 dark:bg-white/10">
+                الوحدة {String(unit.id).padStart(2, "0")}
+              </span>
+              <span className="u-chip bg-white/85 dark:bg-white/10">{unit.timeAllocation}</span>
+              <span className="hidden text-meta font-bold text-[var(--ink-faint)] sm:inline">
+                {unit.targetAudience}
+              </span>
+            </div>
+            <h1 className="u-display text-[clamp(1.5rem,3.6vw,2.15rem)]">{unit.title}</h1>
           </div>
 
-          {/* التقدّم: مسطرة مدرّجة لا شريط ملوّن */}
-          <div className="md:col-span-3">
+          <div className="w-full shrink-0 space-y-2 sm:w-64">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="z-kicker">الإتقان</span>
-              <span className="z-num text-title text-[var(--ink)]">
+              <span className="text-meta font-bold text-[var(--ink-soft)]">الإتقان</span>
+              <span className="u-num text-title text-[var(--pine-deep)]">
                 {stats.progressPercentage}%
               </span>
             </div>
@@ -217,21 +225,15 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label={`نسبة إتقان ${unit.shortTitle}`}
-              className="mt-2 flex gap-[3px]"
+              className="h-2 w-full overflow-hidden rounded-full bg-white/80 dark:bg-black/25"
             >
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span
-                  key={i}
-                  aria-hidden="true"
-                  className="h-[3px] flex-1"
-                  style={{
-                    backgroundColor: i < doneCount ? "var(--pine)" : "var(--rule)",
-                  }}
-                />
-              ))}
+              <div
+                className="h-full rounded-full bg-[var(--pine)] transition-[width] duration-500"
+                style={{ width: `${stats.progressPercentage}%` }}
+              />
             </div>
-            <p className="mt-1.5 text-meta font-medium text-[var(--ink-faint)]">
-              {doneCount} من 6 خطوات
+            <p className="text-meta font-medium text-[var(--ink-faint)]">
+              {doneCount} من 6 خطوات مكتملة
             </p>
           </div>
         </div>
@@ -252,17 +254,18 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
         لا أقراص ملوّنة ولا أيقونات: ستة أهداف في سطرين على الهاتف، وسطر واحد
         على الحاسوب، والمكتمل يظهر بعلامة صغيرة لا بلون كامل.
       */}
-      <div className="z-30 -mx-5 border-b border-[var(--rule)] bg-[var(--background)]/95 px-5 backdrop-blur-sm sm:sticky sm:top-16 sm:mx-0 sm:px-0">
+      <div className="z-30 sticky top-16 -mx-5 bg-[var(--background)]/92 px-5 py-2 backdrop-blur-md sm:mx-0 sm:px-0 sm:py-0">
         <div
           ref={tabListRef}
           role="tablist"
           aria-label="أنماط الدراسة في الوحدة"
           onKeyDown={onTabsKeyDown}
-          className="scrollbar-none flex flex-wrap items-baseline gap-x-5 gap-y-0 overflow-x-hidden md:flex-nowrap"
+          className="u-tabs"
         >
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const isDone = stepDone[tab.id];
+            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
@@ -274,22 +277,22 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => selectTabAndScroll(tab.id)}
                 title={tab.label}
-                className="z-index-item min-h-11 shrink-0"
+                className="u-tab relative grow basis-[calc(50%_-_0.75rem)] sm:grow-0 sm:basis-auto"
               >
-                <span className="z-num me-1" aria-hidden="true">
-                  {index + 1}
-                </span>
+                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="whitespace-nowrap">{tab.label}</span>
                 {tab.count !== null && (
-                  <span className="z-num hidden font-normal opacity-70 sm:inline">{tab.count}</span>
+                  <span className="u-tab-count hidden sm:inline">{tab.count}</span>
                 )}
                 {isDone && (
                   <span
-                    className="ms-1 inline-block h-1.5 w-1.5 rounded-full bg-[var(--pine)]"
+                    className="absolute -top-0.5 end-1 h-1.5 w-1.5 rounded-full bg-[var(--pine)]"
                     aria-hidden="true"
                   />
                 )}
-                <span className="sr-only">{isDone ? " — خطوة مكتملة" : ""}</span>
+                <span className="sr-only">
+                  {index + 1}. {isDone ? "خطوة مكتملة" : "غير مكتملة"}
+                </span>
               </button>
             );
           })}
@@ -383,93 +386,79 @@ export default function UnitClientView({ unit, previousUnit, nextUnit }: UnitCli
       </div>
 
       {/*
-        «الخطوة التالية»: سطر واحد يفصل بين النصّ وما بعده، مثل قلب الصفحة.
         لا صندوق حوله: خطّان شعريان ورقم الخطوة في الهامش يقولان كل شيء.
       */}
-      <div className="flex flex-col gap-3 border-y border-[var(--rule)] py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="flex items-baseline gap-2 text-label font-medium text-[var(--ink-soft)]">
-          <span className="z-num">
-            {activeIndex + 1}/{tabs.length}
+      <div className="u-card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <p className="flex flex-wrap items-baseline gap-2 text-label font-medium text-[var(--ink-soft)]">
+          <span className="u-chip">
+            الخطوة {activeIndex + 1} من {tabs.length}
           </span>
           {nextTab ? (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>
-                التالي: <span className="font-bold text-[var(--ink)]">{nextTab.label}</span>
-              </span>
-            </>
+            <span>
+              التالي: <span className="font-bold text-[var(--ink)]">{nextTab.label}</span>
+            </span>
           ) : (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>آخر خطوة — أعد الاختبار أو انتقل إلى الوحدة الموالية</span>
-            </>
+            <span>آخر خطوة — أعد الاختبار أو انتقل إلى الوحدة الموالية</span>
           )}
         </p>
 
-        <div className="flex items-center gap-3">
-          {nextTab ? (
-            <button
-              type="button"
-              onClick={() => {
-                selectTab(nextTab.id);
-                tabListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className="z-btn"
-            >
-              <span>{nextTab.label}</span>
+        {nextTab ? (
+          <button
+            type="button"
+            onClick={() => {
+              selectTab(nextTab.id);
+              tabListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="u-cta shrink-0"
+          >
+            <span>{nextTab.label}</span>
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+        ) : (
+          nextUnit && (
+            <Link href={`/units/${nextUnit.id}`} className="u-cta shrink-0">
+              <span>الوحدة الموالية: {nextUnit.shortTitle}</span>
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            </button>
-          ) : (
-            nextUnit && (
-              <Link href={`/units/${nextUnit.id}`} className="z-btn">
-                <span>الوحدة التالية: {nextUnit.shortTitle}</span>
-                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            )
-          )}
-        </div>
+            </Link>
+          )
+        )}
       </div>
 
-      {/* التنقّل بين الوحدات — كصفحتي كتاب متقابلتين */}
-      <div className="flex items-stretch justify-between gap-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         {previousUnit ? (
           <Link
             href={`/units/${previousUnit.id}`}
-            className="group flex min-w-0 flex-1 items-baseline gap-2 py-3 pe-3"
+            className="u-card u-card-hover flex items-center gap-3 p-4"
           >
-            <ChevronRight
-              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ink-faint)] transition-colors group-hover:text-[var(--pine)]"
-              aria-hidden="true"
-            />
+            <ChevronRight className="h-5 w-5 shrink-0 text-[var(--pine)]" aria-hidden="true" />
             <span className="min-w-0">
-              <span className="z-kicker block">السابقة</span>
-              <span className="block truncate text-label font-bold text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--pine)] group-hover:underline-offset-4">
+              <span className="block text-meta font-bold text-[var(--ink-faint)]">
+                الوحدة السابقة
+              </span>
+              <span className="block truncate text-label font-bold text-[var(--ink)]">
                 {previousUnit.shortTitle}
               </span>
             </span>
           </Link>
         ) : (
-          <div className="flex-1" />
+          <div className="hidden sm:block" />
         )}
 
-        {nextUnit ? (
+        {nextUnit && (
           <Link
             href={`/units/${nextUnit.id}`}
-            className="group flex min-w-0 flex-1 items-baseline justify-end gap-2 border-s border-[var(--rule)] py-3 ps-3 text-end"
+            className="u-card u-card-hover flex items-center justify-end gap-3 p-4 text-end"
           >
             <span className="min-w-0">
-              <span className="z-kicker block">الموالية</span>
-              <span className="block truncate text-label font-bold text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--pine)] group-hover:underline-offset-4">
+              <span className="block text-meta font-bold text-[var(--ink-faint)]">
+                الوحدة الموالية
+              </span>
+              <span className="block truncate text-label font-bold text-[var(--ink)]">
                 {nextUnit.shortTitle}
               </span>
             </span>
-            <ChevronLeft
-              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ink-faint)] transition-colors group-hover:text-[var(--pine)]"
-              aria-hidden="true"
-            />
+            <ChevronLeft className="h-5 w-5 shrink-0 text-[var(--pine)]" aria-hidden="true" />
           </Link>
-        ) : (
-          <div className="flex-1" />
         )}
       </div>
     </div>

@@ -170,7 +170,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
           </span>
           <button
             onClick={restartQuiz}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
           >
             <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
             <span>إعادة البدء</span>
@@ -180,7 +180,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
 
       {quizFinished ? (
         <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-600 p-8 sm:p-12 shadow-sm text-center max-w-xl mx-auto space-y-6">
-          <div className="w-20 h-20 rounded-3xl bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto shadow-lg shadow-teal-500/20">
+          <div className="w-20 h-20 rounded-3xl bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 flex items-center justify-center mx-auto shadow-[var(--shadow-card)]">
             <Award className="w-10 h-10" aria-hidden="true" />
           </div>
 
@@ -206,10 +206,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
               aria-label="نتيجة الاختبار"
               className="w-full h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden"
             >
-              <div
-                style={{ width: `${scorePercentage}%` }}
-                className="h-full bg-[var(--pine)]"
-              />
+              <div style={{ width: `${scorePercentage}%` }} className="h-full bg-[var(--pine)]" />
             </div>
           </div>
 
@@ -225,7 +222,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             {wrongCount > 0 && (
               <button
                 onClick={startMistakesReview}
-                className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-body-sm transition-all shadow-md shadow-amber-500/20 flex items-center gap-2"
+                className="px-5 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-body-sm transition-all shadow-[var(--shadow-card)] flex items-center gap-2"
               >
                 <AlertCircle className="w-4 h-4" aria-hidden="true" />
                 <span>مراجعة الأخطاء فقط ({wrongCount})</span>
@@ -234,7 +231,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
 
             <button
               onClick={restartQuiz}
-              className="px-5 py-3 rounded-2xl bg-teal-700 text-white font-bold text-body-sm hover:bg-teal-800 transition-colors shadow-md shadow-teal-700/20 flex items-center gap-2"
+              className="px-5 py-3 rounded-full bg-teal-700 text-white font-bold text-body-sm hover:bg-teal-800 transition-colors shadow-[var(--shadow-card)] flex items-center gap-2"
             >
               <RotateCcw className="w-4 h-4" aria-hidden="true" />
               <span>إعادة الاختبار كاملًا</span>
@@ -385,7 +382,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
             <button
               disabled={currentIndex === 0}
               onClick={handlePrev}
-              className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-body-sm transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-body-sm transition-all disabled:opacity-50"
             >
               <ChevronRight className="w-5 h-5" aria-hidden="true" />
               <span>السابق</span>
@@ -393,7 +390,7 @@ export default function McqQuizViewer({ unitId, unitTitle, questions }: McqQuizV
 
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-teal-700 text-white font-bold text-body-sm hover:bg-teal-800 transition-all shadow-md shadow-teal-700/20"
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-teal-700 text-white font-bold text-body-sm hover:bg-teal-800 transition-all shadow-[var(--shadow-card)]"
             >
               <span>
                 {currentIndex + 1 === totalQuestions ? "إنهاء الاختبار" : "السؤال التالي"}

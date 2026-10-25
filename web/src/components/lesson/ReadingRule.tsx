@@ -43,10 +43,10 @@ export default function ReadingRule() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none sticky top-16 z-20 -mx-5 h-[2px] bg-[var(--rule)] sm:-mx-0"
+      className="pointer-events-none sticky top-16 z-20 -mx-5 h-[3px] rounded-full bg-[var(--rule)] sm:-mx-0"
     >
       <div
-        className="h-full bg-[var(--pine)] transition-[width] duration-150 ease-out"
+        className="h-full rounded-full bg-[var(--pine)] transition-[width] duration-150 ease-out"
         style={{ width: `${Math.round(progress * 100)}%` }}
       />
     </div>

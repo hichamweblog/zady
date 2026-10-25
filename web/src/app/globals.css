@@ -53,202 +53,213 @@
 
 /*
  * ============================================================
- *  لوحة «الورق والحبر» — نظام لون واحد، لا لوحة ألوان
+ *  نظام «حبر ونعنع» — لوحة عربية دافئة، سطوح ناعمة، ولون واحد
  * ============================================================
  *
- * التصميم السابق كان «تطبيقًا»: تدرّجات تركوازية، بطاقات مستديرة، ظلال
- * ناعمة، وأيقونة في كل زاوية. أي طالب يفتحه يعرف أنه قالب جاهز.
+ * بعد مراجعة لوحة الإلهام (مواقع عربية تعليمية ومتاجر حديثة): السطح الدافئ
+ * الكريمي، أشرطة نعنعية فاتحة، بطاقات بيضاء مستديرة بظلّ خفيف، وأزرار حبّوبية.
+ * اللون الأساسي واحد (صنوبري عميق) والثانوي واحد (ذهبي للحظة الانتباه)،
+ * والباقي أسطح. هذا ما يفصل «منتجًا مصمَّمًا» عن قالب بدرجات بنفسجية.
  *
- * الاتجاه الآن **كتاب مطبوع**: ورق دافئ، حبر أسود مائل للأخضر، خطوط شعرية
- * بدل الحدود السميكة، وزاوية واحدة مشدودة فقط (الحبر الصنوبري) تُستخدم حين
- * يجب أن ينتبه القارئ. لا تدرّجات، لا زجاج، لا ألوان للزينة.
- *
- * نعيد تعريف درجات Tailwind نفسها (slate/teal/amber/emerald/blue/rose) بدل
- * إضافة عائلة ثانية؛ فكل المكوّنات القائمة تتلوّن تلقائيًا بلا تعارض، ويبقى
- * ملف واحد هو مصدر الحقيقة.
+ * نعيد كتابة درجات Tailwind نفسها حتى تتلوّن كل المكوّنات بلا تعارض.
  */
 @theme {
-  /* الورق والحبر — تحلّ محل slate */
-  --color-slate-50: #f7f3e9;
-  --color-slate-100: #ede7d7;
-  --color-slate-200: #dcd3bf;
-  --color-slate-300: #c4b99f;
-  --color-slate-400: #98917a;
-  --color-slate-500: #7b7460;
-  --color-slate-600: #59523f;
-  --color-slate-700: #3a372a;
-  --color-slate-800: #23251a;
-  --color-slate-900: #15170f;
-  --color-slate-950: #0c0e08;
+  /* أسطح وحبر — تحلّ محل slate */
+  --color-slate-50: #f7faf8;
+  --color-slate-100: #eef5f1;
+  --color-slate-200: #dde9e3;
+  --color-slate-300: #c2d5cc;
+  --color-slate-400: #8fa79c;
+  --color-slate-500: #6f857b;
+  --color-slate-600: #556a61;
+  --color-slate-700: #3c4f47;
+  --color-slate-800: #22332c;
+  --color-slate-900: #14231d;
+  --color-slate-950: #0b1512;
 
-  /* الحبر الصنوبري — الزاوية الوحيدة تحلّ محل teal */
-  --color-teal-50: #ecf2ed;
-  --color-teal-100: #d9e6de;
-  --color-teal-200: #b4cfc2;
-  --color-teal-300: #86b3a1;
-  --color-teal-400: #5e9a84;
-  --color-teal-500: #3b7a65;
-  --color-teal-600: #2a6653;
-  --color-teal-700: #16513f;
-  --color-teal-800: #123f31;
-  --color-teal-900: #0e3026;
-  --color-teal-950: #081f19;
+  /* الصنوبري — العلامة والتفاعل (يحلّ محل teal) */
+  --color-teal-50: #e9f4ef;
+  --color-teal-100: #d3e9e0;
+  --color-teal-200: #a9d3c4;
+  --color-teal-300: #77b8a3;
+  --color-teal-400: #479a82;
+  --color-teal-500: #237e67;
+  --color-teal-600: #146a56;
+  --color-teal-700: #0e5a49;
+  --color-teal-800: #0b4638;
+  --color-teal-900: #09372c;
+  --color-teal-950: #05241d;
 
-  /* المغرة — للمصباح والتحذير فقط، لا للزينة */
-  --color-amber-50: #faf1df;
-  --color-amber-100: #f4e3c3;
-  --color-amber-200: #e9ce9e;
-  --color-amber-300: #d9b172;
-  --color-amber-400: #c49448;
-  --color-amber-500: #a87a2c;
-  --color-amber-600: #8c6422;
-  --color-amber-700: #6e4e1b;
-  --color-amber-800: #4c3612;
-  --color-amber-900: #33240c;
-  --color-amber-950: #1e1607;
+  /* الذهبي — للمصباح واللحظة الواحدة (يحلّ محل amber) */
+  --color-amber-50: #fdf5e4;
+  --color-amber-100: #f9e9c8;
+  --color-amber-200: #f0d69b;
+  --color-amber-300: #e3bd6c;
+  --color-amber-400: #d3a341;
+  --color-amber-500: #b98624;
+  --color-amber-600: #8f6215;
+  --color-amber-700: #714d12;
+  --color-amber-800: #5c4013;
+  --color-amber-900: #3c2a0e;
+  --color-amber-950: #241909;
 
-  /* الزيتوني — علامة «تمّ» فقط */
-  --color-emerald-50: #eef1e2;
-  --color-emerald-100: #dfe6cc;
-  --color-emerald-200: #c3d0a6;
-  --color-emerald-300: #a2b47c;
-  --color-emerald-400: #7e9459;
-  --color-emerald-500: #5f7740;
-  --color-emerald-600: #4b6232;
-  --color-emerald-700: #3a4d27;
-  --color-emerald-800: #2a381c;
-  --color-emerald-900: #1c2612;
-  --color-emerald-950: #101609;
+  /* الزيتوني — «تمّ» */
+  --color-emerald-50: #eef6e6;
+  --color-emerald-100: #dcecd0;
+  --color-emerald-200: #bfdaa9;
+  --color-emerald-300: #9cc27d;
+  --color-emerald-400: #78a556;
+  --color-emerald-500: #5b883c;
+  --color-emerald-600: #47712e;
+  --color-emerald-700: #375a24;
+  --color-emerald-800: #27401a;
+  --color-emerald-900: #1a2b12;
+  --color-emerald-950: #0f1a0a;
 
-  /* النيلي — أرقام الاختبار */
-  --color-blue-50: #eaeef3;
-  --color-blue-100: #d5dee8;
-  --color-blue-200: #aec0d3;
-  --color-blue-300: #7f9cb8;
-  --color-blue-400: #56789a;
-  --color-blue-500: #3c5f82;
-  --color-blue-600: #2f4d6b;
-  --color-blue-700: #263e56;
-  --color-blue-800: #1b2c3d;
-  --color-blue-900: #121e2a;
-  --color-blue-950: #0a131b;
+  /* الأزرق النيلي — أرقام الاختبار */
+  --color-blue-50: #edf2f8;
+  --color-blue-100: #dbe6f1;
+  --color-blue-200: #b9cde2;
+  --color-blue-300: #8dabc8;
+  --color-blue-400: #6386a8;
+  --color-blue-500: #46698b;
+  --color-blue-600: #375671;
+  --color-blue-700: #2c4459;
+  --color-blue-800: #1f3140;
+  --color-blue-900: #15222c;
+  --color-blue-950: #0b141a;
 
-  /* الطوبي — «خطأ» */
-  --color-rose-50: #f7ece8;
-  --color-rose-100: #efd8d1;
-  --color-rose-200: #dfb5a9;
-  --color-rose-300: #c98b79;
-  --color-rose-400: #b1664f;
-  --color-rose-500: #994a34;
-  --color-rose-600: #8e3b2e;
-  --color-rose-700: #743025;
-  --color-rose-800: #52231b;
-  --color-rose-900: #371812;
-  --color-rose-950: #200f0a;
+  /* الطوبي — الخطأ فقط */
+  --color-rose-50: #fdefec;
+  --color-rose-100: #fadcd6;
+  --color-rose-200: #f3b9ae;
+  --color-rose-300: #e79183;
+  --color-rose-400: #d76c5b;
+  --color-rose-500: #bf5142;
+  --color-rose-600: #a64134;
+  --color-rose-700: #853329;
+  --color-rose-800: #5f251e;
+  --color-rose-900: #401914;
+  --color-rose-950: #250f0b;
 
-  /*
-   * الزوايا: الكتاب لا يملك بطاقات مستديرة. 2px حدّ أقصى، والدائري للأقراص
-   * والنقاط فقط. هذا وحده يغيّر شخصية الواجهة أكثر من أي لون.
-   */
-  --radius-md: 0.0625rem;
-  --radius-lg: 0.125rem;
-  --radius-xl: 0.125rem;
-  --radius-2xl: 0.125rem;
-  --radius-3xl: 0.125rem;
+  /* استدارة: البطاقات مستديرة بلطف، والأزرار حبّوبية */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.875rem;
 
-  /* العمق: خطّ لا ظلّ. الظل الوحيد للنوافذ العائمة. */
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: none;
+  /* ظلّ واحد ناعم مشتقّ من لون الحبر لا من الأسود */
+  --shadow-xs: 0 1px 2px rgb(12 35 27 / 0.06);
+  --shadow-sm: 0 2px 10px -4px rgb(12 35 27 / 0.12);
+  --shadow-md: 0 14px 30px -18px rgb(12 35 27 / 0.28);
+  --shadow-lg: 0 28px 60px -32px rgb(12 35 27 / 0.35);
+  --shadow-xl: 0 40px 80px -40px rgb(12 35 27 / 0.4);
 }
 
-/* أسماء دلالية تُستعمل في المكوّنات الجديدة */
+/* أسماء دلالية تُستعمل في المكوّنات */
 @theme {
-  --color-paper: #f4efe3;
-  --color-sheet: #fbf7ee;
-  --color-sunken: #ebe4d4;
-  --color-rule: #dad1bc;
-  --color-rule-strong: #bfb49a;
-  --color-ink: #1a1b14;
-  --color-ink-soft: #4a4736;
-  --color-ink-faint: #6b6450;
-  --color-pine: #16513f;
-  --color-ochre: #7f5413;
+  --color-paper: #faf7f1;
+  --color-sheet: #ffffff;
+  --color-sunken: #eff6f2;
+  --color-rule: #e4ebe6;
+  --color-rule-strong: #cbd9d2;
+  --color-ink: #16211c;
+  --color-ink-soft: #4c5c54;
+  --color-ink-faint: #62736a;
+  --color-pine: #0e5a49;
+  --color-ochre: #8f6215;
 }
 
 @layer base {
   :root {
     color-scheme: light;
-    /* ورق دافئ لا أبيض: الأبيض النقي يبهت العين في القراءة الطويلة */
-    --background: #f4efe3;
-    --foreground: #1a1b14;
-    --card: #fbf7ee;
-    --card-foreground: #1a1b14;
-    --popover: #fbf7ee;
-    --popover-foreground: #1a1b14;
-    --primary: #16513f;
-    --primary-foreground: #f7f3e9;
-    --secondary: #ebe4d4;
-    --secondary-foreground: #1a1b14;
-    --muted: #ebe4d4;
-    --muted-foreground: #4a4736;
-    --accent: #ebe4d4;
-    --accent-foreground: #1a1b14;
-    --destructive: #8e3b2e;
-    --destructive-foreground: #f7f3e9;
-    --border: #dad1bc;
-    --input: #dad1bc;
-    --ring: #16513f;
-    --radius: 0.125rem;
-    /* الخطوط الشعرية — تُستخدم في كل المكوّنات بدل الحدود السميكة */
-    --rule: #dad1bc;
-    --rule-strong: #bfb49a;
-    --paper: #f4efe3;
-    --sheet: #fbf7ee;
-    --sunken: #ebe4d4;
-    --ink: #1a1b14;
-    --ink-soft: #4a4736;
-    --ink-faint: #6b6450;
-    --pine: #16513f;
-    --ochre: #7f5413;
+    /* ورق دافئ لا أبيض نقي: القراءة الطويلة على #fff تُتعب العين */
+    --background: #faf7f1;
+    --foreground: #16211c;
+    --card: #ffffff;
+    --card-foreground: #16211c;
+    --popover: #ffffff;
+    --popover-foreground: #16211c;
+    --primary: #0e5a49;
+    --primary-foreground: #ffffff;
+    --secondary: #eff6f2;
+    --secondary-foreground: #16211c;
+    --muted: #eff6f2;
+    --muted-foreground: #4c5c54;
+    --accent: #fdf5e4;
+    --accent-foreground: #16211c;
+    --destructive: #a64134;
+    --destructive-foreground: #ffffff;
+    --border: #e4ebe6;
+    --input: #dde9e3;
+    --ring: #0e5a49;
+    --radius: 1rem;
+
+    /* رموز النظام: سطحان + شريط + حبر + لون واحد */
+    --paper: #faf7f1;
+    --sheet: #ffffff;
+    --sunken: #eff6f2;
+    --band: #edf5f0;
+    --band-warm: #fdf5e4;
+    --rule: #e4ebe6;
+    --rule-strong: #cbd9d2;
+    --ink: #16211c;
+    --ink-soft: #4c5c54;
+    --ink-faint: #62736a;
+    --pine: #0e5a49;
+    --pine-deep: #0b4638;
+    --pine-soft: #e2f0ea;
+    --ochre: #8f6215;
+    --ochre-soft: #fdf5e4;
+    --shadow-card: 0 2px 10px -4px rgb(12 35 27 / 0.12);
+    --shadow-lift: 0 18px 34px -22px rgb(12 35 27 / 0.3);
   }
 
   /*
-   * الوضع الليلي: «حبر» لا «أزرق ليلي».
-   * الخلفية فحمية مائلة للأخضر، والأسطح أفتح منها بدرجة واحدة فقط،
-   * والخطوط الشعرية واضحة (1.9:1) حتى تُرى البنية بلا ظلال.
+   * الوضع الليلي: أخضر عميق لا أزرق ليلي، والأسطح أفتح من الصفحة بدرجة
+   * واحدة، والحدود واضحة (1.7:1) حتى تُقرأ البنية بلا ظلال ثقيلة.
    */
   .dark {
     color-scheme: dark;
-    --background: #0f1109;
-    --foreground: #efeada;
-    --card: #1a1c13;
-    --card-foreground: #efeada;
-    --popover: #1a1c13;
-    --popover-foreground: #efeada;
-    --primary: #7fb79f;
-    --primary-foreground: #0f1109;
-    --secondary: #22251a;
-    --secondary-foreground: #efeada;
-    --muted: #22251a;
-    --muted-foreground: #c9c3ae;
-    --accent: #22251a;
-    --accent-foreground: #efeada;
-    --destructive: #c98b79;
-    --destructive-foreground: #0f1109;
-    --border: #3a3d2e;
-    --input: #2a2d20;
-    --ring: #7fb79f;
-    --rule: #3f4335;
-    --rule-strong: #4d5140;
-    --paper: #0f1109;
-    --sheet: #1a1c13;
-    --sunken: #15170e;
-    --ink: #efeada;
-    --ink-soft: #c9c3ae;
-    --ink-faint: #a09a84;
-    --pine: #7fb79f;
-    --ochre: #d8a75a;
+    --background: #0b1310;
+    --foreground: #ecf3ef;
+    --card: #14211c;
+    --card-foreground: #ecf3ef;
+    --popover: #16241f;
+    --popover-foreground: #ecf3ef;
+    --primary: #6ed0b4;
+    --primary-foreground: #06201a;
+    --secondary: #16241f;
+    --secondary-foreground: #ecf3ef;
+    --muted: #16241f;
+    --muted-foreground: #b9c9c1;
+    --accent: #2a2416;
+    --accent-foreground: #f6e7c8;
+    --destructive: #e79183;
+    --destructive-foreground: #0b1310;
+    --border: #22362e;
+    --input: #1b2c26;
+    --ring: #6ed0b4;
+
+    --paper: #0b1310;
+    --sheet: #14211c;
+    --sunken: #101b17;
+    --band: #101d18;
+    --band-warm: #1d1a10;
+    --rule: #22362e;
+    --rule-strong: #335046;
+    --ink: #ecf3ef;
+    --ink-soft: #b9c9c1;
+    --ink-faint: #93a99e;
+    --pine: #6ed0b4;
+    --pine-deep: #8ee0c7;
+    --pine-soft: #12302a;
+    --ochre: #f0c878;
+    --ochre-soft: #241d10;
+    --shadow-card: 0 2px 12px -6px rgb(0 0 0 / 0.55);
+    --shadow-lift: 0 24px 44px -28px rgb(0 0 0 / 0.7);
   }
 }
 
@@ -405,173 +416,220 @@ strong {
 
 /*
  * ============================================================
- *  أدوات «الكتاب» — أساس الاتجاه البصري الجديد
+ *  أدوات الواجهة — طبقة واحدة تُبنى منها كل الشاشات
  * ============================================================
  *
- * كل شاشة تُبنى من أربعة عناصر فقط: نصّ، وخطّ شعري، ورقم في الهامش، وكتلة
- * حبر واحدة. لا بطاقات مستديرة ولا ظلال ولا تدرّجات. هذا يقلّل عدد الأشياء
- * القابلة للنقر ويجعل العين تتبع النصّ لا الصناديق.
+ * أربعة أنماط فقط: سطح (u-card)، شريحة (u-chip)، زر حبّوبي (u-cta/u-ghost)،
+ * وفهرس مقسّم (u-tabs). كل ما عداها نصوص ومسافات. هذا يمنع تكرار الأصناف
+ * الطويلة في كل مكوّن ويمنع أن يبدو كل قسم مصمَّمًا على حِدة.
  */
 
-/* عنوان رئيسي: نسخي بوزن 400 وحجم كبير — الهيبة من الحجم لا من السماكة */
-.z-display {
-  font-weight: 400;
-  line-height: 1.16;
-  letter-spacing: 0;
+/* سطح: بطاقة بيضاء مستديرة بظلّ ناعم مشتقّ من لون الحبر */
+.u-card {
+  background-color: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+.u-card-hover {
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.u-card-hover:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+  border-color: var(--rule-strong);
+}
+
+/* شريط قسم: نعنعي فاتح أو ذهبي، بحواف مستديرة كبيرة */
+.u-band {
+  background-color: var(--band);
+  border-radius: 1.875rem;
+}
+
+.u-band-warm {
+  background-color: var(--band-warm);
+  border-radius: 1.875rem;
+}
+
+/* شريحة صغيرة: حالة أو تصنيف */
+.u-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  background-color: var(--pine-soft);
+  color: var(--pine-deep);
+  padding: 0.3rem 0.7rem;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.u-chip-warm {
+  background-color: var(--ochre-soft);
+  color: var(--ochre);
+}
+
+/* عنوان كبير: النسخي بوزن 700 — الهيبة من الحجم والوزن معًا */
+.u-display {
+  font-weight: 700;
+  line-height: 1.28;
   color: var(--ink);
   text-wrap: balance;
 }
 
-/* تسمية صغيرة فوق العنوان: بلا letter-spacing (يحطّم اتصال الحروف العربية) */
-.z-kicker {
+.u-kicker {
   font-size: var(--text-meta);
   font-weight: 700;
   line-height: 1.5;
   color: var(--ink-faint);
 }
 
-/* الرقم في الهامش — عمود الكتاب */
-.z-num {
-  font-size: var(--text-meta);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-faint);
+/* تمييز كلمة داخل العنوان: خطّ ماركر ذهبي لا لون صارخ */
+.u-mark {
+  background-image: linear-gradient(transparent 58%, var(--ochre-soft) 58%);
+  background-repeat: no-repeat;
+  padding-inline: 0.15rem;
 }
 
-/* خطّ شعري: العنصر البنيوي الوحيد */
-.z-hair {
-  border-color: var(--rule);
-}
-
-/* ورقة: سطح بلا ظلّ ولا استدارة */
-.z-sheet {
-  background-color: var(--sheet);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-}
-
-.z-sunken {
-  background-color: var(--sunken);
-  border-radius: 2px;
-}
-
-/* عرض القراءة: 62 محرفًا كحدّ أقصى، وإلا تعبَت العين */
-.z-measure {
-  max-width: 62ch;
-}
-
-/* زرّ الحبر: الكتلة الوحيدة الممتلئة في الشاشة */
-.z-btn {
+/* زرّ أساسي: حبّوبي ممتلئ، ظلّ خفيف، وحركة دفع صغيرة */
+.u-cta {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 2px;
-  background-color: var(--ink);
-  color: var(--paper);
-  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background-color: var(--pine);
+  color: #fff;
+  padding: 0.7rem 1.35rem;
   font-size: var(--text-label);
   font-weight: 700;
-  transition: opacity 0.15s ease;
+  box-shadow: var(--shadow-card);
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease;
 }
 
-.z-btn:hover {
-  opacity: 0.88;
+.u-cta:hover {
+  background-color: var(--pine-deep);
+  transform: translateY(-1px);
 }
 
-/* زرّ الخطّ: بديل ثانوي، بحدّ شعري فقط */
-.z-btn-ghost {
+.dark .u-cta {
+  color: #06201a;
+}
+
+/* زرّ ثانوي: حدّ فقط */
+.u-ghost {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  border-radius: 999px;
   border: 1px solid var(--rule-strong);
-  border-radius: 2px;
-  padding: 0.7rem 1.1rem;
+  background-color: var(--sheet);
+  padding: 0.7rem 1.2rem;
   font-size: var(--text-label);
   font-weight: 700;
   color: var(--ink);
-  transition: background-color 0.15s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.z-btn-ghost:hover {
+.u-ghost:hover {
   background-color: var(--sunken);
+  border-color: var(--pine);
 }
 
-.dark .z-btn {
-  background-color: var(--foreground);
-  color: #0f1109;
-}
-
-.dark .z-btn-ghost {
-  border-color: var(--rule-strong);
-  color: var(--foreground);
-}
-
-.dark .z-btn-ghost:hover {
+/* فهرس مقسّم: حاوية نعنعية والاختيار قرص أبيض — نمط لوحة الإلهام */
+.u-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-radius: 999px;
   background-color: var(--sunken);
+  padding: 0.25rem;
 }
 
-/* رابط تحريري: خطّ تحت النصّ لا لون */
-.z-link {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--rule-strong);
-  transition: text-decoration-color 0.15s ease;
-}
-
-.z-link:hover {
-  text-decoration-color: var(--pine);
-}
-
-/* فهرس أفقي: أرقام وعلامة سفلية، لا أقراص ملوّنة */
-.z-index-item {
-  position: relative;
+.u-tab {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.55rem 0.15rem;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
   font-size: var(--text-label);
   font-weight: 700;
   color: var(--ink-soft);
-  white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-.z-index-item[aria-selected="true"],
-.z-index-item[data-active="true"] {
+.u-tab:hover {
   color: var(--ink);
 }
 
-.z-index-item[aria-selected="true"]::after,
-.z-index-item[data-active="true"]::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  bottom: -1px;
-  height: 2px;
-  background-color: var(--pine);
+.u-tab[aria-selected="true"] {
+  background-color: var(--sheet);
+  color: var(--pine-deep);
+  box-shadow: var(--shadow-xs);
 }
 
-/* اقتباس شرعي: خطّ جانبي لا صندوق ملوّن */
-.z-quote {
-  border-inline-start: 2px solid var(--rule-strong);
-  padding-inline-start: 1rem;
+.dark .u-tab[aria-selected="true"] {
+  background-color: var(--pine-soft);
+  color: var(--pine);
 }
 
-/* الشبكة التحريرية: 12 عمودًا على الحاسوب، عمود واحد على الهاتف */
-.z-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.5rem;
+/* عدد داخل تبويب */
+.u-tab-count {
+  border-radius: 999px;
+  background-color: var(--rule);
+  padding: 0 0.4rem;
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
 
-@media (max-width: 767px) {
-  .z-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.25rem;
+/* اقتباس شرعي: سطح نعنعي مع حدّ جانبي */
+.u-quote {
+  border-radius: 1rem;
+  border-inline-start: 3px solid var(--pine);
+  background-color: var(--pine-soft);
+  padding: 1rem 1.1rem;
+}
+
+/* رقم/عدّاد */
+.u-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* عرض القراءة */
+.u-measure {
+  max-width: 64ch;
+}
+
+/* شبكة المحتوى */
+.u-wrap {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1180px;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .u-wrap {
+    padding-inline: 2rem;
   }
 }
