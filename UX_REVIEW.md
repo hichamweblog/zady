@@ -263,7 +263,7 @@ Cairo خط **كوفي هندسي** صُمّم أصلًا للعناوين وال
 > Arabic نفسه (Google نقلته إلى عائلة Noto). استخدام Noto = نفس الروح، مع
 > تغطية أكمل وتحديثات مستمرة وترخيص OFL.
 
-**دليل بصري:** `/tmp/specimen/typography.png` (مقارنة Cairo ↔ Noto Naskh على
+**دليل بصري:** [`docs/typography-before-after.png`](docs/typography-before-after.png) (مقارنة Cairo ↔ Noto Naskh على
 نفس النص). بدا الفرق واضحًا في التشكيل والوصلات، وظهرت في نسخة Cairo مربّعات
 فارغة حيث يفقد أشكال الحروف النهائية.
 
