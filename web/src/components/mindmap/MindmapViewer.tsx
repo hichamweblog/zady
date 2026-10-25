@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
   ZoomIn,
@@ -9,13 +10,30 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronDown,
-  Info,
-  BookOpen,
   Layers,
   FileImage,
-  ArrowRight,
+  Network,
 } from "lucide-react";
 import type { MindmapNode } from "@/lib/types";
+import MindmapDetailsPanel from "./MindmapDetailsPanel";
+
+/**
+ * الخريطة التفاعلية (React Flow) تُحمَّل عند الطلب فقط:
+ * حزمتها (~55KB مضغوطًا) لا تخصم من وقت التحميل الأول للصفحة،
+ * ولا تُحمَّل إطلاقًا لمن يكتفي بالمخطط الشجري.
+ */
+const MindmapGraph = dynamic(() => import("./MindmapGraph"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[420px] sm:h-[520px] lg:h-[600px] w-full animate-pulse rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 flex items-center justify-center">
+      <span className="text-sm font-bold text-slate-600 dark:text-slate-300">
+        جارٍ تجهيز الخريطة التفاعلية…
+      </span>
+    </div>
+  ),
+});
+
+type ViewMode = "tree" | "graph" | "image";
 
 interface MindmapViewerProps {
   rootNode: MindmapNode;
@@ -24,10 +42,29 @@ interface MindmapViewerProps {
 }
 
 export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: MindmapViewerProps) {
-  const [viewMode, setViewMode] = useState<"tree" | "image">("tree");
+  const [viewMode, setViewMode] = useState<ViewMode>("tree");
   const [selectedNode, setSelectedNode] = useState<MindmapNode | null>(rootNode);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [collapsedNodes, setCollapsedNodes] = useState<Record<string, boolean>>({});
+
+  /** فهرس id ⇒ عقدة (تُستخدمه الخريطة التفاعلية للتنقل من العقدة إلى لوحة الشرح) */
+  const nodesById = useMemo(() => {
+    const map = new Map<string, MindmapNode>();
+    const walk = (node: MindmapNode) => {
+      map.set(node.id, node);
+      node.children?.forEach(walk);
+    };
+    walk(rootNode);
+    return map;
+  }, [rootNode]);
+
+  const selectById = useCallback(
+    (id: string) => {
+      const node = nodesById.get(id);
+      if (node) setSelectedNode(node);
+    },
+    [nodesById]
+  );
 
   const toggleCollapse = (id: string) => {
     setCollapsedNodes((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -37,32 +74,44 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
     setZoomLevel((prev) => Math.min(Math.max(prev + delta, 0.5), 2.5));
   };
 
+  const tabClass = (active: boolean) =>
+    `flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all ${
+      active
+        ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-sm"
+        : "text-slate-700 dark:text-slate-300 hover:text-slate-900"
+    }`;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl" role="tablist">
+        <div
+          className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl flex-wrap"
+          role="tablist"
+          aria-label="طرق عرض الخريطة الذهنية"
+        >
           <button
             role="tab"
             aria-selected={viewMode === "tree"}
             onClick={() => setViewMode("tree")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all ${
-              viewMode === "tree"
-                ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-sm"
-                : "text-slate-700 dark:text-slate-300 hover:text-slate-900"
-            }`}
+            className={tabClass(viewMode === "tree")}
           >
             <Layers className="w-4 h-4" aria-hidden="true" />
             <span>المخطط الشجري والتفاصيل</span>
           </button>
           <button
             role="tab"
+            aria-selected={viewMode === "graph"}
+            onClick={() => setViewMode("graph")}
+            className={tabClass(viewMode === "graph")}
+          >
+            <Network className="w-4 h-4" aria-hidden="true" />
+            <span>الخريطة التفاعلية</span>
+          </button>
+          <button
+            role="tab"
             aria-selected={viewMode === "image"}
             onClick={() => setViewMode("image")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all ${
-              viewMode === "image"
-                ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-sm"
-                : "text-slate-700 dark:text-slate-300 hover:text-slate-900"
-            }`}
+            className={tabClass(viewMode === "image")}
           >
             <FileImage className="w-4 h-4" aria-hidden="true" />
             <span>الخريطة البصرية</span>
@@ -99,103 +148,24 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
         )}
 
         <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold hidden md:block">
-          💡 اختر أي محور من الفهرس لعرض شرحه وشواهده
+          {viewMode === "graph"
+            ? "💡 اسحب الخريطة وتنقّل بين العقد — انقر أي عقدة لعرض شرحها"
+            : "💡 اختر أي محور من الفهرس لعرض شرحه وشواهده"}
         </p>
       </div>
 
-      {viewMode === "tree" ? (
+      {viewMode === "tree" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* لوحة التفاصيل */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 flex items-center justify-center">
-                  <Info className="w-5 h-5" aria-hidden="true" />
-                </div>
-                <div>
-                  <h2 className="font-black text-lg text-slate-900 dark:text-white">
-                    شرح وتفاصيل المحور المحدد
-                  </h2>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    انقر فوق عناصر الفهرس للتنقل
-                  </p>
-                </div>
-              </div>
-
-              {selectedNode && selectedNode.id !== rootNode.id && (
-                <button
-                  onClick={() => setSelectedNode(rootNode)}
-                  className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
-                >
-                  الرجوع للأصل
-                </button>
-              )}
-            </div>
-
-            {selectedNode ? (
-              <div className="space-y-6">
-                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-1.5">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-teal-800 dark:text-teal-400 block">
-                    العنوان المفهومي
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-snug">
-                    {selectedNode.label}
-                  </h3>
-                </div>
-
-                {selectedNode.details ? (
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">
-                      البيان والشرح
-                    </span>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-lg leading-relaxed font-medium border border-slate-200 dark:border-slate-800">
-                      {selectedNode.details}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 rounded-2xl bg-teal-50/70 dark:bg-teal-950/20 border border-teal-200/70 dark:border-teal-900/40 text-sm text-teal-900 dark:text-teal-200 font-medium">
-                    هذا محور رئيسي: اختر أحد عناصره الفرعية لعرض الشرح والشواهد.
-                  </div>
-                )}
-
-                {selectedNode.proof && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-black text-amber-900 dark:text-amber-400">
-                      <BookOpen className="w-5 h-5 text-amber-600" aria-hidden="true" />
-                      <span>الشاهد الشرعي</span>
-                    </div>
-                    <div className="p-5 sm:p-6 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border-r-4 border-amber-500 text-amber-950 dark:text-amber-100 font-quran text-xl sm:text-2xl leading-loose">
-                      {selectedNode.proof}
-                    </div>
-                  </div>
-                )}
-
-                {selectedNode.children && selectedNode.children.length > 0 && (
-                  <div className="space-y-3 pt-2">
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">
-                      يتفرع عن هذا المحور ({selectedNode.children.length} عناصر):
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {selectedNode.children.map((child) => (
-                        <button
-                          key={child.id}
-                          onClick={() => setSelectedNode(child)}
-                          className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:border-teal-500 hover:bg-teal-50/40 dark:hover:bg-slate-800 transition-all flex items-center justify-between gap-2 text-sm font-bold text-slate-800 dark:text-slate-200 text-right"
-                        >
-                          <span className="truncate">{child.label}</span>
-                          <ArrowRight className="w-4 h-4 text-slate-400 shrink-0 rotate-180" aria-hidden="true" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-500">حدد عنصرًا من الفهرس لاستعراض تفاصيله.</p>
-            )}
+          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+            <MindmapDetailsPanel
+              node={selectedNode}
+              rootId={rootNode.id}
+              entitiesLabel="محاور"
+              onSelect={setSelectedNode}
+              onBackToRoot={() => setSelectedNode(rootNode)}
+            />
           </div>
 
-          {/* فهرس الشجرة */}
           <nav
             aria-label="فهرس محاور الوحدة"
             className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4"
@@ -203,7 +173,9 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-teal-700 dark:text-teal-400" aria-hidden="true" />
-                <h2 className="font-black text-base text-slate-900 dark:text-white">فهرس محاور الوحدة</h2>
+                <h2 className="font-black text-base text-slate-900 dark:text-white">
+                  فهرس محاور الوحدة
+                </h2>
               </div>
               <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
                 {rootNode.children?.length ?? 0} أبواب رئيسية
@@ -246,7 +218,36 @@ export default function MindmapViewer({ rootNode, imageSrc, unitTitle }: Mindmap
             </div>
           </nav>
         </div>
-      ) : (
+      )}
+
+      {viewMode === "graph" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-8 space-y-3">
+            <MindmapGraph
+              root={rootNode}
+              selectedId={selectedNode?.id ?? rootNode.id}
+              onSelectNode={selectById}
+            />
+            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium px-1">
+              الخريطة مولَّدة من نفس بيانات المحاور — كل عقدة قابلة للنقر. إن واجهت صعوبة في
+              التنقل، استخدم «المخطط الشجري» فهو يعمل بلوحة المفاتيح وقارئ الشاشة.
+            </p>
+          </div>
+
+          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm lg:sticky lg:top-24">
+            <MindmapDetailsPanel
+              node={selectedNode}
+              rootId={rootNode.id}
+              entitiesLabel="محاور"
+              compact
+              onSelect={setSelectedNode}
+              onBackToRoot={() => setSelectedNode(rootNode)}
+            />
+          </div>
+        </div>
+      )}
+
+      {viewMode === "image" && (
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-sm overflow-hidden flex flex-col items-center">
           <div className="w-full overflow-auto max-h-[750px] p-2 flex justify-center">
             <div
