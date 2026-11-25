@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun, ChevronDown, BookOpen } from "lucide-react";
+import { Moon, Sun, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UNITS_META } from "@/lib/units-meta";
 import { toggleTheme, useIsDark } from "@/lib/useTheme";
 
 /**
- * الترويسة — شريط أبيض لاصق، شعار مربّع نعنعي، وروابط نصّية ثم زرّ ليلي حبّوبي.
- * لا شعارات متدرّجة ولا شارات حالة مكرّرة: الشريط يجب أن يبقى أخفّ من المحتوى.
+ * الترويسة — شريط أبيض لاصق بشعار دراية الأفقي المعتمد (v4.1).
  */
 export default function Navbar() {
   const pathname = usePathname();
@@ -39,17 +38,15 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-[var(--hairline)] bg-[var(--canvas)]/80 backdrop-blur-xl">
       <div className="u-wrap flex h-14 items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-6">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="زادِي">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand-strong)] text-white shadow-[var(--shadow-sm)] dark:text-[var(--brand-ink)]">
-              <BookOpen className="h-4 w-4" aria-hidden="true" />
-            </span>
-            <span className="leading-tight">
-              <span className="block text-label font-bold tracking-normal text-[var(--ink)]">
-                زادِي
-              </span>
-              <span className="block text-meta font-bold text-[var(--ink-faint)]">
-                العلوم الإسلامية
-              </span>
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="دراية — الرئيسية">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/diraya-logo-horizontal.svg"
+              alt="دراية"
+              className="h-9 w-auto dark:brightness-0 dark:invert"
+            />
+            <span className="hidden border-s border-[var(--hairline)] ps-2.5 text-meta font-semibold text-[var(--ink-faint)] sm:inline">
+              العلوم الإسلامية
             </span>
           </Link>
 

@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/_next/", "/icons/", "/og/"],
       },
     ],
-    sitemap: "https://zady.app/sitemap.xml",
-    host: "https://zady.app",
+    sitemap: "https://diraya.app/sitemap.xml",
+    host: "https://diraya.app",
   };
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://zady.app/schema/unit.schema.json",
-  "title": "زادِي — وحدة دراسية كاملة (ملف واحد)",
+  "$id": "https://diraya.app/schema/unit.schema.json",
+  "title": "دراية — وحدة دراسية كاملة (ملف واحد)",
   "description": "ملف واحد لكل وحدة يجمع المادة العلمية كلها: البيانات الوصفية، الفيديو، نصّ الدرس، الخريطة، البطاقات، الفراغات، اختبار QCM، بنك الأسئلة، والمراجعة السريعة. كل الملفات في src/data/units/ يجب أن تطابق هذا المخطط.",
   "type": "object",
   "required": ["schemaVersion", "unit", "lesson", "mindmap", "flashcards", "cloze", "quiz", "questionBank", "revision"],

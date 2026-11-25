@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 import { UNITS_META } from "@/lib/units-meta";
 import ResetProgressButton from "@/components/settings/ResetProgressButton";
 
@@ -8,14 +7,16 @@ export default function Footer() {
     <footer className="mt-auto border-t border-[var(--hairline)] bg-[var(--surface-2)] py-8">
       <div className="u-wrap space-y-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-start gap-2">
-            <GraduationCap
-              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand-strong)]"
-              aria-hidden="true"
+          <div className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/diraya-logo-symbol.svg"
+              alt="شعار دراية"
+              className="h-7 w-auto shrink-0 dark:brightness-0 dark:invert"
             />
             <div>
               <p className="text-label font-semibold text-[var(--ink)]">
-                زادِي — مساحة مراجعة للعلوم الإسلامية
+                دراية — مساحة مراجعة للعلوم الإسلامية
               </p>
             </div>
           </div>
