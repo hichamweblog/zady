@@ -26,7 +26,7 @@ export function toggleTheme(): void {
   const nextIsDark = !document.documentElement.classList.contains("dark");
   document.documentElement.classList.toggle("dark", nextIsDark);
   try {
-    localStorage.setItem("zady_theme", nextIsDark ? "dark" : "light");
+    localStorage.setItem("diraya_theme", nextIsDark ? "dark" : "light");
   } catch {
     /* التخزين المحلي محجوب: الثيم يبقى لهذه الجلسة فقط */
   }

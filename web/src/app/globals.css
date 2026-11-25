@@ -1,235 +1,266 @@
 @import "tailwindcss";
 
 /*
- * الوضع الداكن: **بالكلاس لا بتفضيل النظام**.
- *
- * Tailwind v4 يجعل `dark:` تتبع `@media (prefers-color-scheme: dark)` افتراضيًا.
- * ولأن هذا التطبيق يملك مفتاح تبديل صريحًا (كلاس `.dark` على <html>)، كان
- * الوضع الفاتح لا يعمل عند من نظامه داكن: كل أدوات `dark:*` تبقى مفعّلة
- * وتتجاهل المفتاح، بينما خلفية الصفحة (متغيّرات CSS) تصبح فاتحة ⇒ خليط.
- * السطر التالي يربط كل `dark:*` بالكلاس وحده.
+ * الوضع الداكن بالكلاس فقط (تفضيل يدوي، لا وضع داكن تلقائي وفق سياسة دراية v4.1).
  */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
  * ============================================================
- *  مقياس الطباعة — مصدر واحد لكل الأحجام
+ *  مقياس الطباعة — دراية v4.1 (RTL, mobile-first)
  * ============================================================
- *
- * المشكلة قبل ذلك: 294 صنف حجم نص موزّعة على 8 مقاسات متقاربة
- * (10px · 11px · xs 12 · 13px · sm 14 · base 16 …)، فكان النص العربي
- * يتفاوت بين بطاقة وأخرى بلا سبب، وكثير منه يصغر عن حدّ القراءة.
- *
- * القاعدة الآن:
- *   - المتن 18px (الطالب يقرأ من الهاتف؛ 16px لاتيني لا يكفي لعربية مشكولة).
- *   - أصغر نص في التطبيق 14px، ولا يوجد 10px أو 11px أو 12px إطلاقًا.
- *   - ستة مقاسات فقط: meta · label · body-sm · body · title · display.
- *
- * المتغيّرات معرّفة هنا، والأصناف (utilities) في نهاية الملف.
+ * - متن الواجهة: 18px / 500 (Readex Pro)
+ * - متن الدرس: 20px / 500 (Readex Pro)
+ * - العناوين: Tajawal 800
+ * - النصوص الشرعية والقرآنية: Amiri / Amiri Quran
  */
 @theme {
-  --text-meta: 0.8125rem; /* 13px — بيانات وصفية فقط */
-  --text-meta--line-height: 1.55;
+  --text-meta: 0.875rem; /* 14px */
+  --text-meta--line-height: 1.8;
 
-  --text-label: 0.875rem; /* 14px — أزرار وتسميات */
-  --text-label--line-height: 1.6;
+  --text-label: 1rem; /* 16px */
+  --text-label--line-height: 1.75;
 
-  --text-body-sm: 1rem; /* 16px — نص ثانوي كثيف */
-  --text-body-sm--line-height: 1.75;
+  --text-body-sm: 1rem; /* 16px */
+  --text-body-sm--line-height: 1.8;
 
-  --text-body: 1.125rem; /* 18px — متن القراءة (قرار الجولة 16: العربية تحتاج أكبر) */
-  --text-body--line-height: 1.8;
+  --text-body: 1.125rem; /* 18px — متن الواجهة المعتمد في دراية v4.1 */
+  --text-body--line-height: 1.9;
 
-  --text-title: 1.25rem; /* 20px — عنوان قسم/بطاقة */
-  --text-title--line-height: 1.45;
+  --text-lesson: 1.25rem; /* 20px — متن الدرس المعتمد في دراية v4.1 */
+  --text-lesson--line-height: 1.95;
 
-  --text-heading: 1.375rem; /* 22px — عنوان فرعي */
+  --text-title: 1.25rem; /* 20px */
+  --text-title--line-height: 1.4;
+
+  --text-heading: 1.5rem; /* 24px */
   --text-heading--line-height: 1.35;
 
-  --text-display: 1.75rem; /* 28px — عنوان صفحة/وحدة */
+  --text-display: 1.875rem; /* 30px */
   --text-display--line-height: 1.3;
 }
 
-
 /*
  * ============================================================
- *  نظام «سليت وتيل» — Slate & Deep Teal
+ *  نظام الألوان — دراية v4.1 (Diraya Bold Mobile-First)
  * ============================================================
- *
- * التشخيص الذي دفع إلى هذا النظام:
- *   - الخلفية الزيتية الدافئة كانت تُتعب العين وتُصفرّ الشاشة.
- *   - حدود 1px حول كل بطاقة جعلت الواجهة شبكة مربّعات متشابكة.
- *   - شريط بـ6 تبويبات متجاورة بلا مسار تعليمي.
- *
- * العلاج: كانفس سليت بارد #F8FAFC، سطح أبيض، لون علامة واحد (تيل عميق)،
- * وذهب واحد للتنبيه المنهجي. الفصل بين الأسطح يحدث بالتباين والظلّ الناعم
- * لا بالحدود. ونعيد كتابة درجات Tailwind نفسها حتى تتلوّن كل المكوّنات
- * القديمة تلقائيًا بلا تعارض.
+ * - النيلي (الشعار والروابط والتركيز): #00316F
+ * - الأزرق الملكي v4.1 (الأساسي): #3157B7 / مرور #27499D / ضغط #1F3B82
+ * - السماوي: #39D5DC / سطح #DDF7F5 / ثانوي #006575
+ * - الأصفر: #FFD34D / تحذير #775400 / خلفية #FFF8DC
+ * - الحبر: #122D52 / باهت #52647F / كانفس #FFFFFF / سطح ناعم #EEF3FF
  */
 @theme {
-  /* الأسطح والحبر — تحلّ محل slate */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
-  --color-slate-900: #0f172a;
-  --color-slate-950: #0b0f17;
+  /* الأسطح والحبر — متناغمة مع حبر دراية #122D52 */
+  --color-slate-50: #f7f9ff;
+  --color-slate-100: #eef3ff;
+  --color-slate-200: #d6dfed;
+  --color-slate-300: #b8c7de;
+  --color-slate-400: #71849f;
+  --color-slate-500: #52647f;
+  --color-slate-600: #3a4f6f;
+  --color-slate-700: #253b5e;
+  --color-slate-800: #122d52;
+  --color-slate-900: #0a1e3b;
+  --color-slate-950: #061327;
 
-  /* التيل — العلامة والتفاعل (يحلّ محل teal) */
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-  --color-teal-900: #134e4a;
-  --color-teal-950: #042f2e;
+  /* الأزرق الملكي لدراية v4.1 — يحلّ محل teal في كل المكوّنات */
+  --color-teal-50: #eef3ff;
+  --color-teal-100: #dce6ff;
+  --color-teal-200: #bdceff;
+  --color-teal-300: #8faeff;
+  --color-teal-400: #5c84e8;
+  --color-teal-500: #3d66cc;
+  --color-teal-600: #3157b7;
+  --color-teal-700: #27499d;
+  --color-teal-800: #1f3b82;
+  --color-teal-900: #00316f;
+  --color-teal-950: #001f4a;
 
-  /* الذهبي — للتنبيه المنهجي والشرح، لا للزينة (يحلّ محل amber) */
-  --color-amber-50: #fffbeb;
-  --color-amber-100: #fef3c7;
-  --color-amber-200: #fde68a;
-  --color-amber-300: #fcd34d;
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
-  --color-amber-600: #d97706;
-  --color-amber-700: #b45309;
-  --color-amber-800: #92400e;
-  --color-amber-900: #78350f;
-  --color-amber-950: #451a03;
+  /* الأصفر الدافئ لدراية — للتنبيه المنهجي */
+  --color-amber-50: #fff8dc;
+  --color-amber-100: #fff1b8;
+  --color-amber-200: #ffe480;
+  --color-amber-300: #ffd34d;
+  --color-amber-400: #f5be26;
+  --color-amber-500: #d99b00;
+  --color-amber-600: #a67400;
+  --color-amber-700: #775400;
+  --color-amber-800: #5c4000;
+  --color-amber-900: #422e00;
+  --color-amber-950: #2b1d00;
 
-  /* الزمردي — «متقن/تمّ» فقط */
-  --color-emerald-50: #ecfdf5;
-  --color-emerald-100: #d1fae5;
-  --color-emerald-200: #a7f3d0;
-  --color-emerald-300: #6ee7b7;
-  --color-emerald-400: #34d399;
-  --color-emerald-500: #10b981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
-  --color-emerald-800: #065f46;
-  --color-emerald-900: #064e3b;
-  --color-emerald-950: #022c22;
+  /* الأخضر — «متقن/تمّ» (#137A50) */
+  --color-emerald-50: #eaf7f0;
+  --color-emerald-100: #cdeedc;
+  --color-emerald-200: #9eddb9;
+  --color-emerald-300: #66c791;
+  --color-emerald-400: #35ad6d;
+  --color-emerald-500: #1b9158;
+  --color-emerald-600: #137a50;
+  --color-emerald-700: #0f6240;
+  --color-emerald-800: #0c4d33;
+  --color-emerald-900: #093c28;
+  --color-emerald-950: #052619;
 
-  /* الأزرق النيلي — أرقام الاختبار */
-  --color-blue-50: #eff6ff;
-  --color-blue-100: #dbeafe;
-  --color-blue-200: #bfdbfe;
-  --color-blue-300: #93c5fd;
-  --color-blue-400: #60a5fa;
-  --color-blue-500: #3b82f6;
-  --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
-  --color-blue-800: #1e40af;
-  --color-blue-900: #1e3a8a;
-  --color-blue-950: #172554;
+  /* الأزرق السماوي/النيلي */
+  --color-blue-50: #eef3ff;
+  --color-blue-100: #dce6ff;
+  --color-blue-200: #bdceff;
+  --color-blue-300: #8faeff;
+  --color-blue-400: #5c84e8;
+  --color-blue-500: #3d66cc;
+  --color-blue-600: #3157b7;
+  --color-blue-700: #27499d;
+  --color-blue-800: #1f3b82;
+  --color-blue-900: #00316f;
+  --color-blue-950: #001f4a;
 
-  /* الوردي — الخطأ فقط */
+  /* الأحمر — الخطأ (#B82F3D) */
   --color-rose-50: #fff1f2;
-  --color-rose-100: #ffe4e6;
-  --color-rose-200: #fecdd3;
-  --color-rose-300: #fda4af;
-  --color-rose-400: #fb7185;
-  --color-rose-500: #f43f5e;
-  --color-rose-600: #e11d48;
-  --color-rose-700: #be123c;
-  --color-rose-800: #9f1239;
-  --color-rose-900: #881337;
-  --color-rose-950: #4c0519;
+  --color-rose-100: #ffe1e4;
+  --color-rose-200: #fec6cc;
+  --color-rose-300: #fb9ba6;
+  --color-rose-400: #f46677;
+  --color-rose-500: #dc3f51;
+  --color-rose-600: #b82f3d;
+  --color-rose-700: #992330;
+  --color-rose-800: #7f1e29;
+  --color-rose-900: #691b24;
+  --color-rose-950: #3e0b11;
 
-  /* استدارة: حاويات 16px، أزرار وحقول 12px، رقائق حبّوبية */
+  /* استدارة دراية v4.1: عناصر تحكم 8px، بطاقات 12px، لوحات 16px، زينة 24px */
   --radius-sm: 0.5rem;
-  --radius-md: 0.625rem;
+  --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1rem;
-  --radius-3xl: 1.25rem;
+  --radius-3xl: 1.5rem;
 
-  /* ظلّ محيطي ناعم متعدّد الطبقات — لا أسود صريح */
-  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.04);
-  --shadow-md: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 2px 6px -1px rgb(15 23 42 / 0.03);
-  --shadow-lg: 0 12px 32px -8px rgb(15 23 42 / 0.12), 0 4px 12px -4px rgb(15 23 42 / 0.05);
-  --shadow-xl: 0 24px 48px -12px rgb(15 23 42 / 0.16);
+  /* ظلّ محيطي ناعم متناغم مع النيلي */
+  --shadow-xs: 0 1px 2px rgb(0 49 111 / 0.05);
+  --shadow-sm: 0 1px 3px rgb(0 49 111 / 0.06), 0 1px 2px -1px rgb(0 49 111 / 0.04);
+  --shadow-md: 0 4px 20px -2px rgb(0 49 111 / 0.08), 0 2px 6px -1px rgb(0 49 111 / 0.04);
+  --shadow-lg: 0 12px 32px -8px rgb(0 49 111 / 0.14), 0 4px 12px -4px rgb(0 49 111 / 0.06);
+  --shadow-xl: 0 24px 48px -12px rgb(0 49 111 / 0.18);
 }
 
 /* أسماء دلالية تُستعمل في المكوّنات */
 @theme {
-  --color-canvas: #f8fafc;
+  --color-canvas: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-2: #f1f5f9;
-  --color-hairline: #e2e8f0;
-  --color-ink: #0f172a;
-  --color-ink-2: #475569;
-  --color-brand: #0d9488;
-  --color-accent: #d97706;
+  --color-surface-2: #eef3ff;
+  --color-hairline: #d6dfed;
+  --color-ink: #122d52;
+  --color-ink-2: #52647f;
+  --color-brand: #3157b7;
+  --color-accent: #ffd34d;
 }
 
 @layer base {
-  /*
-   * الرموز الدلالية — الأسماء الجديدة هي المصدر، والأسماء القديمة (paper/sheet/
-   * pine/ochre/ink) تبقى كأسماء مستعارة حتى لا ينكسر أي مكوّن لم يُهاجَر بعد.
-   */
   :root {
     color-scheme: light;
-    /* الكانفس والسطح */
-    --background: #f8fafc;
-    --foreground: #0f172a;
+
+    /* رموز دراية v4.1 المرجعية والدلالية */
+    --brand-navy: #00316f;
+    --brand-blue: #3157b7;
+    --brand-cyan: #39d5dc;
+    --brand-yellow: #ffd34d;
+    --brand-ink: #ffffff;
+    --brand-canvas: #eef3ff;
+    --brand-muted: #52647f;
+    --brand-teal: #006575;
+    --brand-success: #137a50;
+    --brand-error: #b82f3d;
+    --brand-warning: #775400;
+    --brand-control: #71849f;
+
+    --color-canvas: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-soft: #eef3ff;
+    --color-surface-cyan: #ddf7f5;
+    --color-text: #122d52;
+    --color-muted: #52647f;
+    --color-primary: #3157b7;
+    --color-primary-hover: #27499d;
+    --color-primary-pressed: #1f3b82;
+    --color-on-primary: #ffffff;
+    --color-link: #00316f;
+    --color-secondary: #006575;
+    --color-success: #137a50;
+    --color-success-bg: #eaf7f0;
+    --color-danger: #b82f3d;
+    --color-danger-bg: #fff1f2;
+    --color-warning: #775400;
+    --color-warning-bg: #fff8dc;
+    --color-border: #d6dfed;
+    --color-control-border: #71849f;
+    --color-focus: #00316f;
+    --color-disabled-bg: #e8edf4;
+    --color-disabled-text: #52647f;
+
+    --radius-control: 8px;
+    --radius-card: 12px;
+    --radius-panel: 16px;
+    --radius-decorative: 24px;
+    --layout-max: 1248px;
+    --layout-reading: 720px;
+    --button-height: 52px;
+    --target-min: 48px;
+    --focus-width: 3px;
+    --focus-offset: 3px;
+
+    /* الكانفس والسطح (توافق المكوّنات الحالية) */
+    --background: #ffffff;
+    --foreground: #122d52;
     --card: #ffffff;
-    --card-foreground: #0f172a;
+    --card-foreground: #122d52;
     --popover: #ffffff;
-    --popover-foreground: #0f172a;
-    --primary: #0f766e;
+    --popover-foreground: #122d52;
+    --primary: #3157b7;
     --primary-foreground: #ffffff;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    --muted: #f1f5f9;
-    --muted-foreground: #475569;
-    --accent: #d97706;
-    --accent-foreground: #ffffff;
-    --destructive: #be123c;
+    --secondary: #eef3ff;
+    --secondary-foreground: #122d52;
+    --muted: #eef3ff;
+    --muted-foreground: #52647f;
+    --accent: #ffd34d;
+    --accent-foreground: #122d52;
+    --destructive: #b82f3d;
     --destructive-foreground: #ffffff;
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #0d9488;
+    --border: #d6dfed;
+    --input: #71849f;
+    --ring: #00316f;
 
     /* السطح والعمق */
-    --canvas: #f8fafc;
+    --canvas: #ffffff;
     --surface: #ffffff;
-    --surface-2: #f1f5f9;
-    --surface-3: #e2e8f0;
-    --hairline: #e2e8f0;
-    --hairline-strong: #cbd5e1;
+    --surface-2: #eef3ff;
+    --surface-3: #d6dfed;
+    --hairline: #d6dfed;
+    --hairline-strong: #71849f;
 
     /* الحبر */
-    --ink: #0f172a;
-    --ink-soft: #475569;
-    --ink-faint: #64748b;
+    --ink: #122d52;
+    --ink-soft: #52647f;
+    --ink-faint: #52647f;
 
-    /* العلامة: تيل عميق + ذهب واحد */
-    --brand: #0d9488;
-    --brand-strong: #0f766e;
-    --brand-soft: #f0fdfa;
-    --brand-ring: rgb(13 148 136 / 0.28);
-    --brand-ink: #ffffff;
-    --amber: #d97706;
-    --amber-soft: #fffbeb;
-    --amber-chip: #fef3c7;
-    --amber-ink: #b45309;
+    /* العلامة: أزرق دراية الملكي + أصفر دافئ */
+    --brand: #3157b7;
+    --brand-strong: #3157b7;
+    --brand-hover: #27499d;
+    --brand-pressed: #1f3b82;
+    --brand-soft: #eef3ff;
+    --brand-ring: rgb(0 49 111 / 0.28);
+    --amber: #ffd34d;
+    --amber-soft: #fff8dc;
+    --amber-chip: #fff1b8;
+    --amber-ink: #775400;
 
-    --shadow-card: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 2px 6px -1px rgb(15 23 42 / 0.03);
-    --shadow-hover: 0 12px 32px -8px rgb(15 23 42 / 0.12), 0 4px 12px -4px rgb(15 23 42 / 0.05);
-    --shadow-float: 0 24px 48px -12px rgb(15 23 42 / 0.16);
+    --shadow-card: 0 4px 20px -2px rgb(0 49 111 / 0.07), 0 2px 6px -1px rgb(0 49 111 / 0.04);
+    --shadow-hover: 0 12px 32px -8px rgb(0 49 111 / 0.14), 0 4px 12px -4px rgb(0 49 111 / 0.06);
+    --shadow-float: 0 24px 48px -12px rgb(0 49 111 / 0.18);
 
-    /* أسماء مستعارة من النظام السابق */
+    /* أسماء مستعارة للتوافق */
     --paper: var(--canvas);
     --sheet: var(--surface);
     --sunken: var(--surface-2);
@@ -238,7 +269,7 @@
     --rule: var(--hairline);
     --rule-strong: var(--hairline-strong);
     --pine: var(--brand-strong);
-    --pine-deep: var(--brand-strong);
+    --pine-deep: var(--brand-navy);
     --pine-soft: var(--brand-soft);
     --ochre: var(--amber-ink);
     --ochre-soft: var(--amber-soft);
@@ -246,51 +277,52 @@
   }
 
   /*
-   * الوضع الليلي: أزرق-فحمي عميق (Obsidian) وسطح كحلي مرتفع، وتيل فاتح
-   * للتفاعل. الحدود شبه شفافة (7%) لأن الفصل هنا يقوم بالسطوع لا بالخطّ.
+   * وضع ليلي اختياري (بالتبديل اليدوي فقط — لا يُفعَّل تلقائيًا).
    */
   .dark {
     color-scheme: dark;
-    --background: #0b0f17;
-    --foreground: #f8fafc;
-    --card: #131b2e;
-    --card-foreground: #f8fafc;
-    --popover: #16203a;
-    --popover-foreground: #f8fafc;
-    --primary: #2dd4bf;
-    --primary-foreground: #04211d;
-    --secondary: #1a2438;
-    --secondary-foreground: #f8fafc;
-    --muted: #1a2438;
-    --muted-foreground: #94a3b8;
-    --accent: #fbbf24;
-    --accent-foreground: #1c1508;
-    --destructive: #fb7185;
-    --destructive-foreground: #150608;
-    --border: rgb(255 255 255 / 0.08);
-    --input: rgb(255 255 255 / 0.12);
-    --ring: #2dd4bf;
+    --background: #081226;
+    --foreground: #f2f6ff;
+    --card: #101e3b;
+    --card-foreground: #f2f6ff;
+    --popover: #15264a;
+    --popover-foreground: #f2f6ff;
+    --primary: #5c84e8;
+    --primary-foreground: #ffffff;
+    --secondary: #162647;
+    --secondary-foreground: #f2f6ff;
+    --muted: #162647;
+    --muted-foreground: #a5b8d4;
+    --accent: #ffd34d;
+    --accent-foreground: #122d52;
+    --destructive: #f46677;
+    --destructive-foreground: #ffffff;
+    --border: rgb(255 255 255 / 0.1);
+    --input: rgb(255 255 255 / 0.16);
+    --ring: #39d5dc;
 
-    --canvas: #0b0f17;
-    --surface: #131b2e;
-    --surface-2: #1a2438;
-    --surface-3: #223049;
-    --hairline: rgb(255 255 255 / 0.07);
-    --hairline-strong: rgb(255 255 255 / 0.14);
+    --canvas: #081226;
+    --surface: #101e3b;
+    --surface-2: #162647;
+    --surface-3: #1f335c;
+    --hairline: rgb(255 255 255 / 0.09);
+    --hairline-strong: rgb(255 255 255 / 0.18);
 
-    --ink: #f8fafc;
-    --ink-soft: #94a3b8;
-    --ink-faint: #8494ad;
+    --ink: #f2f6ff;
+    --ink-soft: #a5b8d4;
+    --ink-faint: #8ea5c7;
 
-    --brand: #2dd4bf;
-    --brand-strong: #5eead4;
-    --brand-soft: rgb(45 212 191 / 0.1);
-    --brand-ring: rgb(45 212 191 / 0.35);
-    --brand-ink: #04211d;
-    --amber: #fbbf24;
-    --amber-soft: rgb(251 191 36 / 0.1);
-    --amber-chip: rgb(251 191 36 / 0.14);
-    --amber-ink: #fbbf24;
+    --brand: #5c84e8;
+    --brand-strong: #5c84e8;
+    --brand-hover: #4972d9;
+    --brand-pressed: #3157b7;
+    --brand-soft: rgb(57 213 220 / 0.12);
+    --brand-ring: rgb(57 213 220 / 0.35);
+    --brand-ink: #ffffff;
+    --amber: #ffd34d;
+    --amber-soft: rgb(255 211 77 / 0.12);
+    --amber-chip: rgb(255 211 77 / 0.18);
+    --amber-ink: #ffd34d;
 
     --shadow-card: 0 4px 24px -6px rgb(0 0 0 / 0.55);
     --shadow-hover: 0 16px 40px -12px rgb(0 0 0 / 0.7);
@@ -301,40 +333,29 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  /* منع أي عنصر عريض من دفع الصفحة أفقيًا على الهاتف */
   overflow-x: hidden;
 }
 
 body {
-  /*
-   * واجهة الاستخدام بخطّ هندسي عربي حديث (IBM Plex Sans Arabic)، والنصوص
-   * الشرعية تبقى في خطّ النَّسخ (`.font-quran`). الفصل صار وظيفيًا: السانس
-   * للبنية والأزرار والأرقام، والنَّسخ للشاهد القرآني/الحديثي.
-   */
-  font-family: var(--font-ui), var(--font-body), "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-ui), "Readex Pro", Tahoma, Arial, sans-serif;
+  font-weight: 500;
   background-color: var(--background);
   color: var(--foreground);
-  /* المتن الموحّد: كل نص بلا صنف حجم يأخذ هذا */
   font-size: var(--text-body);
-  line-height: 1.8;
-  /* يمنع «الفقاعة» عند الضغط المطوّل على iOS */
+  line-height: 1.9;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
 }
 
-/*
- * نص عربي: لا نستخدم letter-spacing سلبيًا ولا font-weight أخف من 400،
- * فالناسخ يفقد وضوحه. وكل العناوين تقف عند 700 لأن العائلة لا تحمل 800/900
- * (كان `font-black` يُصنَّع صناعيًا فيبدو سميكًا ومشوّهًا).
- */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: 700;
-  line-height: 1.4;
+  font-family: var(--font-heading), "Tajawal", Tahoma, sans-serif;
+  font-weight: 800;
+  line-height: 1.35;
   text-wrap: balance;
 }
 
@@ -347,9 +368,19 @@ strong {
   font-weight: 700;
 }
 
+a {
+  text-underline-offset: 0.22em;
+}
+
 .font-quran {
-  font-family: var(--font-amiri), "Traditional Arabic", serif;
-  line-height: 2.6;
+  font-family: var(--font-quran), var(--font-amiri), "Traditional Arabic", serif;
+  line-height: 2.5;
+}
+
+.diraya-lesson {
+  font-size: var(--text-lesson);
+  line-height: 1.95;
+  max-width: var(--layout-reading);
 }
 
 /* بطاقة ثلاثية الأبعاد */
@@ -379,10 +410,6 @@ strong {
   display: none;
 }
 
-/*
- * انزلاق أفقي مع إشارة بصرية: تلاشٍ على الحافة التي يوجد خلفها محتوى.
- * كان الشريط يُقطع بلا أي دليل على وجود بقية، فيظنّ المستخدم أنها النهاية.
- */
 .scroll-hint {
   position: relative;
   scroll-snap-type: x proximity;
@@ -391,25 +418,22 @@ strong {
   scroll-snap-align: start;
 }
 
-/* مؤشر تركيز واضح لمستخدمي لوحة المفاتيح */
+/* مؤشر تركيز دراية v4.1: 3px بلون نيلي #00316F */
 :focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
 }
 
-/* مناطق الضغط: لا زر أصغر من 44×44 على شاشات اللمس */
+/* أهداف لمس دراية v4.1: 48px كحد أدنى على شاشات اللمس */
 @media (pointer: coarse) {
   button,
   a[role="button"],
   [role="tab"] {
-    min-height: 44px;
+    min-height: 48px;
   }
 }
 
-/*
- * مساحة للشريط السفلي على الهاتف: بدونه يغطّي آخرَ عنصر في الصفحة
- * (زر «الوحدة التالية» أو الفوتر) فلا يمكن الوصول إليه.
- */
+/* مساحة للشريط السفلي على الهاتف */
 @media (max-width: 767px) {
   body {
     padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
@@ -425,11 +449,11 @@ strong {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+  background: #71849f;
   border-radius: 9999px;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #3a4f6f;
 }
 
 /* احترام تفضيل تقليل الحركة */
@@ -446,7 +470,6 @@ strong {
   }
 }
 
-/* تباين أعلى لأزرار وخلفيات تُستخدم كثيرًا */
 @media (prefers-contrast: more) {
   .dark {
     --muted-foreground: #e2e8f0;
@@ -455,39 +478,27 @@ strong {
 
 /*
  * ============================================================
- *  أدوات الواجهة — طبقة واحدة تُبنى منها كل الشاشات
+ *  طبقة المكوّنات (u-*) — متوافقة مع رموز دراية v4.1
  * ============================================================
- *
- * أربعة أنماط فقط: سطح (u-card)، شريحة (u-chip)، زر حبّوبي (u-cta/u-ghost)،
- * وفهرس مقسّم (u-tabs). كل ما عداها نصوص ومسافات. هذا يمنع تكرار الأصناف
- * الطويلة في كل مكوّن ويمنع أن يبدو كل قسم مصمَّمًا على حِدة.
  */
 
-/* ============================================================
- *  طبقة المكوّنات (u-*) — مصدر واحد للشكل
- * ============================================================
- * 1. لا حدّ 1px حول البطاقات: الفصل بالسطوع + ظلّ محيطي ناعم.
- * 2. حاويات 16px، أزرار وحقول 12px، رقائق حبّوبية.
- * 3. لون علامة واحد (تيل) ولون تنبيه واحد (ذهب).
- */
-
-/* سطح: بطاقة بيضاء بظلّ محيطي — بلا إطار */
 .u-card {
   background-color: var(--surface);
-  border: 1px solid transparent;
-  border-radius: 1rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
 
 .dark .u-card {
-  border-color: rgb(255 255 255 / 0.06);
+  border-color: rgb(255 255 255 / 0.08);
 }
 
 .u-card-hover {
   transition:
-    box-shadow 0.2s ease,
-    transform 0.2s ease,
-    background-color 0.2s ease;
+    box-shadow 0.2s ease-out,
+    transform 0.2s ease-out,
+    border-color 0.2s ease-out,
+    background-color 0.2s ease-out;
 }
 
 .u-card-hover:hover {
@@ -495,35 +506,36 @@ strong {
   transform: translateY(-2px);
 }
 
-/* سطح ثانٍ: حاوية داخلية بلون خفيف بدل صندوق بإطار */
 .u-soft {
   background-color: var(--surface-2);
-  border-radius: 1rem;
+  border-radius: var(--radius-card);
 }
 
-/* شريط قسم: تيل فاتح، بلا إطار */
 .u-band {
   background-color: var(--brand-soft);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-panel);
 }
 
 .u-band-warm {
   background-color: var(--amber-soft);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-panel);
 }
 
-/* رقاقة صغيرة: حالة أو تصنيف */
 .u-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   border-radius: 999px;
   background-color: var(--brand-soft);
-  color: var(--brand-strong);
-  padding: 0.2rem 0.6rem;
+  color: var(--brand-navy);
+  padding: 0.2rem 0.7rem;
   font-size: var(--text-meta);
   font-weight: 600;
   line-height: 1.6;
+}
+
+.dark .u-chip {
+  color: var(--brand-cyan);
 }
 
 .u-chip-warm {
@@ -536,9 +548,9 @@ strong {
   color: var(--amber);
 }
 
-/* عنوان كبير */
 .u-display {
-  font-weight: 700;
+  font-family: var(--font-heading), "Tajawal", Tahoma, sans-serif;
+  font-weight: 800;
   line-height: 1.3;
   color: var(--ink);
   text-wrap: balance;
@@ -551,90 +563,95 @@ strong {
   color: var(--ink-faint);
 }
 
-/* تمييز كلمة داخل العنوان: ماركر ذهبي شفاف لا لون صارخ */
+/* تمييز كلمة داخل العنوان بأصفر دراية #FFD34D */
 .u-mark {
-  background-image: linear-gradient(transparent 62%, rgb(217 119 6 / 0.22) 62%);
+  background-image: linear-gradient(transparent 62%, rgb(255 211 77 / 0.45) 62%);
   background-repeat: no-repeat;
-  padding-inline: 0.1rem;
+  padding-inline: 0.15rem;
 }
 
-/* زرّ أساسي: ممتلئ، 12px، ظلّ ناعم */
+/* زرّ دراية الأساسي: ارتفاع 52px، استدارة 8px، أزرق ملكي #3157B7 */
 .u-cta {
   display: inline-flex;
-  min-height: 44px;
+  min-height: var(--button-height);
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   background-color: var(--brand-strong);
   color: var(--brand-ink);
-  padding: 0.65rem 1.15rem;
-  font-size: var(--text-label);
+  padding: 0.75rem 1.5rem;
+  font-size: var(--text-body);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
   transition:
-    background-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    background-color 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    transform 0.15s ease-out;
 }
 
 .u-cta:hover {
-  background-color: var(--primary);
+  background-color: var(--brand-hover);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
+}
+
+.u-cta:active {
+  background-color: var(--brand-pressed);
+  transform: translateY(0);
 }
 
 .dark .u-cta {
   color: var(--brand-ink);
 }
 
-/* زرّ ثانوي: سطح خفيف بلا حدّ */
+/* زرّ ثانوي */
 .u-ghost {
   display: inline-flex;
-  min-height: 44px;
+  min-height: var(--target-min);
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   background-color: var(--surface-2);
-  padding: 0.65rem 1rem;
+  padding: 0.65rem 1.15rem;
   font-size: var(--text-label);
   font-weight: 600;
   color: var(--ink);
   transition:
-    background-color 0.18s ease,
-    color 0.18s ease;
+    background-color 0.15s ease-out,
+    color 0.15s ease-out;
 }
 
 .u-ghost:hover {
   background-color: var(--surface-3);
 }
 
-/* فهرس مقسّم: حاوية غائرة وقرص أبيض للاختيار */
+/* فهرس مقسّم */
 .u-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.125rem;
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   background-color: var(--surface-2);
   padding: 0.25rem;
 }
 
 .u-tab {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  border-radius: 0.625rem;
-  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-control);
+  padding: 0.45rem 0.85rem;
   font-size: var(--text-label);
   font-weight: 600;
   color: var(--ink-soft);
   transition:
-    background-color 0.18s ease,
-    color 0.18s ease,
-    box-shadow 0.18s ease;
+    background-color 0.15s ease-out,
+    color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
 }
 
 .u-tab:hover {
@@ -649,14 +666,13 @@ strong {
 
 .dark .u-tab[aria-selected="true"] {
   background-color: var(--surface-3);
-  color: var(--brand);
+  color: var(--brand-cyan);
 }
 
-/* عدد داخل تبويب */
 .u-tab-count {
   border-radius: 999px;
   background-color: var(--surface-3);
-  padding: 0 0.4rem;
+  padding: 0 0.45rem;
   font-size: var(--text-meta);
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
@@ -666,33 +682,29 @@ strong {
   background-color: rgb(255 255 255 / 0.1);
 }
 
-/* اقتباس شرعي (شاهد): سطح خفيف بلا صندوق ثقيل */
 .u-quote {
-  border-radius: 1rem;
+  border-radius: var(--radius-card);
   background-color: var(--surface-2);
-  padding: 1rem 1.1rem;
+  padding: 1rem 1.15rem;
 }
 
 .dark .u-quote {
   background-color: rgb(255 255 255 / 0.04);
 }
 
-/* رقم/عدّاد */
 .u-num {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
 
-/* عرض القراءة */
 .u-measure {
-  max-width: 64ch;
+  max-width: var(--layout-reading);
 }
 
-/* شبكة المحتوى */
 .u-wrap {
   margin-inline: auto;
   width: 100%;
-  max-width: 1180px;
+  max-width: var(--layout-max);
   padding-inline: 1.25rem;
 }
 

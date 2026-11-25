@@ -29,8 +29,8 @@ export interface ProgressData {
   lastActivity: { unitId: number; tab: string; at: number } | null;
 }
 
-const STORAGE_KEY = "zady_student_progress_v3";
-const LEGACY_KEYS = ["zady_student_progress_v2"];
+const STORAGE_KEY = "diraya_student_progress_v3";
+const LEGACY_KEYS = ["zady_student_progress_v3", "zady_student_progress_v2"];
 
 const EMPTY: ProgressData = {
   flashcardRatings: {},

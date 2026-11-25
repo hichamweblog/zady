@@ -76,7 +76,7 @@ test("ستة مقاسات لا أكثر (مقياس مغلق)", () => {
   const sizes = [...theme.matchAll(/--text-([a-z-]+):\s*[\d.]+rem/g)].map((m) => m[1]);
   assert.deepEqual(
     [...new Set(sizes)].sort(),
-    ["body", "body-sm", "display", "heading", "label", "meta", "title"],
+    ["body", "body-sm", "display", "heading", "label", "lesson", "meta", "title"],
     "المقياس يجب أن يبقى مغلقًا؛ أي حجم جديد يحتاج قرارًا واعيًا"
   );
 });
@@ -428,33 +428,29 @@ test("نصوص الدرس كلها بمقاس واحد، لا مقاس أصغر 
   assert.ok(!viewer.includes("sm:text-heading"), "لا يقفز مقاس الشاهد على الشاشات الكبيرة");
 });
 
-test("الوضع الليلي: أزرق فحميّ عميق وسطح كحلي مرتفع، لا أسود مسطّح", () => {
+test("الوضع الليلي الاختياري: أزرق نيلي عميق وسطح مرتفع، لا أسود مسطّح", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
 
-  assert.match(css, /--background: #0b0f17/, "الكانفس الليلي Obsidian لا أسود");
-  assert.match(css, /--surface: #131b2e/, "السطح الليلي كحلي أفتح من الكانفس");
-  assert.match(css, /--ink: #f8fafc/, "حبر ليلي فاتح عالي التباين");
-  assert.match(css, /--brand: #2dd4bf/, "التيل الفاتح للتفاعل في الليل");
+  assert.match(css, /--background: #081226/, "الكانفس الليلي نيلي عميق لا أسود");
+  assert.match(css, /--surface: #101e3b/, "السطح الليلي أفتح من الكانفس");
+  assert.match(css, /--ink: #f2f6ff/, "حبر ليلي فاتح عالي التباين");
+  assert.match(css, /--brand: #5c84e8/, "الأزرق الملكي الفاتح للتفاعل في الليل");
 
-  // حدود الليل شبه شفافة (7%) لا خطوط صلبة
-  assert.match(css, /--hairline: rgb\(255 255 255 \/ 0\.07\)/, "حدّ ليلي شفاف 7%");
+  assert.match(css, /--hairline: rgb\(255 255 255 \/ 0\.09\)/, "حدّ ليلي شفاف");
 
-  // العمق بالظلّ المحيطي، ويعود لونًا مختلفًا في الليل
   assert.match(css, /--shadow-card:/, "ظلّ البطاقة معرَّف");
   assert.match(css, /--shadow-hover:/, "وظلّ الارتفاع عند المرور");
 });
 
-test("لا إطارات حول البطاقات ولا تدرّجات: الفصل بالسطوع والظلّ", () => {
+test("بطاقات وأزرار دراية v4.1: استدارة منضبطة بلا تدرّجات", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
 
-  // البطاقة: إطار شفاف في النهار وحدّ 6% في الليل فقط
   const card = css.slice(css.indexOf(".u-card {"), css.indexOf(".u-card-hover"));
-  assert.match(card, /border: 1px solid transparent/, "البطاقة بلا إطار مرئي");
+  assert.match(card, /border-radius: var\(--radius-card\)/, "استدارة البطاقة 12px");
   assert.match(card, /box-shadow: var\(--shadow-card\)/, "وتفصلها ظلّ ناعم");
 
-  // السلّم: 8→20px للحاويات، وأزرار 12px
-  assert.match(css, /--radius-xl: 1rem/, "الحاويات 16px");
-  assert.match(css, /\.u-cta \{[^}]*border-radius: 0\.75rem/, "الأزرار 12px");
+  assert.match(css, /--radius-control: 8px/, "استدارة الأزرار 8px");
+  assert.match(css, /\.u-cta \{[^}]*border-radius: var\(--radius-control\)/, "الزر الأساسي 8px");
   assert.match(css, /\.u-chip \{[^}]*border-radius: 999px/, "الرقائق حبّوبية");
 
   const offenders = [];
@@ -465,14 +461,14 @@ test("لا إطارات حول البطاقات ولا تدرّجات: الفص�
   assert.deepEqual(offenders, [], "لا تدرّجات لونية في أي مكوّن");
 });
 
-test("لوحة Slate & Teal: لون علامة واحد ولون تنبيه واحد في النهار", () => {
+test("لوحة دراية v4.1: أزرق ملكي #3157B7 وأصفر #FFD34D وحبر نيلي #122D52", () => {
   const css = fs.readFileSync(path.join(SRC, "app", "globals.css"), "utf8");
-  assert.match(css, /--canvas: #f8fafc/, "كانفس Slate 50");
+  assert.match(css, /--canvas: #ffffff/, "كانفس أبيض");
   assert.match(css, /--surface: #ffffff/, "سطح أبيض");
-  assert.match(css, /--brand: #0d9488/, "تيل 600 هو العلامة");
-  assert.match(css, /--amber: #d97706/, "ذهب واحد للتنبيه");
-  assert.match(css, /--ink: #0f172a/, "حبر Slate 900");
-  assert.match(css, /--ink-soft: #475569/, "حبر ثانوي Slate 600");
+  assert.match(css, /--brand: #3157b7/, "أزرق دراية الملكي v4.1 هو العلامة");
+  assert.match(css, /--amber: #ffd34d/, "أصفر دراية للتنبيه");
+  assert.match(css, /--ink: #122d52/, "حبر دراية النيلي");
+  assert.match(css, /--ink-soft: #52647f/, "حبر ثانوي باهت");
 
   // لا لون زخرفي ثالث في طبقة المكوّنات
   const layer = css.slice(css.indexOf(".u-card {"));

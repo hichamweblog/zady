@@ -17,12 +17,12 @@ export function buildServiceWorker(buildId: string): string {
   const version = buildId.replace(/[^a-zA-Z0-9._-]/g, "").slice(0, 40) || "dev";
 
   return `/*
- * زادِي — Service Worker
+ * دراية — Service Worker
  * مولَّد آليًا من src/lib/service-worker.ts — لا تُحرّره مباشرة.
  * بصمة البناء: ${version}
  */
 const VERSION = ${JSON.stringify(version)};
-const CACHE_NAME = \`zady-\${VERSION}\`;
+const CACHE_NAME = \`diraya-\${VERSION}\`;
 
 /** الصفحات الأساسية: تُخزَّن لتعمل دون اتصال من أول زيارة */
 const PRECACHE_PAGES = ["/", "/units/1", "/units/2", "/units/3", "/units/4"];
@@ -119,7 +119,7 @@ self.addEventListener("fetch", (event) => {
         const fallback = await caches.match("/");
         if (fallback) return fallback;
         return new Response(
-          "<!doctype html><html lang='ar' dir='rtl'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>غير متصل — زادِي</title><body style='font-family:system-ui,sans-serif;padding:2.5rem 1.5rem;text-align:center;line-height:1.9;background:#f8fafc;color:#0f172a'><h1 style='font-size:1.4rem'>لا يوجد اتصال بالإنترنت</h1><p>افتح هذه الوحدة مرة واحدة وأنت متصل لتُحفظ وتعمل دون إنترنت.</p><p><a href='/' style='display:inline-block;margin-top:1rem;padding:.6rem 1.2rem;border-radius:.75rem;background:#0f766e;color:#fff;text-decoration:none;font-weight:700'>العودة إلى الرئيسية</a></p></body></html>",
+          "<!doctype html><html lang='ar' dir='rtl'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>غير متصل — دراية</title><body style='font-family:system-ui,sans-serif;padding:2.5rem 1.5rem;text-align:center;line-height:1.9;background:#EEF3FF;color:#122D52'><h1 style='font-size:1.4rem'>لا يوجد اتصال بالإنترنت</h1><p>افتح هذه الوحدة مرة واحدة وأنت متصل لتُحفظ وتعمل دون إنترنت.</p><p><a href='/' style='display:inline-block;margin-top:1rem;padding:.75rem 1.5rem;border-radius:.5rem;background:#3157B7;color:#fff;text-decoration:none;font-weight:700'>العودة إلى الرئيسية</a></p></body></html>",
           { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } }
         );
       }

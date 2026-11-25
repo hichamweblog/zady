@@ -77,7 +77,7 @@ export default async function UnitPage({ params }: { params: Promise<{ unitId: s
     description: unit.learningObjective,
     teaches: unit.sections.map((section) => section.title),
     isAccessibleForFree: true,
-    provider: { "@type": "Organization", name: "زادِي", url: "https://zady.app" },
+    provider: { "@type": "Organization", name: "دراية", url: "https://diraya.app" },
   };
 
   return (

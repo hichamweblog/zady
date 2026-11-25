@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { UNITS_META } from "@/lib/units-meta";
 
-const SITE_URL = "https://zady.app";
+const SITE_URL = "https://diraya.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

@@ -64,22 +64,22 @@ export default function PwaRegister() {
           className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-500 text-slate-950 font-bold text-label shadow-xl border border-amber-600"
         >
           <WifiOff className="w-4 h-4" aria-hidden="true" />
-          <span>وضع عدم الاتصال — زادِي يعمل من التخزين المحلي ⚡</span>
+          <span>وضع عدم الاتصال — دراية يعمل من التخزين المحلي ⚡</span>
         </div>
       )}
 
       {installEvent && !installDismissed && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-xl max-w-[92vw]">
           <Download
-            className="w-5 h-5 text-teal-700 dark:text-teal-400 shrink-0"
+            className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0"
             aria-hidden="true"
           />
           <p className="text-body-sm font-bold text-slate-800 dark:text-slate-200">
-            ثبّت «زادِي» على جهازك للوصول السريع دون إنترنت
+            ثبّت «دراية» على جهازك للوصول السريع دون إنترنت
           </p>
           <button
             onClick={handleInstall}
-            className="px-3 py-1.5 rounded-xl bg-teal-700 text-white text-label font-bold shrink-0"
+            className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-label font-bold shrink-0"
           >
             تثبيت
           </button>
